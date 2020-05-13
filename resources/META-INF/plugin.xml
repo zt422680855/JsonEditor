@@ -1,0 +1,45 @@
+<idea-plugin>
+  <id>com.zt.little-boy</id>
+  <name>Little Boy</name>
+  <version>1.0</version>
+  <vendor email="hj_zhengt@163.com" url="http://www.baidu.com">Whatever</vendor>
+
+  <description><![CDATA[
+      I do not know.<br>
+      <em>code something</em>
+    ]]></description>
+
+  <change-notes><![CDATA[
+      插件版本更新内容说明.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+    <!--<applicationService serviceInterface="MyPlugin" serviceImplementation="impl.MyPluginImpl"/>-->
+
+    <toolWindow id="JSON Editor" anchor="right" factoryClass="JsonEditor" />
+  </extensions>
+
+  <actions>
+    <!-- Add your actions here -->
+    <group id="PluginTest" text="小朋友你是不是有很多问号" description="小朋友你是不是有很多问号">
+      <add-to-group group-id="MainMenu" anchor="last"/>
+      <action id="MyPluginAction" class="MyPluginAction" text="不要点">
+        <!--<add-to-group group-id="PluginTest" anchor="first"/>-->
+        <keyboard-shortcut first-keystroke="control alt 1" second-keystroke="control 1" keymap="$default"/>
+      </action>
+    </group>
+  </actions>
+
+</idea-plugin>
