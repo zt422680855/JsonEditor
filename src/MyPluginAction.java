@@ -4,7 +4,7 @@ import components.MyPluginDialog;
 
 /**
  * @Description:
- * @Author: 19043204
+ * @Author: zhengtao
  * @CreateDate: 2020/4/27 19:40
  */
 public class MyPluginAction extends AnAction {

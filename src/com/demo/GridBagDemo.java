@@ -7,7 +7,7 @@ import java.awt.*;
 
 /**
  * @Description:
- * @Author: 19043204
+ * @Author: zhengtao
  * @CreateDate: 2020/5/11 11:17
  */
 public class GridBagDemo {

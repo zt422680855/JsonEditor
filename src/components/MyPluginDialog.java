@@ -8,7 +8,7 @@ import javax.swing.*;
 
 /**
  * @Description:
- * @Author: 19043204
+ * @Author: zhengtao
  * @CreateDate: 2020/4/27 20:25
  */
 public class MyPluginDialog extends DialogWrapper {
