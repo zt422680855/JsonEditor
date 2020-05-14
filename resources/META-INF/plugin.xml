@@ -1,17 +1,17 @@
 <idea-plugin>
-  <id>com.zt.little-boy</id>
-  <name>Little Boy</name>
+  <id>com.zt.json-editor</id>
+  <name>JSON Editor</name>
   <version>1.0</version>
-  <vendor email="hj_zhengt@163.com" url="http://www.baidu.com">Whatever</vendor>
+  <vendor email="hj_zhengt@163.com" url="http://www.baidu.com">zhengtao</vendor>
 
   <description><![CDATA[
-      I do not know.<br>
-      <em>code something</em>
+      闲来无事，随便写写，<br>
+      <em>先写个JSON编辑器。</em>
     ]]></description>
 
   <change-notes><![CDATA[
-      插件版本更新内容说明.<br>
-      <em>most HTML tags may be used</em>
+      支持JSON编辑查看.<br>
+      <em></em>
     ]]>
   </change-notes>
 

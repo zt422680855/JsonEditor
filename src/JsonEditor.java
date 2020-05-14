@@ -1,19 +1,25 @@
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.util.Enumeration;
 
 /**
  * @Description:
@@ -22,11 +28,11 @@ import java.awt.*;
  */
 public class JsonEditor implements ToolWindowFactory {
 
-    private JPanel panel = new JBPanel();
+    private JBPanel panel = new JBPanel();
     private GridBagLayout layout = new GridBagLayout();
 
     // left
-    private JTextArea textArea = new JTextArea();
+    private JBTextArea textArea = new JBTextArea();
     private JButton format = new JButton("format");
     private JButton compressJson = new JButton("compress");
 
@@ -40,34 +46,19 @@ public class JsonEditor implements ToolWindowFactory {
     private JButton back = new JButton("back");
     private JButton forward = new JButton("forward");
     private Tree tree;
-    private PatchedDefaultMutableTreeNode root = new PatchedDefaultMutableTreeNode("root");
+    private PatchedDefaultMutableTreeNode root = new PatchedDefaultMutableTreeNode(new JSONObject() {{
+        put("key", "ROOT");
+    }});
 
     private JsonFormatter jsonFormatter = new JsonFormatter();
 
     public JsonEditor() {
         panel.setLayout(layout);
 //        initArrow();
-//        panel.setBackground(JBColor.GRAY);
-        initLeft();
-        initMiddle();
-        tree = new Tree(root);
-        tree.setEditable(true);
-        initRight();
-
-        this.format.addActionListener((e) -> {
-            String text = this.textArea.getText();
-            text = text.replaceAll("(\\n)", "");
-            try {
-                text = (new JSONObject(text)).toString();
-            } catch (JSONException ex) {
-            }
-            String formattedText = this.jsonFormatter.format(text);
-            this.textArea.setText(formattedText);
-        });
-        this.compressJson.addActionListener((e) -> {
-            String text = this.textArea.getText();
-            this.textArea.setText(text.replaceAll("(\\n)", ""));
-        });
+        paintLeft();
+        paintMiddle();
+        paintRight();
+        addActions();
     }
 
     private void initArrow() {
@@ -83,18 +74,17 @@ public class JsonEditor implements ToolWindowFactory {
         syncToLeft.setIcon(left);
     }
 
-    private void initLeft() {
+    private void paintLeft() {
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 150;
         c.weighty = 10;
         c.fill = GridBagConstraints.BOTH;
-        JPanel left = new JBPanel();
-//        left.setBackground(JBColor.PINK);
+        JBPanel left = new JBPanel();
         layout.setConstraints(left, c);
         panel.add(left);
         c = new GridBagConstraints();
-        c.weighty = 2;
         c.weightx = 10;
+        c.weighty = 2;
         c.ipady = -10;
         c.fill = GridBagConstraints.BOTH;
         GridBagLayout leftLayout = new GridBagLayout();
@@ -102,20 +92,20 @@ public class JsonEditor implements ToolWindowFactory {
         leftLayout.setConstraints(format, c);
         c.gridwidth = GridBagConstraints.REMAINDER;
         leftLayout.setConstraints(compressJson, c);
+        left.add(format);
+        left.add(compressJson);
         c = new GridBagConstraints();
         c.weighty = 100;
         c.gridwidth = 2;
         c.fill = GridBagConstraints.BOTH;
-        JScrollPane scrollPane = new JBScrollPane(textArea);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        JBScrollPane scrollPane = new JBScrollPane(textArea);
+        scrollPane.setVerticalScrollBarPolicy(JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         leftLayout.setConstraints(scrollPane, c);
-        left.add(format);
-        left.add(compressJson);
         left.add(scrollPane);
     }
 
-    private void initMiddle() {
-        JPanel middle = new JBPanel();
+    private void paintMiddle() {
+        JBPanel middle = new JBPanel();
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 10;
         c.fill = GridBagConstraints.BOTH;
@@ -134,22 +124,21 @@ public class JsonEditor implements ToolWindowFactory {
         middle.add(syncToLeft);
     }
 
-    private void initRight() {
+    private void paintRight() {
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 100;
         c.weighty = 10;
         c.fill = GridBagConstraints.BOTH;
-        JPanel right = new JBPanel();
-//        right.setBackground(JBColor.GREEN);
+        JBPanel right = new JBPanel();
         layout.setConstraints(right, c);
         panel.add(right);
-        GridBagLayout rightLayout = new GridBagLayout();
-        right.setLayout(rightLayout);
         c = new GridBagConstraints();
         c.weightx = 10;
         c.weighty = 2;
-        c.ipady = -10;
+        c.ipady = -1;
         c.fill = GridBagConstraints.BOTH;
+        GridBagLayout rightLayout = new GridBagLayout();
+        right.setLayout(rightLayout);
         rightLayout.setConstraints(expendJson, c);
         rightLayout.setConstraints(closeJson, c);
         rightLayout.setConstraints(back, c);
@@ -159,20 +148,140 @@ public class JsonEditor implements ToolWindowFactory {
         right.add(closeJson);
         right.add(back);
         right.add(forward);
-        JScrollPane scrollPane = new JBScrollPane();
         c = new GridBagConstraints();
         c.weighty = 100;
         c.gridwidth = 4;
         c.fill = GridBagConstraints.BOTH;
+        initTree();
+        JBScrollPane scrollPane = new JBScrollPane(tree);
+        scrollPane.setHorizontalScrollBarPolicy(JBScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         rightLayout.setConstraints(scrollPane, c);
         right.add(scrollPane);
+    }
+
+    private void initTree() {
+        tree = new Tree(root);
+        tree.setRowHeight(30);
+        tree.setCellRenderer(new TreeNodeRender());
+        tree.expandPath(new TreePath(root.getPath()));
+    }
+
+    private void initTreeNodes(PatchedDefaultMutableTreeNode node, Object value) {
+        if (value instanceof JSONObject) {
+            JSONObject jsonObject = (JSONObject) value;
+            jsonObject.forEach((k, v) -> {
+                PatchedDefaultMutableTreeNode subNode = new PatchedDefaultMutableTreeNode(new JSONObject() {{
+                    put("key", k);
+                    put("value", v);
+                }});
+                node.add(subNode);
+                initTreeNodes(subNode, v);
+            });
+        } else if (value instanceof JSONArray) {
+            JSONArray array = (JSONArray) value;
+            for (int i = 0; i < array.size(); i++) {
+                String k = i + "";
+                Object v = array.get(i);
+                PatchedDefaultMutableTreeNode subNode = new PatchedDefaultMutableTreeNode(new JSONObject() {{
+                    put("key", k);
+                    put("value", v);
+                }});
+                node.add(subNode);
+                initTreeNodes(subNode, v);
+            }
+        }
+    }
+
+    private void addActions() {
+        format.addActionListener((e) -> {
+            String text = textArea.getText();
+            text = text.replaceAll("(\\n)", "");
+            String formattedText = jsonFormatter.format(text);
+            textArea.setText(formattedText);
+        });
+        compressJson.addActionListener((e) -> {
+            String text = textArea.getText();
+            textArea.setText(text.replaceAll("(\\s*)", ""));
+        });
+        syncToRight.addActionListener((e) -> {
+            root.removeAllChildren();
+            JSONObject userObject = (JSONObject) root.getUserObject();
+            Object jsonObject = JSON.parse(textArea.getText());
+            userObject.put("value", jsonObject);
+            initTreeNodes(root, jsonObject);
+            tree.expandPath(new TreePath(root.getPath()));
+            tree.updateUI();
+        });
+        syncToLeft.addActionListener((e) -> {
+            root.removeAllChildren();
+            tree.updateUI();
+        });
+        expendJson.addActionListener((e) -> expandTree(tree, new TreePath(root)));
+        closeJson.addActionListener((e) -> collapseTree(tree, new TreePath(root)));
+    }
+
+    private void expandTree(Tree tree, TreePath parent) {
+        PatchedDefaultMutableTreeNode node = (PatchedDefaultMutableTreeNode) parent.getLastPathComponent();
+        if (node.getChildCount() >= 0) {
+            for (Enumeration<?> e = node.children(); e.hasMoreElements();) {
+                PatchedDefaultMutableTreeNode n = (PatchedDefaultMutableTreeNode) e.nextElement();
+                TreePath path = parent.pathByAddingChild(n);
+                expandTree(tree, path);
+            }
+        }
+        tree.expandPath(parent);
+    }
+
+    private void collapseTree(Tree tree, TreePath parent) {
+        PatchedDefaultMutableTreeNode node = (PatchedDefaultMutableTreeNode) parent.getLastPathComponent();
+        if (node.getChildCount() >= 0) {
+            for (Enumeration<?> e = node.children(); e.hasMoreElements();) {
+                PatchedDefaultMutableTreeNode n = (PatchedDefaultMutableTreeNode) e.nextElement();
+                TreePath path = parent.pathByAddingChild(n);
+                collapseTree(tree, path);
+            }
+        }
+        tree.collapsePath(parent);
     }
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(this.panel, "", false);
+        Content content = contentFactory.createContent(panel, "", false);
         toolWindow.getContentManager().addContent(content);
+    }
+
+    static class TreeNodeRender extends JBPanel implements TreeCellRenderer {
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            PatchedDefaultMutableTreeNode node = (PatchedDefaultMutableTreeNode) value;
+            Object obj = node.getUserObject();
+            JSONObject userObject = (JSONObject) obj;
+            String key = userObject.getString("key");
+            Object data = userObject.get("value");
+            String text;
+            if (data instanceof JSONObject) {
+                JSONObject object = (JSONObject) data;
+                text = key + "{" + object.size() + "}";
+            } else if (data instanceof JSONArray) {
+                JSONArray array = (JSONArray) data;
+                text = key + "[" + array.size() + "]";
+            } else {
+                text = key + ":" + (data != null ? data.toString() : "");
+            }
+            removeAll();
+            GridBagLayout rendererLayout = new GridBagLayout();
+            setLayout(rendererLayout);
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 10;
+            JBLabel label = new JBLabel(text);
+            rendererLayout.setConstraints(label, c);
+            add(label);
+            return this;
+        }
     }
 
     public static void main(String[] args) {
@@ -186,7 +295,7 @@ public class JsonEditor implements ToolWindowFactory {
         jFrame.setVisible(true);
     }
 
-    public JPanel getPanel() {
+    public JBPanel getPanel() {
         return panel;
     }
 
