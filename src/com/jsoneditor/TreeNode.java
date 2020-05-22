@@ -10,10 +10,11 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * @Description:
- * @Author: 19043204
+ * @Author: zhengt
  * @CreateDate: 2020/5/22 22:39
  */
 public class TreeNode extends PatchedDefaultMutableTreeNode implements Transferable, Serializable, Cloneable {
@@ -143,19 +144,14 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Transfera
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        DataFlavor[] flavs = getTransferDataFlavors();
-        for (int i = 0; i < flavs.length; i++) {
-            if (flavs[i].equals(flavor)) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(getTransferDataFlavors())
+                .anyMatch(item -> item.equals(flavor));
     }
 
     @NotNull
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (this.canImport(flavor)) {
+        if (canImport(flavor)) {
             return this;
         } else {
             throw new UnsupportedFlavorException(flavor);

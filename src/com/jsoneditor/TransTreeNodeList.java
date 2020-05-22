@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @Description:
- * @Author: 19043204
+ * @Author: zhengt
  * @CreateDate: 2020/5/22 22:28
  */
 public class TransTreeNodeList implements Transferable, Serializable {

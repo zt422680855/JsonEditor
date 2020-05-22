@@ -12,8 +12,8 @@ import java.util.Map;
 
 /**
  * @Description:
- * @Author: 19043204
- * @CreateDate: 2020/5/20 10:00
+ * @Author: zhengt
+ * @CreateDate: 2020/5/20 22:00
  */
 public class MyDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;

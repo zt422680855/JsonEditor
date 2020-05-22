@@ -7,11 +7,10 @@ import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.util.ArrayList;
 
 /**
  * @Description: https://blog.csdn.net/expleeve/article/details/7764049
- * @Author: 19043204
+ * @Author: zhengt
  * @CreateDate: 2020/5/22 21:56
  */
 public class JsonTreeTransferHandler extends TransferHandler {
