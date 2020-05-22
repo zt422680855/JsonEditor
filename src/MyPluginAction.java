@@ -12,7 +12,6 @@ public class MyPluginAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         MyPluginDialog formTestDialog = new MyPluginDialog(e.getProject());
-        //是否允许用户通过拖拽的方式扩大或缩小
         formTestDialog.setResizable(true);
         formTestDialog.show();
     }

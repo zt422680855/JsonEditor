@@ -6,7 +6,7 @@
 
   <description><![CDATA[
       闲来无事，随便写写，<br>
-      <em>先写个JSON编辑器。</em>
+      <em>JSON编辑器。</em>
     ]]></description>
 
   <change-notes><![CDATA[
@@ -28,7 +28,7 @@
     <!-- Add your extensions here -->
     <!--<applicationService serviceInterface="MyPlugin" serviceImplementation="impl.MyPluginImpl"/>-->
 
-    <toolWindow id="JSON Editor" anchor="right" factoryClass="JsonEditor" />
+    <toolWindow id="JSON Editor" anchor="right" factoryClass="com.jsoneditor.JsonEditor" />
   </extensions>
 
   <actions>

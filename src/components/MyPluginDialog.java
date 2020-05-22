@@ -15,7 +15,7 @@ public class MyPluginDialog extends DialogWrapper {
 
     private String projectName;
 
-    private FormTestSwing formTestSwing = new FormTestSwing();
+    private MyPanel myPanel = new MyPanel();
 
     public MyPluginDialog(@Nullable Project project) {
         super(project);
@@ -24,20 +24,19 @@ public class MyPluginDialog extends DialogWrapper {
         init();
     }
 
-    // 不需要展示时要重写返回null，否则IDEA将展示默认的"Cancel"和"OK"按钮
     @Override
     protected JComponent createNorthPanel() {
-        return formTestSwing.initNorth();
+        return myPanel.initNorth();
     }
 
     @Override
     protected JComponent createSouthPanel() {
-        return formTestSwing.initSouth();
+        return myPanel.initSouth();
     }
 
     @Override
     protected JComponent createCenterPanel() {
-        return formTestSwing.initCenter();
+        return myPanel.initCenter();
     }
 
 }
