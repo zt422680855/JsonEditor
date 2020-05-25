@@ -3,21 +3,16 @@ package com.jsoneditor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * @Description:
  * @Author: zhengt
  * @CreateDate: 2020/5/22 22:39
  */
-public class TreeNode extends PatchedDefaultMutableTreeNode implements Transferable, Serializable, Cloneable {
+public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializable, Cloneable {
 
     static final Integer OBJECT = 1;
     static final Integer ARRAY = 2;
@@ -114,14 +109,6 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Transfera
         }
     }
 
-    public boolean canAdd(TreeNode node) {
-        return node != null && !this.equals(node);
-    }
-
-    public boolean canImport(DataFlavor flavor) {
-        return this.isDataFlavorSupported(flavor);
-    }
-
     @Override
     public TreeNode clone() {
         TreeNode node = new TreeNode();
@@ -137,24 +124,4 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Transfera
         return node;
     }
 
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-        return flavors;
-    }
-
-    @Override
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return Arrays.stream(getTransferDataFlavors())
-                .anyMatch(item -> item.equals(flavor));
-    }
-
-    @NotNull
-    @Override
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (canImport(flavor)) {
-            return this;
-        } else {
-            throw new UnsupportedFlavorException(flavor);
-        }
-    }
 }

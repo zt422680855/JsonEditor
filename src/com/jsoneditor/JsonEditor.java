@@ -1,6 +1,8 @@
 package com.jsoneditor;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
@@ -23,6 +25,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -50,7 +53,9 @@ public class JsonEditor implements ToolWindowFactory {
     private JButton back = new JButton("back");
     private JButton forward = new JButton("forward");
     private Tree tree;
+    private DefaultTreeModel treeModel;
     private TreeNode root = new TreeNode("ROOT", "");
+    private TreePath movingPath;
 
     private JBPopupMenu contextMenus = new JBPopupMenu();
     private JBMenuItem addSub = new JBMenuItem("新增子节点");
@@ -79,9 +84,8 @@ public class JsonEditor implements ToolWindowFactory {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
                 new AddOrEdit(select, true, (node) -> {
-                    model.insertNodeInto(node, select, select.getChildCount());
+                    treeModel.insertNodeInto(node, select, select.getChildCount());
                     if (TreeNode.ARRAY.equals(select.type)) {
                         node.updateArrayNode();
                     } else {
@@ -96,10 +100,9 @@ public class JsonEditor implements ToolWindowFactory {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
                 TreeNode parent = (TreeNode) select.getParent();
                 new AddOrEdit(select, true, (node) -> {
-                    model.insertNodeInto(node, parent, parent.getIndex(select) + 1);
+                    treeModel.insertNodeInto(node, parent, parent.getIndex(select) + 1);
                     parent.updateNode();
                 });
             }
@@ -121,11 +124,10 @@ public class JsonEditor implements ToolWindowFactory {
         delete.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
                 TreeNode[] selectedNodes = tree.getSelectedNodes(TreeNode.class, null);
                 for (TreeNode node : selectedNodes) {
                     TreeNode parent = (TreeNode) node.getParent();
-                    model.removeNodeFromParent(node);
+                    treeModel.removeNodeFromParent(node);
                     parent.updateNode();
                     parent.updateArrayNodeChildren();
                 }
@@ -221,9 +223,10 @@ public class JsonEditor implements ToolWindowFactory {
 
     private void initTree() {
         tree = new Tree(root);
+        treeModel = (DefaultTreeModel) tree.getModel();
         tree.setRowHeight(30);
         tree.setDragEnabled(true);
-        tree.setTransferHandler(new JsonTreeTransferHandler());
+        tree.setTransferHandler(new TransferHandler("drag node."));
         tree.expandPath(new TreePath(root.getPath()));
         tree.addMouseListener(new MouseAdapter() {
 
@@ -231,6 +234,43 @@ public class JsonEditor implements ToolWindowFactory {
             public void mouseClicked(MouseEvent e) {
                 if (e.isMetaDown()) {
                     contextMenus.show(tree, e.getX(), e.getY());
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                TreePath pathWhenReleased = tree.getPathForLocation(e.getX(), e.getY());
+                if (pathWhenReleased != null && movingPath != null) {
+                    Optional.ofNullable(pathWhenReleased.getLastPathComponent()).ifPresent((curNode) -> {
+                        TreeNode target = (TreeNode) curNode;
+                        Optional.ofNullable(target.getParent()).ifPresent((parentNode) -> {
+                            TreeNode parent = (TreeNode) parentNode;
+                            TreeNode movingNode = (TreeNode) movingPath.getLastPathComponent();
+                            TreeNode movingNodeParent = (TreeNode) movingNode.getParent();
+                            int newIndex = parent.getIndex(target);
+                            if (!parent.equals(movingNode.getParent()) || newIndex > parent.getIndex(movingNode)) {
+                                newIndex += 1;
+                            }
+                            treeModel.insertNodeInto(movingNode.clone(), parent, newIndex);
+                            treeModel.removeNodeFromParent(movingNode);
+                            movingPath = null;
+                            parent.updateNode();
+                            movingNodeParent.updateNode();
+                        });
+                    });
+                }
+            }
+
+        });
+        tree.addMouseMotionListener(new MouseAdapter() {
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (movingPath == null) {
+                    TreePath pathWhenPressed = tree.getPathForLocation(e.getX(), e.getY());
+                    if (pathWhenPressed != null) {
+                        movingPath = pathWhenPressed;
+                    }
                 }
             }
         });
@@ -253,11 +293,32 @@ public class JsonEditor implements ToolWindowFactory {
             tree.updateUI();
         });
         syncToLeft.addActionListener((e) -> {
-            root.removeAllChildren();
-            tree.updateUI();
+            treeDataToJson(root);
+            System.out.println(root.value);
+            textArea.setText(JSON.toJSONString(root.value, true));
         });
         expendJson.addActionListener((e) -> expandTree(tree, new TreePath(root)));
         closeJson.addActionListener((e) -> collapseTree(tree, new TreePath(root)));
+    }
+
+    public void treeDataToJson(TreeNode node) {
+        if (TreeNode.OBJECT.equals(node.type)) {
+            JSONObject obj = new JSONObject(true);
+            for (int i = 0; i < node.getChildCount(); i++) {
+                TreeNode currNode = (TreeNode) node.getChildAt(i);
+                obj.put(currNode.key, currNode.value);
+                treeDataToJson(currNode);
+            }
+            node.value = obj;
+        } else if (TreeNode.ARRAY.equals(node.type)) {
+            JSONArray array = new JSONArray();
+            for (int i = 0; i < node.getChildCount(); i++) {
+                TreeNode currNode = (TreeNode) node.getChildAt(i);
+                array.add(currNode.value);
+                treeDataToJson(currNode);
+            }
+            node.value = array;
+        }
     }
 
     private void expandTree(Tree tree, TreePath parent) {
@@ -413,13 +474,25 @@ public class JsonEditor implements ToolWindowFactory {
                     TreeNode returnNode;
                     if (isAdd) {
                         newNode.key = key.getText();
-                        newNode.value = value.getText();
                         newNode.type = ((SelectItem) type.getSelectedItem()).getValue();
+                        if (TreeNode.OBJECT.equals(newNode.type)) {
+                            newNode.value = new JSONObject();
+                        } else if (TreeNode.ARRAY.equals(newNode.type)) {
+                            newNode.value = new JSONArray();
+                        } else {
+                            newNode.value = value.getText();
+                        }
                         returnNode = newNode;
                     } else {
                         selectNode.key = key.getText();
-                        selectNode.value = value.getText();
                         selectNode.type = ((SelectItem) type.getSelectedItem()).getValue();
+                        if (TreeNode.OBJECT.equals(selectNode.type)) {
+                            selectNode.value = new JSONObject();
+                        } else if (TreeNode.ARRAY.equals(selectNode.type)) {
+                            selectNode.value = new JSONArray();
+                        } else {
+                            selectNode.value = value.getText();
+                        }
                         returnNode = selectNode;
                     }
                     returnNode.updateNode();
