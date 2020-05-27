@@ -19,10 +19,6 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
     static final Integer STRING = 3;
     static final Integer OTHER = 4;
 
-    static final DataFlavor NODE_FLAVOR = new DataFlavor(TreeNode.class, "Drag and drop Node");
-
-    static DataFlavor[] flavors = {NODE_FLAVOR};
-
     public String key;
 
     public Object value;
