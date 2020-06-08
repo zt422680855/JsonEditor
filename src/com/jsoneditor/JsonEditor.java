@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.JBMenuItem;
@@ -15,6 +16,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
+import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -60,10 +62,10 @@ public class JsonEditor implements ToolWindowFactory {
     private TreePath movingPath;
 
     private JBPopupMenu contextMenus = new JBPopupMenu();
-    private JBMenuItem addSub = new JBMenuItem("新增子节点");
-    private JBMenuItem addSibling = new JBMenuItem("新增兄弟节点");
-    private JBMenuItem edit = new JBMenuItem("编辑");
-    private JBMenuItem delete = new JBMenuItem("删除");
+    private JBMenuItem addSub = new JBMenuItem("add child", Icons.ADD);
+    private JBMenuItem addSibling = new JBMenuItem("add sibling", Icons.ADD);
+    private JBMenuItem edit = new JBMenuItem("edit", Icons.EDIT);
+    private JBMenuItem delete = new JBMenuItem("delete", Icons.DEL);
 
     public JsonEditor() {
         panel.setLayout(layout);
@@ -93,7 +95,7 @@ public class JsonEditor implements ToolWindowFactory {
                         JSONObject value = (JSONObject) select.value;
                         value.put(node.key, node.value);
                     } else if (TreeNode.ARRAY.equals(select.type)) {
-                        node.updateArrayNodeChildren();
+                        select.updateArrayNodeChildren();
                         JSONArray value = (JSONArray) select.value;
                         value.add(node.value);
                     } else {
@@ -116,11 +118,9 @@ public class JsonEditor implements ToolWindowFactory {
                     int index = parent.getIndex(select) + 1;
                     treeModel.insertNodeInto(node, parent, index);
                     if (TreeNode.OBJECT.equals(parent.type)) {
-                        node.updateArrayNode();
                         JSONObject value = (JSONObject) parent.value;
                         value.put(node.key, node.value);
                     } else if (TreeNode.ARRAY.equals(parent.type)) {
-                        node.updateArrayNode();
                         JSONArray value = (JSONArray) parent.value;
                         value.add(index, node.value);
                     }
@@ -135,16 +135,8 @@ public class JsonEditor implements ToolWindowFactory {
                 new AddOrEdit(select, false, (node) -> {
                     node.updateNode();
                     if (TreeNode.OBJECT.equals(node.type)) {
-                        if (!(node.value instanceof JSONObject)) {
-                            node.value = new JSONObject();
-                            clearSubNodes(node);
-                        }
                         node.updateObjectNodeChildren();
                     } else if (TreeNode.ARRAY.equals(node.type)) {
-                        if (!(node.value instanceof JSONArray)) {
-                            node.value = new JSONArray();
-                            clearSubNodes(node);
-                        }
                         node.updateArrayNodeChildren();
                     }
                 });
@@ -168,12 +160,6 @@ public class JsonEditor implements ToolWindowFactory {
                 }
             }
         });
-    }
-
-    private void clearSubNodes(TreeNode node) {
-        for (int i = 0; i < node.getChildCount(); i++) {
-            treeModel.removeNodeFromParent((TreeNode) node.getChildAt(i));
-        }
     }
 
     private void paintLeft() {
@@ -282,35 +268,37 @@ public class JsonEditor implements ToolWindowFactory {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                TreePath pathWhenReleased = tree.getPathForLocation(e.getX(), e.getY());
-                if (pathWhenReleased != null && movingPath != null) {
-                    if (movingPath.isDescendant(pathWhenReleased)) {
-                        JOptionPane.showMessageDialog(panel, "can not move to child node.",
-                                "error", JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        Optional.ofNullable(pathWhenReleased.getLastPathComponent()).ifPresent((curNode) -> {
-                            TreeNode target = (TreeNode) curNode;
-                            TreeNode movingNode = (TreeNode) movingPath.getLastPathComponent();
-                            TreeNode movingNodeParent = (TreeNode) movingNode.getParent();
-                            if (TreeNode.OBJECT.equals(target.type)) {
-                                treeModel.insertNodeInto(movingNode.clone(), target, target.getChildCount());
-                                target.updateNode();
-                            } else {
-                                Optional.ofNullable(target.getParent()).ifPresent((parentNode) -> {
-                                    TreeNode parent = (TreeNode) parentNode;
-                                    int newIndex = parent.getIndex(target);
-                                    if (!parent.equals(movingNode.getParent()) || newIndex > parent.getIndex(movingNode)) {
-                                        newIndex += 1;
-                                    }
-                                    treeModel.insertNodeInto(movingNode.clone(), parent, newIndex);
-                                    parent.updateNode();
-                                });
-                            }
-                            treeModel.removeNodeFromParent(movingNode);
-                            movingNodeParent.updateNode();
-                            movingPath = null;
-                        });
+                if (movingPath != null) {
+                    TreePath pathWhenReleased = tree.getPathForLocation(e.getX(), e.getY());
+                    if (pathWhenReleased != null) {
+                        if (movingPath.isDescendant(pathWhenReleased)) {
+                            JOptionPane.showMessageDialog(panel, "can not move to child node.",
+                                    "error", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            Optional.ofNullable(pathWhenReleased.getLastPathComponent()).ifPresent((curNode) -> {
+                                TreeNode target = (TreeNode) curNode;
+                                TreeNode movingNode = (TreeNode) movingPath.getLastPathComponent();
+                                TreeNode movingNodeParent = (TreeNode) movingNode.getParent();
+                                if (TreeNode.OBJECT.equals(target.type)) {
+                                    treeModel.insertNodeInto(movingNode.clone(), target, target.getChildCount());
+                                    target.updateNode();
+                                } else {
+                                    Optional.ofNullable(target.getParent()).ifPresent((parentNode) -> {
+                                        TreeNode parent = (TreeNode) parentNode;
+                                        int newIndex = parent.getIndex(target);
+                                        if (!parent.equals(movingNode.getParent()) || newIndex > parent.getIndex(movingNode)) {
+                                            newIndex += 1;
+                                        }
+                                        treeModel.insertNodeInto(movingNode.clone(), parent, newIndex);
+                                        parent.updateNode();
+                                    });
+                                }
+                                treeModel.removeNodeFromParent(movingNode);
+                                movingNodeParent.updateNode();
+                            });
+                        }
                     }
+                    movingPath = null;
                 }
             }
         });
@@ -331,15 +319,15 @@ public class JsonEditor implements ToolWindowFactory {
     private void addActions() {
         format.addActionListener((e) -> {
             Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json, true));
+            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
         compressJson.addActionListener((e) -> {
             Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json));
+            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
         reset.addActionListener((e) -> {
             Object json = JSON.parse(temp, Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json));
+            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
             format.doClick();
             syncToRight.doClick();
         });
@@ -351,8 +339,8 @@ public class JsonEditor implements ToolWindowFactory {
             tree.updateUI();
         });
         syncToLeft.addActionListener((e) -> {
-            treeDataToJson(root);
-            textArea.setText(JSON.toJSONString(root.value, true));
+            refreshTreeData(root);
+            textArea.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
         expendJson.addActionListener((e) -> expandTree(tree, new TreePath(root)));
         closeJson.addActionListener((e) -> collapseTree(tree, new TreePath(root)));
@@ -366,14 +354,14 @@ public class JsonEditor implements ToolWindowFactory {
         });
     }
 
-    public void treeDataToJson(TreeNode node) {
+    public void refreshTreeData(TreeNode node) {
         if (TreeNode.OBJECT.equals(node.type)) {
             JSONObject obj = (JSONObject) node.value;
             obj.clear();
             for (int i = 0; i < node.getChildCount(); i++) {
                 TreeNode currNode = (TreeNode) node.getChildAt(i);
                 obj.put(currNode.key, currNode.value);
-                treeDataToJson(currNode);
+                refreshTreeData(currNode);
             }
         } else if (TreeNode.ARRAY.equals(node.type)) {
             JSONArray array = (JSONArray) node.value;
@@ -381,7 +369,7 @@ public class JsonEditor implements ToolWindowFactory {
             for (int i = 0; i < node.getChildCount(); i++) {
                 TreeNode currNode = (TreeNode) node.getChildAt(i);
                 array.add(currNode.value);
-                treeDataToJson(currNode);
+                refreshTreeData(currNode);
             }
         }
     }
@@ -436,9 +424,9 @@ public class JsonEditor implements ToolWindowFactory {
 
         private JBLabel valueLabel = new JBLabel("value");
 
-        private JButton ok = new JButton("确定");
+        private JButton ok = new JButton("ok");
 
-        private JButton cancel = new JButton("取消");
+        private JButton cancel = new JButton("cancel");
 
         private TreeNode selectNode;
 
@@ -454,16 +442,26 @@ public class JsonEditor implements ToolWindowFactory {
             this.isAdd = isAdd;
             this.selectNode = node;
             this.callback = callback;
-            if (!isAdd) {
+            if (isAdd) {
+                if (TreeNode.ARRAY.equals(selectNode.type)) {
+                    key.setVisible(false);
+                    keyLabel.setVisible(false);
+                }
+            } else {
                 title = "Edit";
                 type.setSelectedItem(SelectItem.getItemByValue(node.type));
                 if (TreeNode.OBJECT.equals(node.type) || TreeNode.ARRAY.equals(node.type)) {
                     value.setVisible(false);
                     valueLabel.setVisible(false);
                 }
+                TreeNode parent = (TreeNode) selectNode.getParent();
+                if (parent != null && TreeNode.ARRAY.equals(parent.type)) {
+                    key.setVisible(false);
+                    keyLabel.setVisible(false);
+                }
             }
             key.setText(isAdd ? "key" : node.key);
-            value.setText(isAdd ? "value" : node.value.toString());
+            value.setText(isAdd ? "value" : (node.value == null ? "null" : node.value.toString()));
             openDialog();
         }
 
@@ -583,8 +581,25 @@ public class JsonEditor implements ToolWindowFactory {
                             }
                             selectNode.value = array;
                             selectNode.updateArrayNodeChildren();
-                        } else {
+                        } else if (TreeNode.STRING.equals(selectNode.type)) {
                             selectNode.value = value.getText();
+                        } else {
+                            String valueStr = value.getText();
+                            try {
+                                if ("".equals(valueStr)) {
+                                    selectNode.value = null;
+                                } else if ("true".equalsIgnoreCase(valueStr) || "false".equalsIgnoreCase(valueStr)) {
+                                    selectNode.value = Boolean.parseBoolean(valueStr);
+                                } else if (Utils.isInteger(valueStr)) {
+                                    selectNode.value = Long.parseLong(valueStr);
+                                } else if (Utils.isFloat(valueStr)) {
+                                    selectNode.value = Double.parseDouble(valueStr);
+                                } else {
+                                    selectNode.value = value.getText();
+                                }
+                            } catch (Exception e1) {
+                                selectNode.value = valueStr;
+                            }
                         }
                         returnNode = selectNode;
                     }
@@ -644,29 +659,29 @@ public class JsonEditor implements ToolWindowFactory {
     }
 
     private static String temp = "{\n" +
-            "    \"name\": \"zhengt\",\n" +
-            "    \"age\": 18,\n" +
-            "    \"isHandsome\": true,\n" +
-            "    \"email\": \"hj_zhengt@163.com\",\n" +
-            "    \"address\": {\n" +
-            "        \"country\": \"中国\",\n" +
-            "        \"province\": \"江苏\",\n" +
-            "        \"city\": \"南京\"\n" +
-            "    },\n" +
-            "    \"hobbys\": [\n" +
-            "        {\n" +
-            "            \"order\": \"first\",\n" +
-            "            \"name\": \"coding\"\n" +
-            "        },\n" +
-            "        {\n" +
-            "            \"order\": \"second\",\n" +
-            "            \"name\": \"fishing\"\n" +
-            "        },\n" +
-            "        {\n" +
-            "            \"order\": \"third\",\n" +
-            "            \"name\": \"whatever\"\n" +
-            "        }\n" +
-            "    ]\n" +
+            "\t\"name\":\"zhengt\",\n" +
+            "\t\"age\":18,\n" +
+            "\t\"isHandsome\":true,\n" +
+            "\t\"email\":\"hj_zhengt@163.com\",\n" +
+            "\t\"address\":{\n" +
+            "\t\t\"country\":\"China\",\n" +
+            "\t\t\"province\":\"jiangsu\",\n" +
+            "\t\t\"city\":\"nanjing\"\n" +
+            "\t},\n" +
+            "\t\"hobbys\":[\n" +
+            "\t\t{\n" +
+            "\t\t\t\"order\":\"first\",\n" +
+            "\t\t\t\"name\":\"coding\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"order\":\"second\",\n" +
+            "\t\t\t\"name\":\"fishing\"\n" +
+            "\t\t},\n" +
+            "\t\t{\n" +
+            "\t\t\t\"order\":\"third\",\n" +
+            "\t\t\t\"name\":\"whatever\"\n" +
+            "\t\t}\n" +
+            "\t]\n" +
             "}";
 
 }

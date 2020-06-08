@@ -72,14 +72,19 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
     }
 
     public void updateNode() {
-        if (value instanceof JSONObject || OBJECT.equals(type)) {
-            label = key + " : " + "{" + getChildCount() + "}";
-        } else if (value instanceof JSONArray || ARRAY.equals(type)) {
-            label = key + " : " + "[" + getChildCount() + "]";
+        TreeNode parent = (TreeNode) getParent();
+        if (parent != null && ARRAY.equals(parent.type)) {
+            updateArrayNode();
         } else {
-            label = key + " : " + (value != null ? value.toString() : "");
+            if (value instanceof JSONObject || OBJECT.equals(type)) {
+                label = key + " : " + "{" + getChildCount() + "}";
+            } else if (value instanceof JSONArray || ARRAY.equals(type)) {
+                label = key + " : " + "[" + getChildCount() + "]";
+            } else {
+                label = key + " : " + (value != null ? value.toString() : "");
+            }
+            setUserObject(label);
         }
-        setUserObject(label);
     }
 
     public void updateArrayNode() {

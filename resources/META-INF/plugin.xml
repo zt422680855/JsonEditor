@@ -28,7 +28,7 @@
     <!-- Add your extensions here -->
     <!--<applicationService serviceInterface="MyPlugin" serviceImplementation="impl.MyPluginImpl"/>-->
 
-    <toolWindow id="JSON Editor" anchor="right" factoryClass="com.jsoneditor.JsonEditor" />
+    <toolWindow id="JSON Editor" icon="/icons/main-icon.svg" anchor="right" factoryClass="com.jsoneditor.JsonEditor" />
   </extensions>
 
   <actions>
