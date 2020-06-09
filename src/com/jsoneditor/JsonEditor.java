@@ -16,10 +16,12 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.tree.TreeModelAdapter;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -253,6 +255,28 @@ public class JsonEditor implements ToolWindowFactory {
     private void initTree() {
         tree = new Tree(root);
         treeModel = (DefaultTreeModel) tree.getModel();
+        treeModel.addTreeModelListener(new TreeModelAdapter() {
+            @Override
+            public void treeStructureChanged(TreeModelEvent event) {
+                System.out.println("structure change");
+
+            }
+
+            @Override
+            public void treeNodesChanged(TreeModelEvent event) {
+                System.out.println("change");
+            }
+
+            @Override
+            public void treeNodesInserted(TreeModelEvent event) {
+                System.out.println("add");
+            }
+
+            @Override
+            public void treeNodesRemoved(TreeModelEvent event) {
+                System.out.println("del");
+            }
+        });
         tree.setRowHeight(30);
         tree.setDragEnabled(true);
         tree.setTransferHandler(new TransferHandler("drag node."));
@@ -272,7 +296,7 @@ public class JsonEditor implements ToolWindowFactory {
                     TreePath pathWhenReleased = tree.getPathForLocation(e.getX(), e.getY());
                     if (pathWhenReleased != null) {
                         if (movingPath.isDescendant(pathWhenReleased)) {
-                            JOptionPane.showMessageDialog(panel, "can not move to child node.",
+                            JOptionPane.showMessageDialog(panel, "can not move into child node.",
                                     "error", JOptionPane.ERROR_MESSAGE);
                         } else {
                             Optional.ofNullable(pathWhenReleased.getLastPathComponent()).ifPresent((curNode) -> {
@@ -323,7 +347,7 @@ public class JsonEditor implements ToolWindowFactory {
         });
         compressJson.addActionListener((e) -> {
             Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            textArea.setText(JSON.toJSONString(json, SerializerFeature.WriteMapNullValue));
         });
         reset.addActionListener((e) -> {
             Object json = JSON.parse(temp, Feature.OrderedField);

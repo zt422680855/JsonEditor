@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
 
-import java.awt.datatransfer.DataFlavor;
 import java.io.Serializable;
 
 /**
