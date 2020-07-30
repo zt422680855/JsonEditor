@@ -24,24 +24,30 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
 
     public String label;
 
-    public Integer type = STRING;
+    public Integer type;
 
     public TreeNode() {
     }
 
     public TreeNode(String key, Object value) {
+        this.key = key;
+        this.value = value;
         if (value instanceof JSONObject) {
             JSONObject object = (JSONObject) value;
             label = key + " : " + "{" + object.size() + "}";
+            this.type = OBJECT;
         } else if (value instanceof JSONArray) {
             JSONArray array = (JSONArray) value;
             label = key + " : " + "[" + array.size() + "]";
+            this.type = ARRAY;
+        } else if (value instanceof String) {
+            label = key + " : " + value.toString();
+            this.type = STRING;
         } else {
-            label = key + " : " + (value != null ? value.toString() : "");
+            label = key + " : " + value.toString();
+            this.type = OTHER;
         }
         setUserObject(label);
-        this.key = key;
-        this.value = value;
     }
 
     public void loadTreeNodes() {

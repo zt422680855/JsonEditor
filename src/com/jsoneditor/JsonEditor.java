@@ -295,10 +295,7 @@ public class JsonEditor implements ToolWindowFactory {
                 if (movingPath != null) {
                     TreePath pathWhenReleased = tree.getPathForLocation(e.getX(), e.getY());
                     if (pathWhenReleased != null) {
-                        if (movingPath.isDescendant(pathWhenReleased)) {
-                            JOptionPane.showMessageDialog(panel, "can not move into child node.",
-                                    "error", JOptionPane.ERROR_MESSAGE);
-                        } else {
+                        if (!movingPath.isDescendant(pathWhenReleased)) {
                             Optional.ofNullable(pathWhenReleased.getLastPathComponent()).ifPresent((curNode) -> {
                                 TreeNode target = (TreeNode) curNode;
                                 TreeNode movingNode = (TreeNode) movingPath.getLastPathComponent();

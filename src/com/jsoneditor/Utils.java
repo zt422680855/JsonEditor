@@ -4,20 +4,20 @@ import java.util.regex.Pattern;
 
 /**
  * @Description:
- * @Author: 19043204
+ * @Author: zhengt
  * @CreateDate: 2020/5/29 23:05
  */
 public class Utils {
 
-    private static Pattern integerRegx = Pattern.compile("^[-\\+]?[\\d]*$");
+    private final static Pattern INTEGER_REGX = Pattern.compile("^[-\\+]?[\\d]*$");
 
-    private static Pattern floatRegx = Pattern.compile("^[-\\+]?[.\\d]*$");
+    private final static Pattern FLOAT_REGX = Pattern.compile("^[-\\+]?[.\\d]*$");
 
     public static boolean isInteger(String str) {
-        return integerRegx.matcher(str).matches();
+        return INTEGER_REGX.matcher(str).matches();
     }
 
     public static boolean isFloat(String str) {
-        return floatRegx.matcher(str).matches();
+        return FLOAT_REGX.matcher(str).matches();
     }
 }
