@@ -91,9 +91,9 @@ public class JsonEditor implements ToolWindowFactory {
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 new AddOrEdit(select, true, (node) -> {
+                    node.updateNode();
                     treeModel.insertNodeInto(node, select, select.getChildCount());
                     if (TreeNode.OBJECT.equals(select.type)) {
-                        node.updateObjectNodeChildren();
                         JSONObject value = (JSONObject) select.value;
                         value.put(node.key, node.value);
                     } else if (TreeNode.ARRAY.equals(select.type)) {
@@ -117,6 +117,7 @@ public class JsonEditor implements ToolWindowFactory {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 TreeNode parent = (TreeNode) select.getParent();
                 new AddOrEdit(select, true, (node) -> {
+                    node.loadTreeNodes();
                     int index = parent.getIndex(select) + 1;
                     treeModel.insertNodeInto(node, parent, index);
                     if (TreeNode.OBJECT.equals(parent.type)) {
@@ -136,11 +137,6 @@ public class JsonEditor implements ToolWindowFactory {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 new AddOrEdit(select, false, (node) -> {
                     node.updateNode();
-                    if (TreeNode.OBJECT.equals(node.type)) {
-                        node.updateObjectNodeChildren();
-                    } else if (TreeNode.ARRAY.equals(node.type)) {
-                        node.updateArrayNodeChildren();
-                    }
                 });
             }
         });
@@ -158,7 +154,7 @@ public class JsonEditor implements ToolWindowFactory {
                         JSONArray value = (JSONArray) parent.value;
                         value.remove(node.value);
                     }
-                    parent.updateNode();
+                    parent.loadTreeNodes();
                 }
             }
         });
@@ -174,7 +170,7 @@ public class JsonEditor implements ToolWindowFactory {
         panel.add(left);
         c = new GridBagConstraints();
         c.weightx = 10;
-        c.weighty = 2;
+        c.weighty = 20;
         c.ipady = -10;
         c.fill = GridBagConstraints.BOTH;
         GridBagLayout leftLayout = new GridBagLayout();
@@ -187,7 +183,7 @@ public class JsonEditor implements ToolWindowFactory {
         left.add(compressJson);
         left.add(reset);
         c = new GridBagConstraints();
-        c.weighty = 100;
+        c.weighty = 65;
         c.gridwidth = 3;
         c.fill = GridBagConstraints.BOTH;
         JBScrollPane scrollPane = new JBScrollPane(textArea);
@@ -259,7 +255,6 @@ public class JsonEditor implements ToolWindowFactory {
             @Override
             public void treeStructureChanged(TreeModelEvent event) {
                 System.out.println("structure change");
-
             }
 
             @Override
@@ -300,8 +295,9 @@ public class JsonEditor implements ToolWindowFactory {
                                 TreeNode target = (TreeNode) curNode;
                                 TreeNode movingNode = (TreeNode) movingPath.getLastPathComponent();
                                 TreeNode movingNodeParent = (TreeNode) movingNode.getParent();
+                                TreeNode cloneNode = movingNode.clone();
                                 if (TreeNode.OBJECT.equals(target.type)) {
-                                    treeModel.insertNodeInto(movingNode.clone(), target, target.getChildCount());
+                                    treeModel.insertNodeInto(cloneNode, target, target.getChildCount());
                                     target.updateNode();
                                 } else {
                                     Optional.ofNullable(target.getParent()).ifPresent((parentNode) -> {
@@ -310,12 +306,13 @@ public class JsonEditor implements ToolWindowFactory {
                                         if (!parent.equals(movingNode.getParent()) || newIndex > parent.getIndex(movingNode)) {
                                             newIndex += 1;
                                         }
-                                        treeModel.insertNodeInto(movingNode.clone(), parent, newIndex);
+                                        treeModel.insertNodeInto(cloneNode, parent, newIndex);
                                         parent.updateNode();
                                     });
                                 }
                                 treeModel.removeNodeFromParent(movingNode);
                                 movingNodeParent.updateNode();
+                                tree.setSelectionPath(new TreePath(cloneNode.getPath()));
                             });
                         }
                     }
@@ -379,16 +376,16 @@ public class JsonEditor implements ToolWindowFactory {
         if (TreeNode.OBJECT.equals(node.type)) {
             JSONObject obj = (JSONObject) node.value;
             obj.clear();
-            for (int i = 0; i < node.getChildCount(); i++) {
-                TreeNode currNode = (TreeNode) node.getChildAt(i);
+            for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
+                TreeNode currNode = (TreeNode) e.nextElement();
                 obj.put(currNode.key, currNode.value);
                 refreshTreeData(currNode);
             }
         } else if (TreeNode.ARRAY.equals(node.type)) {
             JSONArray array = (JSONArray) node.value;
             array.clear();
-            for (int i = 0; i < node.getChildCount(); i++) {
-                TreeNode currNode = (TreeNode) node.getChildAt(i);
+            for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
+                TreeNode currNode = (TreeNode) e.nextElement();
                 array.add(currNode.value);
                 refreshTreeData(currNode);
             }
@@ -604,7 +601,24 @@ public class JsonEditor implements ToolWindowFactory {
                             selectNode.updateArrayNodeChildren();
                         } else if (TreeNode.STRING.equals(selectNode.type)) {
                             selectNode.value = value.getText();
+                            while (true) {
+                                Enumeration<?> ele = selectNode.children();
+                                if (ele.hasMoreElements()) {
+                                    treeModel.removeNodeFromParent((TreeNode) ele.nextElement());
+                                } else {
+                                    break;
+                                }
+                            }
+                            selectNode.loadTreeNodes();
                         } else {
+                            while (true) {
+                                Enumeration<?> ele = selectNode.children();
+                                if (ele.hasMoreElements()) {
+                                    treeModel.removeNodeFromParent((TreeNode) ele.nextElement());
+                                } else {
+                                    break;
+                                }
+                            }
                             String valueStr = value.getText();
                             try {
                                 if ("".equals(valueStr)) {
@@ -618,13 +632,12 @@ public class JsonEditor implements ToolWindowFactory {
                                 } else {
                                     selectNode.value = value.getText();
                                 }
-                            } catch (Exception e1) {
+                            } catch (Exception ex) {
                                 selectNode.value = valueStr;
                             }
                         }
                         returnNode = selectNode;
                     }
-                    returnNode.updateNode();
                     callback.accept(returnNode);
                     AddOrEdit.this.dispose();
                 }

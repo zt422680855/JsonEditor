@@ -5,10 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
 
 import java.io.Serializable;
+import java.util.Enumeration;
 
 /**
  * @Description:
- * @Author: zhengtao
+ * @Author: zhengt
  * @CreateDate: 2020/5/22 22:39
  */
 public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializable, Cloneable {
@@ -32,29 +33,14 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
     public TreeNode(String key, Object value) {
         this.key = key;
         this.value = value;
-        if (value instanceof JSONObject) {
-            JSONObject object = (JSONObject) value;
-            label = key + " : " + "{" + object.size() + "}";
-            this.type = OBJECT;
-        } else if (value instanceof JSONArray) {
-            JSONArray array = (JSONArray) value;
-            label = key + " : " + "[" + array.size() + "]";
-            this.type = ARRAY;
-        } else if (value instanceof String) {
-            label = key + " : " + value.toString();
-            this.type = STRING;
-        } else {
-            label = key + " : " + value.toString();
-            this.type = OTHER;
-        }
-        setUserObject(label);
     }
 
     public void loadTreeNodes() {
         if (value instanceof JSONObject) {
             type = TreeNode.OBJECT;
-            JSONObject jsonObject = (JSONObject) value;
-            jsonObject.forEach((k, v) -> {
+            JSONObject object = (JSONObject) value;
+            label = key + " : " + "{" + object.size() + "}";
+            object.forEach((k, v) -> {
                 TreeNode subNode = new TreeNode(k, v);
                 add(subNode);
                 subNode.loadTreeNodes();
@@ -62,6 +48,7 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
         } else if (value instanceof JSONArray) {
             type = TreeNode.ARRAY;
             JSONArray array = (JSONArray) value;
+            label = key + " : " + "[" + array.size() + "]";
             for (int i = 0; i < array.size(); i++) {
                 String k = i + "";
                 Object v = array.get(i);
@@ -70,10 +57,13 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
                 subNode.loadTreeNodes();
             }
         } else if (value instanceof String) {
+            label = key + " : " + value.toString();
             type = TreeNode.STRING;
         } else {
+            label = key + " : " + value.toString();
             type = TreeNode.OTHER;
         }
+        setUserObject(label);
     }
 
     public void updateNode() {
@@ -104,14 +94,16 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
     }
 
     public void updateArrayNodeChildren() {
-        for (int i = 0; i < getChildCount(); i++) {
-            ((TreeNode) getChildAt(i)).updateArrayNode();
+        for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
+            TreeNode currNode = (TreeNode) e.nextElement();
+            currNode.updateArrayNode();
         }
     }
 
     public void updateObjectNodeChildren() {
-        for (int i = 0; i < getChildCount(); i++) {
-            ((TreeNode) getChildAt(i)).updateNode();
+        for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
+            TreeNode currNode = (TreeNode) e.nextElement();
+            currNode.updateNode();
         }
     }
 
