@@ -1,33 +1,24 @@
 <idea-plugin>
   <id>com.zt.json-editor</id>
   <name>JSON Editor</name>
-  <version>1.0</version>
-  <vendor email="hj_zhengt@163.com" url="http://www.baidu.com">zhengtao</vendor>
+  <version>1.2</version>
+  <vendor email="hj_zhengt@163.com" url="https://me.csdn.net/">zhengtao</vendor>
 
   <description><![CDATA[
-      闲来无事，随便写写，<br>
-      <em>JSON编辑器。</em>
+      support JSON editing and viewing.<br>
     ]]></description>
 
   <change-notes><![CDATA[
-      支持JSON编辑查看.<br>
+      fix some bugs.<br>
       <em></em>
     ]]>
   </change-notes>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <depends>com.intellij.modules.platform</depends>
+
   <idea-version since-build="173.0"/>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
-
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-    <!--<applicationService serviceInterface="MyPlugin" serviceImplementation="impl.MyPluginImpl"/>-->
-
     <toolWindow id="JSON Editor" icon="/icons/main-icon.svg" anchor="right" factoryClass="com.jsoneditor.JsonEditor" />
   </extensions>
 

@@ -93,19 +93,6 @@ public class JsonEditor implements ToolWindowFactory {
                 new AddOrEdit(select, true, (node) -> {
                     node.updateNode();
                     treeModel.insertNodeInto(node, select, select.getChildCount());
-                    if (TreeNode.OBJECT.equals(select.type)) {
-                        JSONObject value = (JSONObject) select.value;
-                        value.put(node.key, node.value);
-                    } else if (TreeNode.ARRAY.equals(select.type)) {
-                        select.updateArrayNodeChildren();
-                        JSONArray value = (JSONArray) select.value;
-                        value.add(node.value);
-                    } else {
-                        select.type = TreeNode.OBJECT;
-                        select.value = new JSONObject() {{
-                            put(node.key, node.value);
-                        }};
-                    }
                     select.updateNode();
                     tree.expandPath(new TreePath(select.getPath()));
                 });
@@ -117,16 +104,9 @@ public class JsonEditor implements ToolWindowFactory {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 TreeNode parent = (TreeNode) select.getParent();
                 new AddOrEdit(select, true, (node) -> {
-                    node.loadTreeNodes();
+                    node.updateNode();
                     int index = parent.getIndex(select) + 1;
                     treeModel.insertNodeInto(node, parent, index);
-                    if (TreeNode.OBJECT.equals(parent.type)) {
-                        JSONObject value = (JSONObject) parent.value;
-                        value.put(node.key, node.value);
-                    } else if (TreeNode.ARRAY.equals(parent.type)) {
-                        JSONArray value = (JSONArray) parent.value;
-                        value.add(index, node.value);
-                    }
                     parent.updateNode();
                 });
             }
@@ -147,14 +127,7 @@ public class JsonEditor implements ToolWindowFactory {
                 for (TreeNode node : selectedNodes) {
                     TreeNode parent = (TreeNode) node.getParent();
                     treeModel.removeNodeFromParent(node);
-                    if (TreeNode.OBJECT.equals(parent.type)) {
-                        JSONObject value = (JSONObject) parent.value;
-                        value.remove(node.key);
-                    } else if (TreeNode.ARRAY.equals(parent.type)) {
-                        JSONArray value = (JSONArray) parent.value;
-                        value.remove(node.value);
-                    }
-                    parent.loadTreeNodes();
+                    parent.updateNode();
                 }
             }
         });
@@ -170,7 +143,7 @@ public class JsonEditor implements ToolWindowFactory {
         panel.add(left);
         c = new GridBagConstraints();
         c.weightx = 10;
-        c.weighty = 20;
+        c.weighty = 4;
         c.ipady = -10;
         c.fill = GridBagConstraints.BOTH;
         GridBagLayout leftLayout = new GridBagLayout();
@@ -183,7 +156,7 @@ public class JsonEditor implements ToolWindowFactory {
         left.add(compressJson);
         left.add(reset);
         c = new GridBagConstraints();
-        c.weighty = 65;
+        c.weighty = 100;
         c.gridwidth = 3;
         c.fill = GridBagConstraints.BOTH;
         JBScrollPane scrollPane = new JBScrollPane(textArea);
@@ -576,8 +549,25 @@ public class JsonEditor implements ToolWindowFactory {
                             newNode.value = new JSONObject();
                         } else if (TreeNode.ARRAY.equals(newNode.type)) {
                             newNode.value = new JSONArray();
-                        } else {
+                        } else if (TreeNode.STRING.equals(newNode.type)) {
                             newNode.value = value.getText();
+                        } else {
+                            String valueStr = value.getText();
+                            try {
+                                if ("".equals(valueStr)) {
+                                    newNode.value = null;
+                                } else if ("true".equalsIgnoreCase(valueStr) || "false".equalsIgnoreCase(valueStr)) {
+                                    newNode.value = Boolean.parseBoolean(valueStr);
+                                } else if (Utils.isInteger(valueStr)) {
+                                    newNode.value = Long.parseLong(valueStr);
+                                } else if (Utils.isFloat(valueStr)) {
+                                    newNode.value = Double.parseDouble(valueStr);
+                                } else {
+                                    newNode.value = value.getText();
+                                }
+                            } catch (Exception ex) {
+                                newNode.value = valueStr;
+                            }
                         }
                         returnNode = newNode;
                     } else {
@@ -609,7 +599,7 @@ public class JsonEditor implements ToolWindowFactory {
                                     break;
                                 }
                             }
-                            selectNode.loadTreeNodes();
+                            selectNode.updateNode();
                         } else {
                             while (true) {
                                 Enumeration<?> ele = selectNode.children();
