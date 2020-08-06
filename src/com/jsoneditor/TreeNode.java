@@ -14,10 +14,10 @@ import java.util.Enumeration;
  */
 public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializable, Cloneable {
 
-    static final Integer OBJECT = 1;
-    static final Integer ARRAY = 2;
-    static final Integer STRING = 3;
-    static final Integer OTHER = 4;
+    public static Integer OBJECT = 1;
+    public static Integer ARRAY = 2;
+    public static Integer STRING = 3;
+    public static Integer OTHER = 4;
 
     public String key;
 
