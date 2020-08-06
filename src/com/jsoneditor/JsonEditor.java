@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * @Description:
+ * @Description: 开发时iml文件module节点的type要等于PLUGIN_MODULE
  * @Author: zhengtao
  * @CreateDate: 2020/5/7 22:44
  */
@@ -93,10 +93,17 @@ public class JsonEditor implements ToolWindowFactory {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(select, true, (node) -> {
+                new AddOrEdit(select, 1, (node) -> {
                     node.updateNode();
                     treeModel.insertNodeInto(node, select, select.getChildCount());
-                    if (!TreeNode.OBJECT.equals(select.type) && !TreeNode.ARRAY.equals(select.type)) {
+                    if (TreeNode.OBJECT.equals(select.type)) {
+//                        JSONObject value = (JSONObject) select.value;
+//                        value.put(node.key, node.value);
+                    } else if (TreeNode.ARRAY.equals(select.type)) {
+                        select.updateArrayNodeChildren();
+//                        JSONArray value = (JSONArray) select.value;
+//                        value.add(node.value);
+                    } else {
                         select.type = TreeNode.OBJECT;
                         select.value = new JSONObject(true);
                     }
@@ -110,10 +117,11 @@ public class JsonEditor implements ToolWindowFactory {
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 TreeNode parent = (TreeNode) select.getParent();
-                new AddOrEdit(select, true, (node) -> {
+                new AddOrEdit(select, 2, (node) -> {
                     node.updateNode();
                     int index = parent.getIndex(select) + 1;
                     treeModel.insertNodeInto(node, parent, index);
+                    node.updateNode();
                     parent.updateNode();
                 });
             }
@@ -122,7 +130,7 @@ public class JsonEditor implements ToolWindowFactory {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(select, false, (node) -> {
+                new AddOrEdit(select, 3, (node) -> {
                     node.updateNode();
                 });
             }
@@ -135,6 +143,7 @@ public class JsonEditor implements ToolWindowFactory {
                     TreeNode parent = (TreeNode) node.getParent();
                     treeModel.removeNodeFromParent(node);
                     parent.updateNode();
+                    parent.updateArrayNodeChildren();
                 }
             }
         });
@@ -432,16 +441,23 @@ public class JsonEditor implements ToolWindowFactory {
 
         private String title = "Add";
 
-        private boolean isAdd;
+        // 1、2、3分别代表新增子节点、新增兄弟节点、编辑节点
+        private Integer opt;
 
         private Consumer<TreeNode> callback;
 
-        public AddOrEdit(TreeNode node, boolean isAdd, Consumer<TreeNode> callback) {
-            this.isAdd = isAdd;
+        public AddOrEdit(TreeNode node, Integer opt, Consumer<TreeNode> callback) {
+            this.opt = opt;
             this.selectNode = node;
             this.callback = callback;
-            if (isAdd) {
+            if (opt == 1) {
                 if (TreeNode.ARRAY.equals(selectNode.type)) {
+                    key.setVisible(false);
+                    keyLabel.setVisible(false);
+                }
+            } if (opt == 2) {
+                TreeNode parent = (TreeNode) node.getParent();
+                if (TreeNode.ARRAY.equals(parent.type)) {
                     key.setVisible(false);
                     keyLabel.setVisible(false);
                 }
@@ -458,8 +474,8 @@ public class JsonEditor implements ToolWindowFactory {
                     keyLabel.setVisible(false);
                 }
             }
-            key.setText(isAdd ? "key" : node.key);
-            value.setText(isAdd ? "value" : (node.value == null ? "null" : node.value.toString()));
+            key.setText(opt != 3 ? "key" : node.key);
+            value.setText(opt != 3  ? "value" : (node.value == null ? "null" : node.value.toString()));
             openDialog();
         }
 
@@ -549,7 +565,7 @@ public class JsonEditor implements ToolWindowFactory {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     TreeNode returnNode;
-                    if (isAdd) {
+                    if (opt != 3) {
                         newNode.key = key.getText();
                         newNode.type = ((SelectItem) type.getSelectedItem()).getValue();
                         if (TreeNode.OBJECT.equals(newNode.type)) {

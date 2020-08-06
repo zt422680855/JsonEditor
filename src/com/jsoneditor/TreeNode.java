@@ -70,6 +70,7 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
         TreeNode parent = (TreeNode) getParent();
         if (parent != null && ARRAY.equals(parent.type)) {
             updateArrayNode();
+            parent.updateArrayNodeChildren();
         } else {
             if (value instanceof JSONObject || OBJECT.equals(type)) {
                 label = key + " : " + "{" + getChildCount() + "}";
