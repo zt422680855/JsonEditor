@@ -96,6 +96,10 @@ public class JsonEditor implements ToolWindowFactory {
                 new AddOrEdit(select, true, (node) -> {
                     node.updateNode();
                     treeModel.insertNodeInto(node, select, select.getChildCount());
+                    if (!TreeNode.OBJECT.equals(select.type) && !TreeNode.ARRAY.equals(select.type)) {
+                        select.type = TreeNode.OBJECT;
+                        select.value = new JSONObject(true);
+                    }
                     select.updateNode();
                     tree.expandPath(new TreePath(select.getPath()));
                 });
@@ -549,7 +553,7 @@ public class JsonEditor implements ToolWindowFactory {
                         newNode.key = key.getText();
                         newNode.type = ((SelectItem) type.getSelectedItem()).getValue();
                         if (TreeNode.OBJECT.equals(newNode.type)) {
-                            newNode.value = new JSONObject();
+                            newNode.value = new JSONObject(true);
                         } else if (TreeNode.ARRAY.equals(newNode.type)) {
                             newNode.value = new JSONArray();
                         } else if (TreeNode.STRING.equals(newNode.type)) {
@@ -577,7 +581,7 @@ public class JsonEditor implements ToolWindowFactory {
                         selectNode.key = key.getText();
                         selectNode.type = ((SelectItem) type.getSelectedItem()).getValue();
                         if (TreeNode.OBJECT.equals(selectNode.type)) {
-                            JSONObject obj = new JSONObject();
+                            JSONObject obj = new JSONObject(true);
                             for (int i = 0; i < selectNode.getChildCount(); i++) {
                                 TreeNode child = (TreeNode) selectNode.getChildAt(i);
                                 obj.put(child.key, child.value);
