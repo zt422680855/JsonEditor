@@ -11,7 +11,10 @@ import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.ui.components.*;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
@@ -44,7 +47,7 @@ public class JsonEditor implements ToolWindowFactory {
     private GridBagLayout layout = new GridBagLayout();
 
     // left
-    private JBTextArea textArea = new JBTextArea();
+    private JTextArea textArea = new JTextArea();
     private JButton format = new JButton("format");
     private JButton compressJson = new JButton("compress");
     private JButton reset = new JButton("reset");
