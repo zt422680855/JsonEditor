@@ -3,6 +3,10 @@ package com.jsoneditor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
+import com.jsoneditor.node.ArrayNode;
+import com.jsoneditor.node.ObjectNode;
+import com.jsoneditor.node.OtherNode;
+import com.jsoneditor.node.StringNode;
 
 import java.io.Serializable;
 import java.util.Enumeration;
@@ -14,10 +18,10 @@ import java.util.Enumeration;
  */
 public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializable, Cloneable {
 
-    public static Integer OBJECT = 1;
-    public static Integer ARRAY = 2;
-    public static Integer STRING = 3;
-    public static Integer OTHER = 4;
+    static final Integer OBJECT = 1;
+    static final Integer ARRAY = 2;
+    static final Integer STRING = 3;
+    static final Integer OTHER = 4;
 
     public String key;
 
@@ -35,35 +39,23 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Serializa
         this.value = value;
     }
 
-    public void loadTreeNodes() {
+    public static TreeNode getNode(String key, Object value) {
+        TreeNode node;
         if (value instanceof JSONObject) {
-            type = TreeNode.OBJECT;
-            JSONObject object = (JSONObject) value;
-            label = key + " : " + "{" + object.size() + "}";
-            object.forEach((k, v) -> {
-                TreeNode subNode = new TreeNode(k, v);
-                add(subNode);
-                subNode.loadTreeNodes();
-            });
+            node = new ObjectNode(key, value);
+            // delete
+            node.type = 1;
         } else if (value instanceof JSONArray) {
-            type = TreeNode.ARRAY;
-            JSONArray array = (JSONArray) value;
-            label = key + " : " + "[" + array.size() + "]";
-            for (int i = 0; i < array.size(); i++) {
-                String k = i + "";
-                Object v = array.get(i);
-                TreeNode subNode = new TreeNode(k, v);
-                add(subNode);
-                subNode.loadTreeNodes();
-            }
+            node = new ArrayNode(key, value);
+            node.type = 2;
         } else if (value instanceof String) {
-            label = key + " : " + value.toString();
-            type = TreeNode.STRING;
+            node = new StringNode(key, value);
+            node.type = 3;
         } else {
-            label = key + " : " + value.toString();
-            type = TreeNode.OTHER;
+            node = new OtherNode(key, value);
+            node.type = 4;
         }
-        setUserObject(label);
+        return node;
     }
 
     public void updateNode() {

@@ -20,6 +20,9 @@ import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.tree.TreeModelAdapter;
+import com.jsoneditor.node.ArrayNode;
+import com.jsoneditor.node.ObjectNode;
+import com.jsoneditor.node.StringNode;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +40,13 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
- * @Description: 开发时iml文件module节点的type要等于PLUGIN_MODULE
+ * @Description: 开发时iml文件module节点的type要等于PLUGIN_MODULE。
+ * TODO
+ * 1. 前进后退
+ * 2. 选中节点展开
+ * 3. 数组子节点拖拽索引未改变
+ * 4. 按钮大小变化
+ * 5. 代码整理、重构
  * @Author: zhengtao
  * @CreateDate: 2020/5/7 22:44
  */
@@ -63,7 +72,7 @@ public class JsonEditor implements ToolWindowFactory {
     private JButton forward = new JButton("forward");
     private Tree tree;
     private DefaultTreeModel treeModel;
-    private TreeNode root = new TreeNode("ROOT", "");
+    private ObjectNode root = new ObjectNode("ROOT", "");
     private TreePath movingPath;
 
     private JBPopupMenu contextMenus = new JBPopupMenu();
@@ -96,10 +105,10 @@ public class JsonEditor implements ToolWindowFactory {
                 new AddOrEdit(select, 1, (node) -> {
                     node.updateNode();
                     treeModel.insertNodeInto(node, select, select.getChildCount());
-                    if (TreeNode.OBJECT.equals(select.type)) {
+                    if (select instanceof ObjectNode) {
 //                        JSONObject value = (JSONObject) select.value;
 //                        value.put(node.key, node.value);
-                    } else if (TreeNode.ARRAY.equals(select.type)) {
+                    } else if (select instanceof ArrayNode) {
                         select.updateArrayNodeChildren();
 //                        JSONArray value = (JSONArray) select.value;
 //                        value.add(node.value);
@@ -303,6 +312,8 @@ public class JsonEditor implements ToolWindowFactory {
                                 movingNodeParent.updateNode();
                                 tree.setSelectionPath(new TreePath(cloneNode.getPath()));
                             });
+                        } else {
+                            System.out.println("aaa");
                         }
                     }
                     movingPath = null;
@@ -341,12 +352,12 @@ public class JsonEditor implements ToolWindowFactory {
         syncToRight.addActionListener((e) -> {
             root.removeAllChildren();
             root.value = JSON.parse(textArea.getText(), Feature.OrderedField);
-            root.loadTreeNodes();
+            refreshTree(root);
             tree.expandPath(new TreePath(root.getPath()));
             tree.updateUI();
         });
         syncToLeft.addActionListener((e) -> {
-            refreshTreeData(root);
+            refreshJson(root);
             textArea.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
         expendJson.addActionListener((e) -> expandTree(tree, new TreePath(root)));
@@ -361,24 +372,52 @@ public class JsonEditor implements ToolWindowFactory {
         });
     }
 
-    public void refreshTreeData(TreeNode node) {
-        if (TreeNode.OBJECT.equals(node.type)) {
+    public void refreshJson(TreeNode node) {
+        if (node instanceof ObjectNode) {
             JSONObject obj = (JSONObject) node.value;
             obj.clear();
             for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
                 TreeNode currNode = (TreeNode) e.nextElement();
                 obj.put(currNode.key, currNode.value);
-                refreshTreeData(currNode);
+                refreshJson(currNode);
             }
-        } else if (TreeNode.ARRAY.equals(node.type)) {
+        } else if (node instanceof ArrayNode) {
             JSONArray array = (JSONArray) node.value;
             array.clear();
             for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
                 TreeNode currNode = (TreeNode) e.nextElement();
                 array.add(currNode.value);
-                refreshTreeData(currNode);
+                refreshJson(currNode);
             }
         }
+    }
+
+    public void refreshTree(TreeNode node) {
+        if (node.value instanceof JSONObject) {
+//            node.type = TreeNode.OBJECT;
+            JSONObject object = (JSONObject) node.value;
+            node.label = node.key + " : " + "{" + object.size() + "}";
+            object.forEach((k, v) -> {
+                TreeNode subNode = TreeNode.getNode(k, v);
+                node.add(subNode);
+                refreshTree(subNode);
+            });
+        } else if (node.value instanceof JSONArray) {
+//            node.type = TreeNode.ARRAY;
+            JSONArray array = (JSONArray) node.value;
+            node.label = node.key + " : " + "[" + array.size() + "]";
+            for (int i = 0; i < array.size(); i++) {
+                String k = i + "";
+                Object v = array.get(i);
+                TreeNode subNode = TreeNode.getNode(k, v);
+                node.add(subNode);
+                refreshTree(subNode);
+            }
+        } else {
+            node.label = node.key + " : " + node.value.toString();
+//            node.type = TreeNode.OTHER;
+        }
+        node.setUserObject(node.label);
     }
 
     private void expandTree(Tree tree, TreePath parent) {
@@ -437,8 +476,6 @@ public class JsonEditor implements ToolWindowFactory {
 
         private TreeNode selectNode;
 
-        private TreeNode newNode = new TreeNode();
-
         private String title = "Add";
 
         // 1、2、3分别代表新增子节点、新增兄弟节点、编辑节点
@@ -463,13 +500,21 @@ public class JsonEditor implements ToolWindowFactory {
                 }
             } else {
                 title = "Edit";
-                type.setSelectedItem(SelectItem.getItemByValue(node.type));
-                if (TreeNode.OBJECT.equals(node.type) || TreeNode.ARRAY.equals(node.type)) {
+                if (node instanceof ObjectNode) {
+                    type.setSelectedItem(SelectItem.OBJECT);
                     value.setVisible(false);
                     valueLabel.setVisible(false);
+                } else if (node instanceof ArrayNode) {
+                    type.setSelectedItem(SelectItem.ARRAY);
+                    value.setVisible(false);
+                    valueLabel.setVisible(false);
+                } else if (node instanceof StringNode) {
+                    type.setSelectedItem(SelectItem.STRING);
+                } else {
+                    type.setSelectedItem(SelectItem.OTHER);
                 }
                 TreeNode parent = (TreeNode) selectNode.getParent();
-                if (parent != null && TreeNode.ARRAY.equals(parent.type)) {
+                if (parent instanceof ArrayNode) {
                     key.setVisible(false);
                     keyLabel.setVisible(false);
                 }
@@ -566,33 +611,34 @@ public class JsonEditor implements ToolWindowFactory {
                 public void mouseClicked(MouseEvent e) {
                     TreeNode returnNode;
                     if (opt != 3) {
-                        newNode.key = key.getText();
-                        newNode.type = ((SelectItem) type.getSelectedItem()).getValue();
-                        if (TreeNode.OBJECT.equals(newNode.type)) {
-                            newNode.value = new JSONObject(true);
-                        } else if (TreeNode.ARRAY.equals(newNode.type)) {
-                            newNode.value = new JSONArray();
-                        } else if (TreeNode.STRING.equals(newNode.type)) {
-                            newNode.value = value.getText();
+                        String nodeKey = key.getText();
+                        Object nodeValue;
+                        Integer nodeType = ((SelectItem) type.getSelectedItem()).getValue();
+                        if (TreeNode.OBJECT.equals(nodeType)) {
+                            nodeValue = new JSONObject(true);
+                        } else if (TreeNode.ARRAY.equals(nodeType)) {
+                            nodeValue = new JSONArray();
+                        } else if (TreeNode.STRING.equals(nodeType)) {
+                            nodeValue = value.getText();
                         } else {
                             String valueStr = value.getText();
                             try {
                                 if ("".equals(valueStr)) {
-                                    newNode.value = null;
+                                    nodeValue = null;
                                 } else if ("true".equalsIgnoreCase(valueStr) || "false".equalsIgnoreCase(valueStr)) {
-                                    newNode.value = Boolean.parseBoolean(valueStr);
+                                    nodeValue = Boolean.parseBoolean(valueStr);
                                 } else if (Utils.isInteger(valueStr)) {
-                                    newNode.value = Long.parseLong(valueStr);
+                                    nodeValue = Long.parseLong(valueStr);
                                 } else if (Utils.isFloat(valueStr)) {
-                                    newNode.value = Double.parseDouble(valueStr);
+                                    nodeValue = Double.parseDouble(valueStr);
                                 } else {
-                                    newNode.value = value.getText();
+                                    nodeValue = value.getText();
                                 }
                             } catch (Exception ex) {
-                                newNode.value = valueStr;
+                                nodeValue = valueStr;
                             }
                         }
-                        returnNode = newNode;
+                        returnNode = TreeNode.getNode(nodeKey, nodeValue);
                     } else {
                         selectNode.key = key.getText();
                         selectNode.type = ((SelectItem) type.getSelectedItem()).getValue();

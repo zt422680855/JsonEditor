@@ -9,8 +9,6 @@ import com.jsoneditor.TreeNode;
  */
 public class ObjectNode extends TreeNode {
 
-    private Integer type = OBJECT;
-
     public ObjectNode() {
 
     }
