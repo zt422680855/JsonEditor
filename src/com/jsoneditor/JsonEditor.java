@@ -204,13 +204,13 @@ public class JsonEditor implements ToolWindowFactory {
             root.removeAllChildren();
             try {
                 root.value = JSON.parse(textArea.getText(), Feature.OrderedField);
+                refreshTree(root);
+                tree.expandPath(new TreePath(root.getPath()));
+                tree.updateUI();
             } catch (JSONException ex) {
                 JOptionPane.showMessageDialog(panel, "json格式错误",
                         "error", JOptionPane.ERROR_MESSAGE);
             }
-            refreshTree(root);
-            tree.expandPath(new TreePath(root.getPath()));
-            tree.updateUI();
         });
         syncToLeft.addActionListener((e) -> {
             refreshJson(root);
