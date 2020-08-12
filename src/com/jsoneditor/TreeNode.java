@@ -59,7 +59,6 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
         return (TreeNode) super.getParent();
     }
 
-
     @Override
     public TreeNode clone() {
         return new ObjectNode();
