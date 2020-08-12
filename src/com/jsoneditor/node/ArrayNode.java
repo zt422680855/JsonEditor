@@ -2,6 +2,8 @@ package com.jsoneditor.node;
 
 import com.jsoneditor.TreeNode;
 
+import java.util.Enumeration;
+
 /**
  * @Description:
  * @Author: zhengt
@@ -15,6 +17,28 @@ public class ArrayNode extends TreeNode {
 
     public ArrayNode(String key, Object value) {
         super(key, value);
+        updateNode();
     }
 
+    @Override
+    public void updateNode() {
+        int childCount = getChildCount();
+        TreeNode parent = getParent();
+        if (parent == null || parent instanceof ObjectNode) {
+            label = key + " : " + "[" + childCount + "]";
+        } else if (parent instanceof ArrayNode) {
+            label = parent.getIndex(this) + " : " + "[" + childCount + "]";
+        }
+        super.updateNode();
+    }
+
+    @Override
+    public ArrayNode clone() {
+        ArrayNode node = new ArrayNode(key, value);
+        for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
+            TreeNode currNode = (TreeNode) e.nextElement();
+            node.add(currNode.clone());
+        }
+        return node;
+    }
 }

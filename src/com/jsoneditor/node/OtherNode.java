@@ -15,6 +15,22 @@ public class OtherNode extends TreeNode {
 
     public OtherNode(String key, Object value) {
         super(key, value);
+        updateNode();
     }
 
+    @Override
+    public void updateNode() {
+        TreeNode parent = getParent();
+        if (parent == null || parent instanceof ObjectNode) {
+            label = key + " : " + (value != null ? value.toString() : "");
+        } else if (parent instanceof ArrayNode) {
+            label = parent.getIndex(this) + " : " + (value != null ? value.toString() : "");
+        }
+        super.updateNode();
+    }
+
+    @Override
+    public OtherNode clone() {
+        return new OtherNode(key, value);
+    }
 }

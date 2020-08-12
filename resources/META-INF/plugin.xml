@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.zt.json-editor</id>
   <name>JSON Editor</name>
-  <version>1.5</version>
+  <version>1.6</version>
   <vendor email="hj_zhengt@163.com" url="https://me.csdn.net/">zhengtao</vendor>
 
   <description><![CDATA[
@@ -9,7 +9,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      2020-08-04<br>
       For the first time, there may be some small bugs. Hope more support.<br>
+      <br>
+      2020-08-12<br>
+      version: 1.6<br>
+      fix some bugs.<br>
     ]]>
   </change-notes>
 

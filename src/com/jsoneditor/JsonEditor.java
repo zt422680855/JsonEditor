@@ -2,6 +2,7 @@ package com.jsoneditor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -19,34 +20,33 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.tree.TreeModelAdapter;
+import com.jsoneditor.action.*;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
+import com.jsoneditor.node.OtherNode;
 import com.jsoneditor.node.StringNode;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /**
  * @Description: 开发时iml文件module节点的type要等于PLUGIN_MODULE。
  * TODO
- * 1. 前进后退
- * 2. 选中节点展开
- * 3. 数组子节点拖拽索引未改变
- * 4. 按钮大小变化
- * 5. 代码整理、重构
+ * 1. 按钮大小变化
+ * 2. 代码整理、重构
  * @Author: zhengtao
  * @CreateDate: 2020/5/7 22:44
  */
@@ -81,81 +81,18 @@ public class JsonEditor implements ToolWindowFactory {
     private JBMenuItem edit = new JBMenuItem("edit", Icons.EDIT);
     private JBMenuItem delete = new JBMenuItem("delete", Icons.DEL);
 
+    private UndoManager undoManager = new UndoManager();
+
     public JsonEditor() {
         panel.setLayout(layout);
         paintLeft();
         paintMiddle();
         paintRight();
         addActions();
-        initContextMenu();
 
-        textArea.setText(temp);
         syncToRight.doClick();
-    }
 
-    private void initContextMenu() {
-        contextMenus.add(addSub);
-        contextMenus.add(addSibling);
-        contextMenus.add(edit);
-        contextMenus.add(delete);
-        addSub.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(select, 1, (node) -> {
-                    node.updateNode();
-                    treeModel.insertNodeInto(node, select, select.getChildCount());
-                    if (select instanceof ObjectNode) {
-//                        JSONObject value = (JSONObject) select.value;
-//                        value.put(node.key, node.value);
-                    } else if (select instanceof ArrayNode) {
-                        select.updateArrayNodeChildren();
-//                        JSONArray value = (JSONArray) select.value;
-//                        value.add(node.value);
-                    } else {
-                        select.type = TreeNode.OBJECT;
-                        select.value = new JSONObject(true);
-                    }
-                    select.updateNode();
-                    tree.expandPath(new TreePath(select.getPath()));
-                });
-            }
-        });
-        addSibling.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                TreeNode parent = (TreeNode) select.getParent();
-                new AddOrEdit(select, 2, (node) -> {
-                    node.updateNode();
-                    int index = parent.getIndex(select) + 1;
-                    treeModel.insertNodeInto(node, parent, index);
-                    node.updateNode();
-                    parent.updateNode();
-                });
-            }
-        });
-        edit.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(select, 3, (node) -> {
-                    node.updateNode();
-                });
-            }
-        });
-        delete.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                TreeNode[] selectedNodes = tree.getSelectedNodes(TreeNode.class, null);
-                for (TreeNode node : selectedNodes) {
-                    TreeNode parent = (TreeNode) node.getParent();
-                    treeModel.removeNodeFromParent(node);
-                    parent.updateNode();
-                    parent.updateArrayNodeChildren();
-                }
-            }
-        });
+        undoManager.setLimit(10);
     }
 
     private void paintLeft() {
@@ -185,6 +122,7 @@ public class JsonEditor implements ToolWindowFactory {
         c.gridwidth = 3;
         c.fill = GridBagConstraints.BOTH;
         JBScrollPane scrollPane = new JBScrollPane(textArea);
+        textArea.setText(temp);
         scrollPane.setVerticalScrollBarPolicy(JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         leftLayout.setConstraints(scrollPane, c);
         left.add(scrollPane);
@@ -244,32 +182,60 @@ public class JsonEditor implements ToolWindowFactory {
         scrollPane.setVerticalScrollBarPolicy(JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         rightLayout.setConstraints(scrollPane, c);
         right.add(scrollPane);
+        initContextMenu();
+    }
+
+    private void addActions() {
+        format.addActionListener((e) -> {
+            Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
+            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+        });
+        compressJson.addActionListener((e) -> {
+            Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
+            textArea.setText(JSON.toJSONString(json, SerializerFeature.WriteMapNullValue));
+        });
+        reset.addActionListener((e) -> {
+            Object json = JSON.parse(temp, Feature.OrderedField);
+            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            format.doClick();
+            syncToRight.doClick();
+        });
+        syncToRight.addActionListener((e) -> {
+            root.removeAllChildren();
+            try {
+                root.value = JSON.parse(textArea.getText(), Feature.OrderedField);
+            } catch (JSONException ex) {
+                JOptionPane.showMessageDialog(panel, "json格式错误",
+                        "error", JOptionPane.ERROR_MESSAGE);
+            }
+            refreshTree(root);
+            tree.expandPath(new TreePath(root.getPath()));
+            tree.updateUI();
+        });
+        syncToLeft.addActionListener((e) -> {
+            refreshJson(root);
+            textArea.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+        });
+        expendJson.addActionListener((e) -> expandTree(tree, new TreePath(root)));
+        closeJson.addActionListener((e) -> collapseTree(tree, new TreePath(root)));
+        back.addActionListener((e) -> {
+            try {
+                undoManager.undo();
+            } catch (CannotUndoException ex) {
+            }
+        });
+        forward.addActionListener((e) -> {
+            try {
+                undoManager.redo();
+            } catch (CannotRedoException ex) {
+            }
+        });
     }
 
     private void initTree() {
         tree = new Tree(root);
         treeModel = (DefaultTreeModel) tree.getModel();
-        treeModel.addTreeModelListener(new TreeModelAdapter() {
-            @Override
-            public void treeStructureChanged(TreeModelEvent event) {
-                System.out.println("structure change");
-            }
-
-            @Override
-            public void treeNodesChanged(TreeModelEvent event) {
-                System.out.println("change");
-            }
-
-            @Override
-            public void treeNodesInserted(TreeModelEvent event) {
-                System.out.println("add");
-            }
-
-            @Override
-            public void treeNodesRemoved(TreeModelEvent event) {
-                System.out.println("del");
-            }
-        });
+        tree.setCellRenderer(new CustomTreeCellRenderer());
         tree.setRowHeight(30);
         tree.setDragEnabled(true);
         tree.setTransferHandler(new TransferHandler("drag node."));
@@ -279,6 +245,16 @@ public class JsonEditor implements ToolWindowFactory {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.isMetaDown()) {
+                    TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
+                    if (select.isRoot()) {
+                        addSibling.setVisible(false);
+                        edit.setVisible(false);
+                        delete.setVisible(false);
+                    } else {
+                        addSibling.setVisible(true);
+                        edit.setVisible(true);
+                        delete.setVisible(true);
+                    }
                     contextMenus.show(tree, e.getX(), e.getY());
                 }
             }
@@ -292,28 +268,24 @@ public class JsonEditor implements ToolWindowFactory {
                             Optional.ofNullable(pathWhenReleased.getLastPathComponent()).ifPresent((curNode) -> {
                                 TreeNode target = (TreeNode) curNode;
                                 TreeNode movingNode = (TreeNode) movingPath.getLastPathComponent();
-                                TreeNode movingNodeParent = (TreeNode) movingNode.getParent();
                                 TreeNode cloneNode = movingNode.clone();
-                                if (TreeNode.OBJECT.equals(target.type)) {
-                                    treeModel.insertNodeInto(cloneNode, target, target.getChildCount());
-                                    target.updateNode();
+                                AddAction addAction;
+                                if (target instanceof ObjectNode || target instanceof ArrayNode) {
+                                    addAction = new AddAction(tree, cloneNode, target, target.getChildCount());
                                 } else {
-                                    Optional.ofNullable(target.getParent()).ifPresent((parentNode) -> {
-                                        TreeNode parent = (TreeNode) parentNode;
-                                        int newIndex = parent.getIndex(target);
-                                        if (!parent.equals(movingNode.getParent()) || newIndex > parent.getIndex(movingNode)) {
-                                            newIndex += 1;
-                                        }
-                                        treeModel.insertNodeInto(cloneNode, parent, newIndex);
-                                        parent.updateNode();
-                                    });
+                                    TreeNode parent = target.getParent();
+                                    int newIndex = parent.getIndex(target);
+                                    if (!parent.equals(movingNode.getParent()) || newIndex > parent.getIndex(movingNode)) {
+                                        newIndex += 1;
+                                    }
+                                    addAction = new AddAction(tree, cloneNode, parent, newIndex);
                                 }
-                                treeModel.removeNodeFromParent(movingNode);
-                                movingNodeParent.updateNode();
-                                tree.setSelectionPath(new TreePath(cloneNode.getPath()));
+                                DeleteAction delAction = new DeleteAction(tree, new TreeNode[]{movingNode});
+                                // 一个拖拽动作等效为一个插入和删除节点动作
+                                DragAction dragAction = new DragAction(tree, addAction, delAction);
+                                dragAction.doAction();
+                                undoManager.addEdit(dragAction);
                             });
-                        } else {
-                            System.out.println("aaa");
                         }
                     }
                     movingPath = null;
@@ -334,41 +306,68 @@ public class JsonEditor implements ToolWindowFactory {
         });
     }
 
-    private void addActions() {
-        format.addActionListener((e) -> {
-            Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+    private void initContextMenu() {
+        contextMenus.add(addSub);
+        contextMenus.add(addSibling);
+        contextMenus.add(edit);
+        contextMenus.add(delete);
+        addSub.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
+                new AddOrEdit(select, 1, (node, selectNode) -> {
+                    TreeAction action;
+                    if (selectNode instanceof StringNode || selectNode instanceof OtherNode) {
+                        TreeNode newSelect = TreeNode.getNode(selectNode.key, new JSONObject(true));
+                        newSelect.add(node);
+                        action = new ReplaceAction(tree, newSelect, selectNode, false);
+                    } else {
+                        action = new AddAction(tree, node, selectNode, selectNode.getChildCount());
+                    }
+                    action.doAction();
+                    undoManager.addEdit(action);
+                });
+            }
         });
-        compressJson.addActionListener((e) -> {
-            Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json, SerializerFeature.WriteMapNullValue));
+        addSibling.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
+                TreeNode parent = select.getParent();
+                new AddOrEdit(select, 2, (node, selectNode) -> {
+                    int index = parent.getIndex(selectNode) + 1;
+                    AddAction action = new AddAction(tree, node, parent, index);
+                    action.doAction();
+                    undoManager.addEdit(action);
+                });
+            }
         });
-        reset.addActionListener((e) -> {
-            Object json = JSON.parse(temp, Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-            format.doClick();
-            syncToRight.doClick();
+        edit.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
+                new AddOrEdit(select, 3, (node, selectNode) -> {
+                    boolean keepChildren = false;
+                    if (node instanceof ObjectNode || node instanceof ArrayNode) {
+                        if (selectNode instanceof ObjectNode || selectNode instanceof ArrayNode) {
+                            node.attachChildrenFromAnotherNode(selectNode);
+                            keepChildren = true;
+                        }
+                    }
+                    ReplaceAction action = new ReplaceAction(tree, node, selectNode, keepChildren);
+                    action.doAction();
+                    undoManager.addEdit(action);
+                });
+            }
         });
-        syncToRight.addActionListener((e) -> {
-            root.removeAllChildren();
-            root.value = JSON.parse(textArea.getText(), Feature.OrderedField);
-            refreshTree(root);
-            tree.expandPath(new TreePath(root.getPath()));
-            tree.updateUI();
-        });
-        syncToLeft.addActionListener((e) -> {
-            refreshJson(root);
-            textArea.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-        });
-        expendJson.addActionListener((e) -> expandTree(tree, new TreePath(root)));
-        closeJson.addActionListener((e) -> collapseTree(tree, new TreePath(root)));
-        back.addActionListener((e) -> {
-            JOptionPane.showMessageDialog(panel, "coming soon.",
-                    "tip", JOptionPane.INFORMATION_MESSAGE);
-        });
-        forward.addActionListener((e) -> {
-            JOptionPane.showMessageDialog(panel, "coming soon.",
-                    "tip", JOptionPane.INFORMATION_MESSAGE);
+        delete.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TreeNode[] selectedNodes = tree.getSelectedNodes(TreeNode.class, null);
+                DeleteAction action = new DeleteAction(tree, selectedNodes);
+                action.doAction();
+                undoManager.addEdit(action);
+            }
         });
     }
 
@@ -394,7 +393,6 @@ public class JsonEditor implements ToolWindowFactory {
 
     public void refreshTree(TreeNode node) {
         if (node.value instanceof JSONObject) {
-//            node.type = TreeNode.OBJECT;
             JSONObject object = (JSONObject) node.value;
             node.label = node.key + " : " + "{" + object.size() + "}";
             object.forEach((k, v) -> {
@@ -403,7 +401,6 @@ public class JsonEditor implements ToolWindowFactory {
                 refreshTree(subNode);
             });
         } else if (node.value instanceof JSONArray) {
-//            node.type = TreeNode.ARRAY;
             JSONArray array = (JSONArray) node.value;
             node.label = node.key + " : " + "[" + array.size() + "]";
             for (int i = 0; i < array.size(); i++) {
@@ -415,7 +412,6 @@ public class JsonEditor implements ToolWindowFactory {
             }
         } else {
             node.label = node.key + " : " + node.value.toString();
-//            node.type = TreeNode.OTHER;
         }
         node.setUserObject(node.label);
     }
@@ -456,10 +452,10 @@ public class JsonEditor implements ToolWindowFactory {
         private JBLabel typeLabel = new JBLabel("type");
 
         private ComboBox<SelectItem> type = new ComboBox<SelectItem>() {{
-            addItem(SelectItem.STRING);
-            addItem(SelectItem.OBJECT);
-            addItem(SelectItem.ARRAY);
-            addItem(SelectItem.OTHER);
+            addItem(SelectItem.String);
+            addItem(SelectItem.Object);
+            addItem(SelectItem.Array);
+            addItem(SelectItem.Other);
         }};
 
         private JBTextField key = new JBTextField();
@@ -478,49 +474,48 @@ public class JsonEditor implements ToolWindowFactory {
 
         private String title = "Add";
 
-        // 1、2、3分别代表新增子节点、新增兄弟节点、编辑节点
-        private Integer opt;
+        private BiConsumer<TreeNode, TreeNode> callback;
 
-        private Consumer<TreeNode> callback;
-
-        public AddOrEdit(TreeNode node, Integer opt, Consumer<TreeNode> callback) {
-            this.opt = opt;
+        public AddOrEdit(TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
             this.selectNode = node;
             this.callback = callback;
+            // 1、2、3分别代表新增子节点、新增兄弟节点、编辑节点
             if (opt == 1) {
-                if (TreeNode.ARRAY.equals(selectNode.type)) {
+                type.setSelectedItem(SelectItem.String);
+                if (node instanceof ArrayNode) {
                     key.setVisible(false);
                     keyLabel.setVisible(false);
                 }
-            } if (opt == 2) {
-                TreeNode parent = (TreeNode) node.getParent();
-                if (TreeNode.ARRAY.equals(parent.type)) {
+            } else if (opt == 2) {
+                type.setSelectedItem(SelectItem.String);
+                TreeNode parent = node.getParent();
+                if (parent instanceof ArrayNode) {
                     key.setVisible(false);
                     keyLabel.setVisible(false);
                 }
-            } else {
+            } else if (opt == 3) {
                 title = "Edit";
                 if (node instanceof ObjectNode) {
-                    type.setSelectedItem(SelectItem.OBJECT);
+                    type.setSelectedItem(SelectItem.Object);
                     value.setVisible(false);
                     valueLabel.setVisible(false);
                 } else if (node instanceof ArrayNode) {
-                    type.setSelectedItem(SelectItem.ARRAY);
+                    type.setSelectedItem(SelectItem.Array);
                     value.setVisible(false);
                     valueLabel.setVisible(false);
                 } else if (node instanceof StringNode) {
-                    type.setSelectedItem(SelectItem.STRING);
+                    type.setSelectedItem(SelectItem.String);
                 } else {
-                    type.setSelectedItem(SelectItem.OTHER);
+                    type.setSelectedItem(SelectItem.Other);
                 }
-                TreeNode parent = (TreeNode) selectNode.getParent();
+                TreeNode parent = selectNode.getParent();
                 if (parent instanceof ArrayNode) {
                     key.setVisible(false);
                     keyLabel.setVisible(false);
                 }
             }
             key.setText(opt != 3 ? "key" : node.key);
-            value.setText(opt != 3  ? "value" : (node.value == null ? "null" : node.value.toString()));
+            value.setText(opt != 3 ? "value" : (node.value == null ? "null" : node.value.toString()));
             openDialog();
         }
 
@@ -597,7 +592,7 @@ public class JsonEditor implements ToolWindowFactory {
             type.addItemListener((e) -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     SelectItem select = (SelectItem) type.getSelectedItem();
-                    if (TreeNode.OBJECT.equals(select.value) || TreeNode.ARRAY.equals(select.value)) {
+                    if (SelectItem.Object.equals(select) || SelectItem.Array.equals(select)) {
                         value.setVisible(false);
                         valueLabel.setVisible(false);
                     } else {
@@ -609,95 +604,31 @@ public class JsonEditor implements ToolWindowFactory {
             ok.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    TreeNode returnNode;
-                    if (opt != 3) {
-                        String nodeKey = key.getText();
-                        Object nodeValue;
-                        Integer nodeType = ((SelectItem) type.getSelectedItem()).getValue();
-                        if (TreeNode.OBJECT.equals(nodeType)) {
-                            nodeValue = new JSONObject(true);
-                        } else if (TreeNode.ARRAY.equals(nodeType)) {
-                            nodeValue = new JSONArray();
-                        } else if (TreeNode.STRING.equals(nodeType)) {
-                            nodeValue = value.getText();
-                        } else {
-                            String valueStr = value.getText();
-                            try {
-                                if ("".equals(valueStr)) {
-                                    nodeValue = null;
-                                } else if ("true".equalsIgnoreCase(valueStr) || "false".equalsIgnoreCase(valueStr)) {
-                                    nodeValue = Boolean.parseBoolean(valueStr);
-                                } else if (Utils.isInteger(valueStr)) {
-                                    nodeValue = Long.parseLong(valueStr);
-                                } else if (Utils.isFloat(valueStr)) {
-                                    nodeValue = Double.parseDouble(valueStr);
-                                } else {
-                                    nodeValue = value.getText();
-                                }
-                            } catch (Exception ex) {
-                                nodeValue = valueStr;
-                            }
-                        }
-                        returnNode = TreeNode.getNode(nodeKey, nodeValue);
+                    String nodeKey = key.getText();
+                    Object nodeValue;
+                    SelectItem nodeType = (SelectItem) type.getSelectedItem();
+                    if (SelectItem.Object.equals(nodeType)) {
+                        nodeValue = new JSONObject(true);
+                    } else if (SelectItem.Array.equals(nodeType)) {
+                        nodeValue = new JSONArray();
+                    } else if (SelectItem.String.equals(nodeType)) {
+                        nodeValue = value.getText();
                     } else {
-                        selectNode.key = key.getText();
-                        selectNode.type = ((SelectItem) type.getSelectedItem()).getValue();
-                        if (TreeNode.OBJECT.equals(selectNode.type)) {
-                            JSONObject obj = new JSONObject(true);
-                            for (int i = 0; i < selectNode.getChildCount(); i++) {
-                                TreeNode child = (TreeNode) selectNode.getChildAt(i);
-                                obj.put(child.key, child.value);
-                            }
-                            selectNode.value = obj;
-                            selectNode.updateObjectNodeChildren();
-                        } else if (TreeNode.ARRAY.equals(selectNode.type)) {
-                            JSONArray array = new JSONArray();
-                            for (int i = 0; i < selectNode.getChildCount(); i++) {
-                                TreeNode child = (TreeNode) selectNode.getChildAt(i);
-                                array.add(child.value);
-                            }
-                            selectNode.value = array;
-                            selectNode.updateArrayNodeChildren();
-                        } else if (TreeNode.STRING.equals(selectNode.type)) {
-                            selectNode.value = value.getText();
-                            while (true) {
-                                Enumeration<?> ele = selectNode.children();
-                                if (ele.hasMoreElements()) {
-                                    treeModel.removeNodeFromParent((TreeNode) ele.nextElement());
-                                } else {
-                                    break;
-                                }
-                            }
-                            selectNode.updateNode();
+                        String valueStr = value.getText();
+                        if ("".equals(valueStr)) {
+                            nodeValue = null;
+                        } else if ("true".equalsIgnoreCase(valueStr) || "false".equalsIgnoreCase(valueStr)) {
+                            nodeValue = Boolean.parseBoolean(valueStr);
+                        } else if (Utils.isInteger(valueStr)) {
+                            nodeValue = Long.parseLong(valueStr);
+                        } else if (Utils.isFloat(valueStr)) {
+                            nodeValue = Double.parseDouble(valueStr);
                         } else {
-                            while (true) {
-                                Enumeration<?> ele = selectNode.children();
-                                if (ele.hasMoreElements()) {
-                                    treeModel.removeNodeFromParent((TreeNode) ele.nextElement());
-                                } else {
-                                    break;
-                                }
-                            }
-                            String valueStr = value.getText();
-                            try {
-                                if ("".equals(valueStr)) {
-                                    selectNode.value = null;
-                                } else if ("true".equalsIgnoreCase(valueStr) || "false".equalsIgnoreCase(valueStr)) {
-                                    selectNode.value = Boolean.parseBoolean(valueStr);
-                                } else if (Utils.isInteger(valueStr)) {
-                                    selectNode.value = Long.parseLong(valueStr);
-                                } else if (Utils.isFloat(valueStr)) {
-                                    selectNode.value = Double.parseDouble(valueStr);
-                                } else {
-                                    selectNode.value = value.getText();
-                                }
-                            } catch (Exception ex) {
-                                selectNode.value = valueStr;
-                            }
+                            nodeValue = value.getText();
                         }
-                        returnNode = selectNode;
                     }
-                    callback.accept(returnNode);
+                    TreeNode returnNode = TreeNode.getNode(nodeKey, nodeValue);
+                    callback.accept(returnNode, selectNode);
                     AddOrEdit.this.dispose();
                 }
             });
@@ -713,32 +644,11 @@ public class JsonEditor implements ToolWindowFactory {
     enum SelectItem {
 
         // types
-        OBJECT("Object", 1),
-        ARRAY("Array", 2),
-        STRING("String", 3),
-        OTHER("Other", 4);
+        Object,
+        Array,
+        String,
+        Other;
 
-        private String name;
-
-        private Integer value;
-
-        SelectItem(String name, Integer value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        public static SelectItem getItemByValue(Integer value) {
-            return Arrays.stream(values()).filter(item -> value.equals(item.getValue())).findAny().orElse(null);
-        }
-
-        public Integer getValue() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
     }
 
     public static void main(String[] args) {
