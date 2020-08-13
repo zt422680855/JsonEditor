@@ -187,12 +187,22 @@ public class JsonEditor implements ToolWindowFactory {
 
     private void addActions() {
         format.addActionListener((e) -> {
-            Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            try {
+                Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
+                textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(panel, "json格式错误",
+                        "error", JOptionPane.ERROR_MESSAGE);
+            }
         });
         compressJson.addActionListener((e) -> {
-            Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
-            textArea.setText(JSON.toJSONString(json, SerializerFeature.WriteMapNullValue));
+            try {
+                Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
+                textArea.setText(JSON.toJSONString(json, SerializerFeature.WriteMapNullValue));
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(panel, "json格式错误",
+                        "error", JOptionPane.ERROR_MESSAGE);
+            }
         });
         reset.addActionListener((e) -> {
             Object json = JSON.parse(temp, Feature.OrderedField);
