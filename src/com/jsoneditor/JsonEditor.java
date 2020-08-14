@@ -191,8 +191,7 @@ public class JsonEditor implements ToolWindowFactory {
                 Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
                 textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(panel, "json格式错误",
-                        "error", JOptionPane.ERROR_MESSAGE);
+                jsonError();
             }
         });
         compressJson.addActionListener((e) -> {
@@ -200,8 +199,7 @@ public class JsonEditor implements ToolWindowFactory {
                 Object json = JSON.parse(textArea.getText(), Feature.OrderedField);
                 textArea.setText(JSON.toJSONString(json, SerializerFeature.WriteMapNullValue));
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(panel, "json格式错误",
-                        "error", JOptionPane.ERROR_MESSAGE);
+                jsonError();
             }
         });
         reset.addActionListener((e) -> {
@@ -219,8 +217,7 @@ public class JsonEditor implements ToolWindowFactory {
                 tree.updateUI();
                 undoManager.discardAllEdits();
             } catch (JSONException ex) {
-                JOptionPane.showMessageDialog(panel, "json格式错误",
-                        "error", JOptionPane.ERROR_MESSAGE);
+                jsonError();
             }
         });
         syncToLeft.addActionListener((e) -> {
@@ -409,8 +406,13 @@ public class JsonEditor implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(panel, "", false);
+        Content content = contentFactory.createContent(panel, "JSON Editor", true);
         toolWindow.getContentManager().addContent(content);
+    }
+
+    private void jsonError() {
+        JOptionPane.showMessageDialog(panel, "JSON format error",
+                "error", JOptionPane.ERROR_MESSAGE);
     }
 
     class AddOrEdit extends JDialog {

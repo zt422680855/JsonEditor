@@ -17,7 +17,7 @@ import javax.swing.undo.CannotUndoException;
 public class AddAction extends TreeAction {
 
     // 待添加的节点
-    private TreeNode target;
+    protected TreeNode target;
 
     // 添加到该父节点下
     private TreeNode parent;

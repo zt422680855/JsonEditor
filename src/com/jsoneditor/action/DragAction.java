@@ -2,6 +2,7 @@ package com.jsoneditor.action;
 
 import com.intellij.ui.treeStructure.Tree;
 
+import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotUndoException;
 
 /**
@@ -24,6 +25,7 @@ public class DragAction extends TreeAction {
     @Override
     public void doAction() {
         addAction.doAction();
+        tree.setSelectionPath(new TreePath(addAction.target.getPath()));
         delAction.doAction();
     }
 
