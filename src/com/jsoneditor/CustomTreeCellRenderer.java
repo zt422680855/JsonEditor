@@ -1,5 +1,6 @@
 package com.jsoneditor;
 
+import com.intellij.ui.JBColor;
 import com.intellij.ui.JBDefaultTreeCellRenderer;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
@@ -19,9 +20,13 @@ public class CustomTreeCellRenderer extends JBDefaultTreeCellRenderer {
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
                                                   boolean leaf, int row, boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-        if (sel && !hasFocus) {
-            setBackgroundSelectionColor(getBackground());
-        }
+//        if (sel) {
+//            if (hasFocus) {
+//                setBackgroundSelectionColor(getBackground());
+//            } else {
+//                setBackgroundSelectionColor(JBColor.PINK);
+//            }
+//        }
         Icon icon;
         if (value instanceof ObjectNode) {
             icon = Icons.OBJECT;

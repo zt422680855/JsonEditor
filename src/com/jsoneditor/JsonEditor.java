@@ -406,7 +406,8 @@ public class JsonEditor implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(panel, "JSON Editor", true);
+        Content content = contentFactory.createContent(panel, "", true);
+        content.setCloseable(true);
         toolWindow.getContentManager().addContent(content);
     }
 
