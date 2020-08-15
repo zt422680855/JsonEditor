@@ -20,13 +20,15 @@ public class CustomTreeCellRenderer extends JBDefaultTreeCellRenderer {
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
                                                   boolean leaf, int row, boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-//        if (sel) {
-//            if (hasFocus) {
-//                setBackgroundSelectionColor(getBackground());
-//            } else {
-//                setBackgroundSelectionColor(JBColor.PINK);
-//            }
-//        }
+        // 解决选中并失去焦点时，背景颜色不一致问题
+        if (sel) {
+            setBackgroundSelectionColor(null);
+        }
+        // 解决value过长显示问题
+        final Dimension size = getPreferredSize();
+        Dimension rv = new Dimension(300, size.height);
+        setPreferredSize(rv);
+        // 设置节点icon
         Icon icon;
         if (value instanceof ObjectNode) {
             icon = Icons.OBJECT;
