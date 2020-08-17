@@ -23,9 +23,9 @@ public class Left extends JBPanel {
     private GridBagLayout layout;
 
     protected JTextArea textArea = new JTextArea();
-    protected JButton format = new JButton("format");
-    protected JButton compressJson = new JButton("compress");
-    protected JButton reset = new JButton("reset");
+    private JButton format = new JButton("format");
+    private JButton compressJson = new JButton("compress");
+    private JButton reset = new JButton("reset");
 
     public Left(JBPanel panel) {
         this.parentPanel = panel;
@@ -36,7 +36,7 @@ public class Left extends JBPanel {
         compress();
     }
 
-    public void paint() {
+    private void paint() {
         GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 150;

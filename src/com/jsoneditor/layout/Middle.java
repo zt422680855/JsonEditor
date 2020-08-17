@@ -25,7 +25,7 @@ public class Middle extends JBPanel {
     private GridBagLayout layout;
 
     public JButton syncToRight = new JButton(">");
-    public JButton syncToLeft = new JButton("<");
+    private JButton syncToLeft = new JButton("<");
 
     public Middle(JBPanel panel) {
         this.parentPanel = panel;
