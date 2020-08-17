@@ -1,6 +1,5 @@
 package com.jsoneditor;
 
-import com.intellij.ui.JBColor;
 import com.intellij.ui.JBDefaultTreeCellRenderer;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
