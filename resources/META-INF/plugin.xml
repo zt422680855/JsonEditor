@@ -23,7 +23,7 @@
   <idea-version since-build="173.0"/>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="JSON Editor" icon="/icons/main-icon.svg" anchor="right" factoryClass="com.jsoneditor.JsonEditor" />
+    <toolWindow id="JSON Editor" secondary="true" icon="/icons/main-icon.svg" anchor="right" factoryClass="com.jsoneditor.JsonEditor" />
   </extensions>
 
   <actions>

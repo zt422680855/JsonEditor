@@ -1,11 +1,10 @@
-package com.jsoneditor.layout;
+package com.jsoneditor.moddle;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
-import com.jsoneditor.After;
 import com.jsoneditor.Constant;
 
 import javax.swing.*;
@@ -34,6 +33,7 @@ public class Left extends JBPanel {
         paint();
         format();
         compress();
+        reset();
     }
 
     private void paint() {
@@ -91,11 +91,10 @@ public class Left extends JBPanel {
         });
     }
 
-    public void reset(After after) {
+    private void reset() {
         reset.addActionListener((e) -> {
             Object json = JSON.parse(Constant.TEMP, Feature.OrderedField);
             textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-            after.process();
         });
     }
 

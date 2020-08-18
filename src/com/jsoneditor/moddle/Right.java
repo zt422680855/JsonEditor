@@ -1,4 +1,4 @@
-package com.jsoneditor.layout;
+package com.jsoneditor.moddle;
 
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.openapi.ui.JBMenuItem;
