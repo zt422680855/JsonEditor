@@ -60,14 +60,13 @@ public class Right extends JBPanel {
         GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 100;
-        c.weighty = 10;
+        c.weighty = 5;
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
         parentPanel.add(this);
         c = new GridBagConstraints();
         c.weightx = 10;
         c.weighty = 2;
-        c.ipady = -1;
         c.fill = GridBagConstraints.BOTH;
         layout.setConstraints(expendJson, c);
         layout.setConstraints(closeJson, c);
@@ -79,7 +78,7 @@ public class Right extends JBPanel {
         add(back);
         add(forward);
         c = new GridBagConstraints();
-        c.weighty = 100;
+        c.weighty = 200;
         c.gridwidth = 4;
         c.fill = GridBagConstraints.BOTH;
         initTree();

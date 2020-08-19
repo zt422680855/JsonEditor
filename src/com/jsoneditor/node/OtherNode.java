@@ -22,7 +22,7 @@ public class OtherNode extends TreeNode {
     public void updateNode() {
         TreeNode parent = getParent();
         if (parent == null || parent instanceof ObjectNode) {
-            label = key + " : " + (value != null ? value.toString() : "");
+            label = key + " : " + value;
         } else if (parent instanceof ArrayNode) {
             label = parent.getIndex(this) + " : " + (value != null ? value.toString() : "");
         }

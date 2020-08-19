@@ -204,6 +204,8 @@ public class AddOrEdit extends JDialog {
                         nodeValue = Long.parseLong(valueStr);
                     } else if (Utils.isFloat(valueStr)) {
                         nodeValue = Double.parseDouble(valueStr);
+                    } else if ("null".equals(valueStr)) {
+                        nodeValue = null;
                     } else {
                         nodeValue = value.getText();
                     }

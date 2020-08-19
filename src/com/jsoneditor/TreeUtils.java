@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.Tree;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
+import com.jsoneditor.node.OtherNode;
+import com.jsoneditor.node.StringNode;
 
 import javax.swing.tree.TreePath;
 import java.util.Enumeration;
@@ -22,6 +24,11 @@ public class TreeUtils {
             obj.clear();
             for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
                 TreeNode currNode = (TreeNode) e.nextElement();
+                if ("null".equals(currNode.value)) {
+                    if (currNode instanceof OtherNode) {
+                        currNode.value = null;
+                    }
+                }
                 obj.put(currNode.key, currNode.value);
                 refreshJson(currNode);
             }
@@ -30,6 +37,9 @@ public class TreeUtils {
             array.clear();
             for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
                 TreeNode currNode = (TreeNode) e.nextElement();
+                if ("null".equals(currNode.value)) {
+                    currNode.value = null;
+                }
                 array.add(currNode.value);
                 refreshJson(currNode);
             }
@@ -57,6 +67,9 @@ public class TreeUtils {
                 refreshTree(subNode);
             }
         } else {
+            if (node.value == null) {
+                node.value = "null";
+            }
             node.label = node.key + " : " + node.value.toString();
         }
         node.setUserObject(node.label);

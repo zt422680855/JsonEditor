@@ -3,6 +3,7 @@ package com.jsoneditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
@@ -41,26 +42,28 @@ public class JsonEditor extends JBPanel implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        ContentManager contentManager = toolWindow.getContentManager();
-        Content[] contents = contentManager.getContents();
-        Content content = null;
-        for (Content ct : contents) {
-            if (project.getName().equals(ct.getDisplayName())) {
-                content = ct;
-            }
-        }
-        if (content == null) {
-            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-            content = contentFactory.createContent(this, project.getName(), true);
-            contentManager.addContent(content);
-        } else {
-            contentManager.setSelectedContent(content);
-        }
-        toolWindow.activate(null, true);
-//        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-//        Content content = contentFactory.createContent(this, "JSON Editor", true);
-
-//        toolWindow.getContentManager().addContent(content);
+//        String projectName = project.getName();
+//        ContentManager contentManager = toolWindow.getContentManager();
+//        Content[] contents = contentManager.getContents();
+//        Content content = null;
+//        for (Content ct : contents) {
+//            if (projectName.equals(ct.getDisplayName())) {
+//                content = ct;
+//            }
+//        }
+//        if (content == null) {
+//            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+//            content = contentFactory.createContent(this, projectName, true);
+//            contentManager.addContent(content);
+//        } else {
+//            contentManager.setSelectedContent(content);
+//        }
+//        toolWindow.activate(null, true);
+        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+        Content content = contentFactory.createContent(this, "", true);
+        toolWindow.getContentManager().addContent(content);
+//        JOptionPane.showMessageDialog(this, sb.toString() + contents.length,
+//                "error", JOptionPane.ERROR_MESSAGE);
     }
 
     // 本地测试用

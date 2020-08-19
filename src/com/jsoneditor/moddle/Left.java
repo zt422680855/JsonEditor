@@ -40,14 +40,13 @@ public class Left extends JBPanel {
         GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 150;
-        c.weighty = 10;
+        c.weighty = 5;
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
         parentPanel.add(this);
         c = new GridBagConstraints();
         c.weightx = 10;
-        c.weighty = 4;
-        c.ipady = -10;
+        c.weighty = 2;
         c.fill = GridBagConstraints.BOTH;
         layout.setConstraints(format, c);
         layout.setConstraints(compressJson, c);
@@ -57,7 +56,7 @@ public class Left extends JBPanel {
         add(compressJson);
         add(reset);
         c = new GridBagConstraints();
-        c.weighty = 100;
+        c.weighty = 200;
         c.gridwidth = 3;
         c.fill = GridBagConstraints.BOTH;
         JBScrollPane scrollPane = new JBScrollPane(textArea);
