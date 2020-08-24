@@ -49,7 +49,6 @@ public class JsonEditor extends JBPanel implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        right.setVisible(false);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(this, "", true);
         toolWindow.getContentManager().addContent(content);
