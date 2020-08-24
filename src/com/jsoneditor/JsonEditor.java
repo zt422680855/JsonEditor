@@ -1,13 +1,14 @@
 package com.jsoneditor;
 
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.content.ContentManager;
+import com.jsoneditor.buttons.*;
 import com.jsoneditor.moddle.Left;
 import com.jsoneditor.moddle.Middle;
 import com.jsoneditor.moddle.Right;
@@ -26,15 +27,21 @@ import java.awt.*;
  */
 public class JsonEditor extends JBPanel implements ToolWindowFactory {
 
+    private Left left;
+
+    private Middle middle;
+
+    private Right right;
+
     public JsonEditor() {
         setLayout(new GridBagLayout());
         init();
     }
 
     private void init() {
-        Left left = new Left(this);
-        Middle middle = new Middle(this);
-        Right right = new Right(this);
+        this.left = new Left(this);
+        this.middle = new Middle(this);
+        this.right = new Right(this);
         middle.toRight(left, right);
         middle.toLeft(left, right);
         middle.syncToRight.doClick();
@@ -42,28 +49,23 @@ public class JsonEditor extends JBPanel implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-//        String projectName = project.getName();
-//        ContentManager contentManager = toolWindow.getContentManager();
-//        Content[] contents = contentManager.getContents();
-//        Content content = null;
-//        for (Content ct : contents) {
-//            if (projectName.equals(ct.getDisplayName())) {
-//                content = ct;
-//            }
-//        }
-//        if (content == null) {
-//            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-//            content = contentFactory.createContent(this, projectName, true);
-//            contentManager.addContent(content);
-//        } else {
-//            contentManager.setSelectedContent(content);
-//        }
-//        toolWindow.activate(null, true);
+        right.setVisible(false);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(this, "", true);
         toolWindow.getContentManager().addContent(content);
-//        JOptionPane.showMessageDialog(this, sb.toString() + contents.length,
-//                "error", JOptionPane.ERROR_MESSAGE);
+        addActions(toolWindow);
+    }
+
+    private void addActions(@NotNull ToolWindow toolWindow) {
+        Format format = new Format(left);
+        Compress compress = new Compress(left);
+        Reset reset = new Reset(left);
+        Expand expand = new Expand(right);
+        Close close = new Close(right);
+        Back back = new Back();
+        Forward forward = new Forward();
+        ToolWindowEx ex = (ToolWindowEx) toolWindow;
+        ex.setTitleActions(format, compress, reset, expand, close, back, forward);
     }
 
     // 本地测试用

@@ -27,5 +27,6 @@ public abstract class TreeAction extends AbstractUndoableEdit {
     @Override
     public void redo() throws CannotRedoException {
         doAction();
+        super.redo();
     }
 }

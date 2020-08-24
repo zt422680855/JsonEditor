@@ -40,6 +40,7 @@ public class DeleteAction extends TreeAction {
             treeModel.insertNodeInto(nodeInfo.target, parent, nodeInfo.index);
             parent.updateNode();
         });
+        super.undo();
     }
 
     class NodeInfo {
@@ -56,4 +57,5 @@ public class DeleteAction extends TreeAction {
             this.index = parent.getIndex(target);
         }
     }
+
 }

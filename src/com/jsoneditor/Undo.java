@@ -24,14 +24,18 @@ public class Undo {
 
     public static void undo() {
         try {
-            UNDO_MANAGER.undo();
+            if (UNDO_MANAGER.canUndo()) {
+                UNDO_MANAGER.undo();
+            }
         } catch (CannotUndoException ex) {
         }
     }
 
     public static void redo() {
         try {
-            UNDO_MANAGER.redo();
+            if (UNDO_MANAGER.canRedo()) {
+                UNDO_MANAGER.redo();
+            }
         } catch (CannotUndoException ex) {
         }
     }

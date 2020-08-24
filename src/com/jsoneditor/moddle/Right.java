@@ -38,8 +38,8 @@ public class Right extends JBPanel {
     private JButton closeJson = new JButton("close");
     private JButton back = new JButton("back");
     private JButton forward = new JButton("forward");
-    protected Tree tree;
-    protected ObjectNode root = new ObjectNode("ROOT", "");
+    public Tree tree;
+    public ObjectNode root = new ObjectNode("ROOT", "");
     private TreePath movingPath;
 
     private JBPopupMenu contextMenus = new JBPopupMenu();

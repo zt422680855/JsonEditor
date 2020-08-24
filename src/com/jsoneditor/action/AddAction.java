@@ -47,5 +47,7 @@ public class AddAction extends TreeAction {
     public void undo() throws CannotUndoException {
         treeModel.removeNodeFromParent(target);
         parent.updateNode();
+        super.undo();
     }
+
 }

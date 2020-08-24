@@ -19,4 +19,9 @@ public interface Icons {
     Icon ARRAY = IconLoader.getIcon("/icons/array.png");
     Icon AUTO = IconLoader.getIcon("/icons/auto.png");
 
+    Icon FORMAT = IconLoader.getIcon("/icons/format.png");
+    Icon COMPRESS = IconLoader.getIcon("/icons/compress.png");
+    Icon I2 = IconLoader.getIcon("/actions/expandall.png");
+    Icon I3 = IconLoader.getIcon("/actions/collapseall.png");
+
 }

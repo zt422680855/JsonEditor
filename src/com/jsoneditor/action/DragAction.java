@@ -3,6 +3,7 @@ package com.jsoneditor.action;
 import com.intellij.ui.treeStructure.Tree;
 
 import javax.swing.tree.TreePath;
+import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 /**
@@ -33,5 +34,22 @@ public class DragAction extends TreeAction {
     public void undo() throws CannotUndoException {
         addAction.undo();
         delAction.undo();
+        super.undo();
+    }
+
+    @Override
+    public void redo() throws CannotRedoException {
+        addAction.redo();
+        delAction.redo();
+    }
+
+    @Override
+    public boolean canUndo() {
+        return addAction.canUndo() && delAction.canUndo();
+    }
+
+    @Override
+    public boolean canRedo() {
+        return addAction.canRedo() && delAction.canRedo();
     }
 }

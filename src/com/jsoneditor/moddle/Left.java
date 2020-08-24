@@ -21,7 +21,7 @@ public class Left extends JBPanel {
 
     private GridBagLayout layout;
 
-    protected JTextArea textArea = new JTextArea();
+    public JTextArea textArea = new JTextArea();
     private JButton format = new JButton("format");
     private JButton compressJson = new JButton("compress");
     private JButton reset = new JButton("reset");

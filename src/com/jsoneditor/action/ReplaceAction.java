@@ -53,5 +53,7 @@ public class ReplaceAction extends TreeAction {
         treeModel.insertNodeInto(source, parent, parent.getIndex(target));
         treeModel.removeNodeFromParent(target);
         parent.updateNode();
+        super.undo();
     }
+
 }
