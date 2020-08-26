@@ -1,6 +1,7 @@
 package com.jsoneditor;
 
-import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
@@ -59,12 +60,15 @@ public class JsonEditor extends JBPanel implements ToolWindowFactory {
         Format format = new Format(left);
         Compress compress = new Compress(left);
         Reset reset = new Reset(left);
+        ActionGroup leftAction = new DefaultActionGroup(format, compress, reset);
         Expand expand = new Expand(right);
         Close close = new Close(right);
         Back back = new Back();
         Forward forward = new Forward();
+        ActionGroup rightAction = new DefaultActionGroup(expand, close, back, forward);
         ToolWindowEx ex = (ToolWindowEx) toolWindow;
-        ex.setTitleActions(format, compress, reset, expand, close, back, forward);
+        ActionGroup otherAction = new DefaultActionGroup(new SwitchView(right, middle));
+        ex.setTitleActions(leftAction, rightAction, otherAction);
     }
 
     // 本地测试用

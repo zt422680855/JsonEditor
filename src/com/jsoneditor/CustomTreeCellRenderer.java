@@ -1,5 +1,6 @@
 package com.jsoneditor;
 
+import com.intellij.ui.JBColor;
 import com.intellij.ui.JBDefaultTreeCellRenderer;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
@@ -25,7 +26,21 @@ public class CustomTreeCellRenderer extends JBDefaultTreeCellRenderer {
             setBackgroundSelectionColor(null);
         }
 
-        // 结局value过长显示问题
+        if (value instanceof TreeNode) {
+            TreeNode node = (TreeNode) value;
+            if (node.filter) {
+                if (!node.getUserObject().startsWith("SELECT-")) {
+                    node.setUserObject("SELECT-" + node.getUserObject());
+                }
+                setTextNonSelectionColor(JBColor.RED);
+            } else {
+                String[] split = node.getUserObject().split("-");
+                node.setUserObject(split.length == 2 ? split[1] : split[0]);
+                setTextNonSelectionColor(JBColor.BLACK);
+            }
+        }
+
+        // 解决value过长显示问题
         Dimension size = getPreferredSize();
         Dimension d = new Dimension(300, size.height);
         setPreferredSize(d);

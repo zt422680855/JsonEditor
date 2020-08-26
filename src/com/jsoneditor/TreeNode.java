@@ -3,13 +3,16 @@ package com.jsoneditor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
+import com.intellij.ui.treeStructure.Tree;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.OtherNode;
 import com.jsoneditor.node.StringNode;
 
+import javax.swing.tree.TreePath;
 import java.io.Serializable;
 import java.util.Enumeration;
+import java.util.function.Consumer;
 
 /**
  * @Description:
@@ -23,6 +26,8 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     public Object value;
 
     public String label;
+
+    public boolean filter = false;
 
     public TreeNode() {
     }
@@ -60,8 +65,29 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     }
 
     @Override
+    public String getUserObject() {
+        return (String) super.getUserObject();
+    }
+
+    @Override
     public TreeNode clone() {
         return new ObjectNode();
+    }
+
+    public void recursionOption(Consumer<TreeNode> consumer) {
+        consumer.accept(this);
+        for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
+            TreeNode child = (TreeNode) e.nextElement();
+            child.recursionOption(consumer);
+        }
+    }
+
+    public void enpandByNode(Tree tree) {
+        tree.expandPath(new TreePath(getPath()));
+        TreeNode parent = getParent();
+        if (parent != null) {
+            parent.enpandByNode(tree);
+        }
     }
 
     public void attachChildrenFromAnotherNode(TreeNode another) {

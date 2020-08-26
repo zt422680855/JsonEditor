@@ -3,22 +3,31 @@ package com.jsoneditor.moddle;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
+import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.Tree;
-import com.jsoneditor.*;
+import com.jsoneditor.AddOrEdit;
+import com.jsoneditor.CustomTreeCellRenderer;
+import com.jsoneditor.TreeNode;
+import com.jsoneditor.Undo;
 import com.jsoneditor.action.*;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.OtherNode;
 import com.jsoneditor.node.StringNode;
 import icons.Icons;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
@@ -34,12 +43,61 @@ public class Right extends JBPanel {
 
     private GridBagLayout layout;
 
-    private JButton expendJson = new JButton("expend");
-    private JButton closeJson = new JButton("close");
-    private JButton back = new JButton("back");
-    private JButton forward = new JButton("forward");
+    private static final String DEFAULT_SEATCH_TEXT = "search...";
+
+    private JBTextField search = new JBTextField(DEFAULT_SEATCH_TEXT) {{
+        setForeground(JBColor.GRAY);
+        addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                search.setForeground(JBColor.BLACK);
+                if (DEFAULT_SEATCH_TEXT.equals(search.getText())) {
+                    search.setText("");
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if ("".equals(search.getText())) {
+                    search.setForeground(JBColor.GRAY);
+                    search.setText(DEFAULT_SEATCH_TEXT);
+                }
+            }
+        });
+
+        getDocument().addDocumentListener(new DocumentAdapter() {
+
+            @Override
+            protected void textChanged(@NotNull DocumentEvent documentEvent) {
+                TreeNode root = getRoot();
+                String text = search.getText();
+                if (!DEFAULT_SEATCH_TEXT.equals(text) && text.length() >= 3) {
+                    root.recursionOption((node) -> {
+                        String userObject = node.getUserObject();
+                        javax.swing.tree.TreeNode[] nodes = ((DefaultTreeModel) tree.getModel()).getPathToRoot(node);
+                        TreePath path = new TreePath(nodes);
+                        if (userObject.toLowerCase().lastIndexOf(text.toLowerCase()) > -1) {
+                            TreePath[] selectionPaths = tree.getSelectionPaths();
+                            if (selectionPaths == null || selectionPaths.length == 0) {
+                                tree.setSelectionPath(path);
+                                tree.scrollPathToVisible(path);
+                            }
+                            node.enpandByNode(tree);
+                            node.filter = true;
+                        } else {
+                            node.filter = false;
+                        }
+                    });
+                } else {
+                    root.recursionOption((node) -> node.filter = false);
+                }
+                tree.updateUI();
+            }
+
+        });
+    }};
+
     public Tree tree;
-    public ObjectNode root = new ObjectNode("ROOT", "");
     private TreePath movingPath;
 
     private JBPopupMenu contextMenus = new JBPopupMenu();
@@ -53,33 +111,25 @@ public class Right extends JBPanel {
         this.layout = new GridBagLayout();
         setLayout(this.layout);
         paintRight();
-        initAction();
     }
 
     private void paintRight() {
         GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 100;
-        c.weighty = 5;
+        c.weighty = 200;
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
         parentPanel.add(this);
         c = new GridBagConstraints();
-        c.weightx = 10;
+        c.weightx = 100;
         c.weighty = 2;
         c.fill = GridBagConstraints.BOTH;
-        layout.setConstraints(expendJson, c);
-        layout.setConstraints(closeJson, c);
-        layout.setConstraints(back, c);
         c.gridwidth = GridBagConstraints.REMAINDER;
-        layout.setConstraints(forward, c);
-        add(expendJson);
-        add(closeJson);
-        add(back);
-        add(forward);
+        layout.setConstraints(search, c);
+        add(search);
         c = new GridBagConstraints();
         c.weighty = 200;
-        c.gridwidth = 4;
         c.fill = GridBagConstraints.BOTH;
         initTree();
         JBScrollPane scrollPane = new JBScrollPane(tree);
@@ -91,6 +141,7 @@ public class Right extends JBPanel {
     }
 
     private void initTree() {
+        TreeNode root = new ObjectNode("ROOT", new JSONObject(true));
         tree = new Tree(root);
         tree.setCellRenderer(new CustomTreeCellRenderer());
         tree.setRowHeight(30);
@@ -240,21 +291,14 @@ public class Right extends JBPanel {
         });
     }
 
-    public void initAction() {
-        expendJson.addActionListener((e) -> TreeUtils.expandTree(tree, new TreePath(root)));
-        closeJson.addActionListener((e) -> TreeUtils.collapseTree(tree, new TreePath(root)));
-        back.addActionListener((e) -> {
-            try {
-                Undo.undo();
-            } catch (CannotUndoException ex) {
-            }
-        });
-        forward.addActionListener((e) -> {
-            try {
-                Undo.redo();
-            } catch (CannotRedoException ex) {
-            }
-        });
+    public TreeNode getRoot() {
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        return (TreeNode) model.getRoot();
+    }
+
+    public void setRoot(TreeNode root) {
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        model.setRoot(root);
     }
 
 }

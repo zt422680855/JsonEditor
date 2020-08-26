@@ -5,9 +5,9 @@ import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import com.jsoneditor.TreeNode;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
-import com.jsoneditor.node.ObjectNode;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -37,7 +37,7 @@ public class Middle extends JBPanel {
     private void paint() {
         GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
         GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 10;
+        c.weightx = 5;
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
         parentPanel.add(this);
@@ -55,8 +55,10 @@ public class Middle extends JBPanel {
     public void toRight(Left left, Right right) {
         syncToRight.addActionListener((e) -> {
             try {
-                ObjectNode root = right.root;
-                right.root.value = JSON.parse(left.textArea.getText(), Feature.OrderedField);
+                TreeNode root;
+                Object parse = JSON.parse(left.textArea.getText(), Feature.OrderedField);
+                root = TreeNode.getNode("ROOT", parse);
+                right.setRoot(root);
                 TreeUtils.refreshTree(root);
                 right.tree.expandPath(new TreePath(root.getPath()));
                 right.tree.updateUI();
@@ -70,7 +72,7 @@ public class Middle extends JBPanel {
 
     public void toLeft(Left left, Right right) {
         syncToLeft.addActionListener((e) -> {
-            ObjectNode root = right.root;
+            TreeNode root = right.getRoot();
             TreeUtils.refreshJson(root);
             left.textArea.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });

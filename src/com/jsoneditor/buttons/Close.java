@@ -28,6 +28,6 @@ public class Close extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
-        TreeUtils.collapseTree(right.tree, new TreePath(right.root));
+        TreeUtils.collapseTree(right.tree, new TreePath(right.getRoot()));
     }
 }
