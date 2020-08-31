@@ -3,29 +3,23 @@ package com.jsoneditor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.ui.treeStructure.Tree;
+import com.jsoneditor.node.ArrayNode;
+import com.jsoneditor.node.ObjectNode;
+import com.jsoneditor.node.OtherNode;
+import com.jsoneditor.node.StringNode;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
+import javax.swing.tree.TreePath;
 import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.function.Consumer;
 
 /**
  * @Description:
- * @Author: 19043204
+ * @Author: zhengt
  * @CreateDate: 2020/5/22 22:39
  */
-public class TreeNode extends PatchedDefaultMutableTreeNode implements Transferable, Serializable, Cloneable {
-
-    static final Integer OBJECT = 1;
-    static final Integer ARRAY = 2;
-    static final Integer STRING = 3;
-    static final Integer OTHER = 4;
-
-    static final DataFlavor NODE_FLAVOR = new DataFlavor(TreeNode.class, "Drag and drop Node");
-
-    static DataFlavor[] flavors = {NODE_FLAVOR};
+public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements Serializable, Cloneable {
 
     public String key;
 
@@ -33,132 +27,73 @@ public class TreeNode extends PatchedDefaultMutableTreeNode implements Transfera
 
     public String label;
 
-    public Integer type = STRING;
+    public boolean filter = false;
 
     public TreeNode() {
     }
 
     public TreeNode(String key, Object value) {
-        if (value instanceof JSONObject) {
-            JSONObject object = (JSONObject) value;
-            label = key + " : " + "{" + object.size() + "}";
-        } else if (value instanceof JSONArray) {
-            JSONArray array = (JSONArray) value;
-            label = key + " : " + "[" + array.size() + "]";
-        } else {
-            label = key + " : " + (value != null ? value.toString() : "");
-        }
-        setUserObject(label);
         this.key = key;
         this.value = value;
     }
 
-    public void loadTreeNodes() {
+    public static TreeNode getNode(String key, Object value) {
+        TreeNode node;
         if (value instanceof JSONObject) {
-            type = TreeNode.OBJECT;
-            JSONObject jsonObject = (JSONObject) value;
-            jsonObject.forEach((k, v) -> {
-                TreeNode subNode = new TreeNode(k, v);
-                add(subNode);
-                subNode.loadTreeNodes();
-            });
+            node = new ObjectNode(key, value);
         } else if (value instanceof JSONArray) {
-            type = TreeNode.ARRAY;
-            JSONArray array = (JSONArray) value;
-            for (int i = 0; i < array.size(); i++) {
-                String k = i + "";
-                Object v = array.get(i);
-                TreeNode subNode = new TreeNode(k, v);
-                add(subNode);
-                subNode.loadTreeNodes();
-            }
+            node = new ArrayNode(key, value);
         } else if (value instanceof String) {
-            type = TreeNode.STRING;
+            node = new StringNode(key, value);
         } else {
-            type = TreeNode.OTHER;
-        }
-    }
-
-    public void updateNode() {
-        if (value instanceof JSONObject || OBJECT.equals(type)) {
-            label = key + " : " + "{" + getChildCount() + "}";
-        } else if (value instanceof JSONArray || ARRAY.equals(type)) {
-            label = key + " : " + "[" + getChildCount() + "]";
-        } else {
-            label = key + " : " + (value != null ? value.toString() : "");
-        }
-        setUserObject(label);
-    }
-
-    public void updateArrayNode() {
-        if (OBJECT.equals(type)) {
-            label = getParent().getIndex(this) + " : " + "{" + getChildCount() + "}";
-        } else if (ARRAY.equals(type)) {
-            label = getParent().getIndex(this) + " : " + "[" + getChildCount() + "]";
-        } else {
-            label = getParent().getIndex(this) + " : " + (value != null ? value.toString() : "");
-        }
-        setUserObject(label);
-    }
-
-    public void updateArrayNodeChildren() {
-        for (int i = 0; i < getChildCount(); i++) {
-            ((TreeNode) getChildAt(i)).updateArrayNode();
-        }
-    }
-
-    public void updateObjectNodeChildren() {
-        for (int i = 0; i < getChildCount(); i++) {
-            ((TreeNode) getChildAt(i)).updateNode();
-        }
-    }
-
-    public boolean canAdd(TreeNode node) {
-        return node != null && !this.equals(node);
-    }
-
-    public boolean canImport(DataFlavor flavor) {
-        return this.isDataFlavorSupported(flavor);
-    }
-
-    @Override
-    public TreeNode clone() {
-        TreeNode node = new TreeNode();
-        node.key = key;
-        node.value = value;
-        node.type = type;
-        node.label = label;
-        node.setUserObject(node.label);
-        node.setAllowsChildren(getAllowsChildren());
-        for (int i = 0; i < getChildCount(); i++) {
-            node.add(((TreeNode) getChildAt(i)).clone());
+            node = new OtherNode(key, value);
         }
         return node;
     }
 
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-        return flavors;
+    public void updateNode() {
+        setUserObject(label);
+        for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
+            TreeNode currNode = (TreeNode) e.nextElement();
+            currNode.updateNode();
+        }
     }
 
     @Override
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-        DataFlavor[] flavs = getTransferDataFlavors();
-        for (int i = 0; i < flavs.length; i++) {
-            if (flavs[i].equals(flavor)) {
-                return true;
-            }
-        }
-        return false;
+    public TreeNode getParent() {
+        return (TreeNode) super.getParent();
     }
 
-    @NotNull
     @Override
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (this.canImport(flavor)) {
-            return this;
-        } else {
-            throw new UnsupportedFlavorException(flavor);
+    public String getUserObject() {
+        return (String) super.getUserObject();
+    }
+
+    @Override
+    public TreeNode clone() {
+        return new ObjectNode();
+    }
+
+    public void recursionOption(Consumer<TreeNode> consumer) {
+        consumer.accept(this);
+        for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
+            TreeNode child = (TreeNode) e.nextElement();
+            child.recursionOption(consumer);
         }
     }
+
+    public void enpandByNode(Tree tree) {
+        tree.expandPath(new TreePath(getPath()));
+        TreeNode parent = getParent();
+        if (parent != null) {
+            parent.enpandByNode(tree);
+        }
+    }
+
+    public void attachChildrenFromAnotherNode(TreeNode another) {
+        for (; another.getChildCount() > 0; ) {
+            add((TreeNode) another.getFirstChild());
+        }
+    }
+
 }
