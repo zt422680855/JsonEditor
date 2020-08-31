@@ -6,7 +6,6 @@ import com.intellij.ui.treeStructure.Tree;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.OtherNode;
-import com.jsoneditor.node.StringNode;
 
 import javax.swing.tree.TreePath;
 import java.util.Enumeration;

@@ -31,6 +31,8 @@ public class OtherNode extends TreeNode {
 
     @Override
     public OtherNode clone() {
-        return new OtherNode(key, value);
+        OtherNode node = new OtherNode(key, value);
+        node.filter = this.filter;
+        return node;
     }
 }

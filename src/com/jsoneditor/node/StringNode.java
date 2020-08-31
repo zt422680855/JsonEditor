@@ -31,6 +31,8 @@ public class StringNode extends TreeNode {
 
     @Override
     public StringNode clone() {
-        return new StringNode(key, value);
+        StringNode node = new StringNode(key, value);
+        node.filter = filter;
+        return node;
     }
 }

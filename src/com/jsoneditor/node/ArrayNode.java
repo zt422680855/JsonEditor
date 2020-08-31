@@ -35,6 +35,7 @@ public class ArrayNode extends TreeNode {
     @Override
     public ArrayNode clone() {
         ArrayNode node = new ArrayNode(key, value);
+        node.filter = this.filter;
         for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
             TreeNode currNode = (TreeNode) e.nextElement();
             node.add(currNode.clone());

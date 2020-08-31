@@ -35,6 +35,7 @@ public class ObjectNode extends TreeNode {
     @Override
     public ObjectNode clone() {
         ObjectNode node = new ObjectNode(key, value);
+        node.filter = this.filter;
         for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
             TreeNode currNode = (TreeNode) e.nextElement();
             node.add(currNode.clone());

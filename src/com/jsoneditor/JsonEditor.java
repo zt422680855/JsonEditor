@@ -20,9 +20,7 @@ import java.awt.*;
 
 /**
  * @Description: 开发时iml文件module节点的type要等于PLUGIN_MODULE。
- * TODO
- * 1. 按钮大小变化
- * 2. 代码整理、重构
+ *
  * @Author: zhengtao
  * @CreateDate: 2020/5/7 22:44
  */

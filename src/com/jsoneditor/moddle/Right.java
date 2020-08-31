@@ -9,6 +9,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.tree.TreeModelAdapter;
 import com.jsoneditor.AddOrEdit;
 import com.jsoneditor.CustomTreeCellRenderer;
 import com.jsoneditor.TreeNode;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -82,9 +84,11 @@ public class Right extends JBPanel {
                                 tree.setSelectionPath(path);
                                 tree.scrollPathToVisible(path);
                             }
+                            tree.addSelectionPath(path);
                             node.enpandByNode(tree);
                             node.filter = true;
                         } else {
+                            tree.removeSelectionPath(path);
                             node.filter = false;
                         }
                     });
@@ -143,6 +147,18 @@ public class Right extends JBPanel {
     private void initTree() {
         TreeNode root = new ObjectNode("ROOT", new JSONObject(true));
         tree = new Tree(root);
+        tree.getModel().addTreeModelListener(new TreeModelAdapter() {
+
+            @Override
+            public void treeNodesInserted(TreeModelEvent event) {
+                search.setText(search.getText());
+            }
+
+            @Override
+            public void treeNodesRemoved(TreeModelEvent event) {
+                search.setText(search.getText());
+            }
+        });
         tree.setCellRenderer(new CustomTreeCellRenderer());
         tree.setRowHeight(30);
         tree.setDragEnabled(true);

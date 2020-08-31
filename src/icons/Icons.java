@@ -21,7 +21,7 @@ public interface Icons {
 
     Icon FORMAT = IconLoader.getIcon("/icons/format.png");
     Icon COMPRESS = IconLoader.getIcon("/icons/compress.png");
-    Icon I2 = IconLoader.getIcon("/actions/expandall.png");
-    Icon I3 = IconLoader.getIcon("/actions/collapseall.png");
+
+    Icon SELECT = IconLoader.getIcon("/icons/select.png");
 
 }

@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.zt.json-editor</id>
   <name>JSON Editor</name>
-  <version>2.0</version>
+  <version>2.2</version>
   <vendor email="hj_zhengt@163.com" url="https://me.csdn.net/">zhengtao</vendor>
 
   <description><![CDATA[
@@ -24,18 +24,12 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <toolWindow id="JSON Editor" secondary="true" icon="/icons/main-icon.svg"
-                anchor="right" factoryClass="com.jsoneditor.JsonEditor" />
+                anchor="right" factoryClass="com.jsoneditor.JsonEditor"/>
   </extensions>
 
   <actions>
     <!-- Add your actions here -->
-    <!--<group id="PluginTest" text="小朋友你是不是有很多问号" description="小朋友你是不是有很多问号">
-      <add-to-group group-id="MainMenu" anchor="last"/>
-      <action id="MyPluginAction" class="MyPluginAction" text="不要点">
-        &lt;!&ndash;<add-to-group group-id="PluginTest" anchor="first"/>&ndash;&gt;
-        <keyboard-shortcut first-keystroke="control alt 1" second-keystroke="control 1" keymap="$default"/>
-      </action>
-    </group>-->
+
   </actions>
 
 </idea-plugin>
