@@ -58,14 +58,16 @@ public class JsonEditor extends JBPanel implements ToolWindowFactory {
         Format format = new Format(left);
         Compress compress = new Compress(left);
         Reset reset = new Reset(left);
-        ActionGroup leftAction = new DefaultActionGroup(format, compress, reset);
+        DefaultActionGroup leftAction = new DefaultActionGroup(format, compress, reset);
+        leftAction.addSeparator();
         Expand expand = new Expand(right);
         Close close = new Close(right);
         Back back = new Back();
         Forward forward = new Forward();
-        ActionGroup rightAction = new DefaultActionGroup(expand, close, back, forward);
+        DefaultActionGroup rightAction = new DefaultActionGroup(expand, close, back, forward);
+        rightAction.addSeparator();
         ToolWindowEx ex = (ToolWindowEx) toolWindow;
-        ActionGroup otherAction = new DefaultActionGroup(new SwitchView(right, middle));
+        DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView(right, middle));
         ex.setTitleActions(leftAction, rightAction, otherAction);
     }
 

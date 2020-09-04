@@ -11,6 +11,9 @@ import javax.swing.*;
  */
 public interface Icons {
 
+    Icon TO_LEFT = IconLoader.getIcon("/icons/toLeft.png");
+    Icon TO_RIGHT = IconLoader.getIcon("/icons/toRight.png");
+
     Icon ADD = IconLoader.getIcon("/icons/add.png");
     Icon EDIT = IconLoader.getIcon("/icons/edit.png");
     Icon DEL = IconLoader.getIcon("/icons/del.png");
@@ -23,5 +26,8 @@ public interface Icons {
     Icon COMPRESS = IconLoader.getIcon("/icons/compress.png");
 
     Icon SELECT = IconLoader.getIcon("/icons/select.png");
+
+    Icon SHOW = IconLoader.getIcon("/icons/show.png");
+    Icon HIDE = IconLoader.getIcon("/icons/hide.png");
 
 }

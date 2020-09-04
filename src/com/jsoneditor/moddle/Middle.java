@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import com.jsoneditor.TreeNode;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
+import icons.Icons;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -24,8 +25,14 @@ public class Middle extends JBPanel {
 
     private GridBagLayout layout;
 
-    public JButton syncToRight = new JButton(">");
-    private JButton syncToLeft = new JButton("<");
+    public JButton syncToRight = new JButton(){{
+        setIcon(Icons.TO_RIGHT);
+        setBorderPainted(false);
+    }};
+    private JButton syncToLeft = new JButton(){{
+        setIcon(Icons.TO_LEFT);
+        setBorderPainted(false);
+    }};
 
     public Middle(JBPanel panel) {
         this.parentPanel = panel;

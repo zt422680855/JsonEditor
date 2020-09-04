@@ -84,11 +84,9 @@ public class Right extends JBPanel {
                                 tree.setSelectionPath(path);
                                 tree.scrollPathToVisible(path);
                             }
-                            tree.addSelectionPath(path);
                             node.enpandByNode(tree);
                             node.filter = true;
                         } else {
-                            tree.removeSelectionPath(path);
                             node.filter = false;
                         }
                     });

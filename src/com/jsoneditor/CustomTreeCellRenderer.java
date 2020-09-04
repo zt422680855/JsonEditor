@@ -45,7 +45,6 @@ public class CustomTreeCellRenderer extends JBDefaultTreeCellRenderer {
                 icon = Icons.AUTO;
             }
         }
-
         setIcon(icon);
         return this;
     }
