@@ -1,9 +1,9 @@
 package com.jsoneditor.buttons;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.ui.AnActionButton;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.moddle.Right;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +15,7 @@ import javax.swing.tree.TreePath;
  * @Author: zhengt
  * @CreateDate: 2020/8/21 22:53
  */
-public class Close extends AnAction {
+public class Close extends AnActionButton {
 
     private Right right;
 

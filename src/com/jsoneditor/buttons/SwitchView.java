@@ -1,8 +1,8 @@
 package com.jsoneditor.buttons;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.ui.AnActionButton;
 import com.jsoneditor.moddle.Middle;
 import com.jsoneditor.moddle.Right;
 import icons.Icons;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * @Author: zhengt
  * @CreateDate: 2020/8/24 22:26
  */
-public class SwitchView extends AnAction {
+public class SwitchView extends AnActionButton {
 
     private Right right;
 
