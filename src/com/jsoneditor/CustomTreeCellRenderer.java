@@ -1,11 +1,12 @@
 package com.jsoneditor;
 
-import com.intellij.ui.JBDefaultTreeCellRenderer;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
+import com.jsoneditor.node.TreeNode;
 import icons.Icons;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 
 /**
@@ -13,7 +14,7 @@ import java.awt.*;
  * @Author: zhengt
  * @CreateDate: 2020/8/11 22:03
  */
-public class CustomTreeCellRenderer extends JBDefaultTreeCellRenderer {
+public class CustomTreeCellRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,

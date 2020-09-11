@@ -1,4 +1,4 @@
-package com.jsoneditor.action;
+package com.jsoneditor.edits;
 
 import com.intellij.ui.treeStructure.Tree;
 
@@ -11,13 +11,13 @@ import javax.swing.undo.CannotRedoException;
  * @Author: zhengt
  * @CreateDate: 2020/8/11 22:10
  */
-public abstract class TreeAction extends AbstractUndoableEdit {
+public abstract class TreeEdit extends AbstractUndoableEdit {
 
     protected Tree tree;
 
     protected DefaultTreeModel treeModel;
 
-    public TreeAction(Tree tree) {
+    public TreeEdit(Tree tree) {
         this.tree = tree;
         this.treeModel = (DefaultTreeModel) tree.getModel();
     }

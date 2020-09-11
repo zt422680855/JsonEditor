@@ -1,11 +1,11 @@
-package com.jsoneditor.moddle;
+package com.jsoneditor.moddles;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
-import com.jsoneditor.TreeNode;
+import com.jsoneditor.node.TreeNode;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
 import icons.Icons;
@@ -63,7 +63,7 @@ public class Middle extends JBPanel {
         syncToRight.addActionListener((e) -> {
             try {
                 TreeNode root;
-                Object parse = JSON.parse(left.textArea.getText(), Feature.OrderedField);
+                Object parse = JSON.parse(left.textPanel.getText(), Feature.OrderedField);
                 root = TreeNode.getNode("ROOT", parse);
                 right.setRoot(root);
                 TreeUtils.refreshTree(root);
@@ -81,7 +81,7 @@ public class Middle extends JBPanel {
         syncToLeft.addActionListener((e) -> {
             TreeNode root = right.getRoot();
             TreeUtils.refreshJson(root);
-            left.textArea.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            left.textPanel.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
     }
 

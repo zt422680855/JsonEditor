@@ -1,6 +1,6 @@
 package com.jsoneditor;
 
-import com.jsoneditor.action.TreeAction;
+import com.jsoneditor.edits.TreeEdit;
 
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
@@ -18,7 +18,7 @@ public class Undo {
         UNDO_MANAGER.setLimit(10);
     }
 
-    public static void addAction(TreeAction action) {
+    public static void addAction(TreeEdit action) {
         UNDO_MANAGER.addEdit(action);
     }
 

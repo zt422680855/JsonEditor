@@ -1,4 +1,4 @@
-package com.jsoneditor.moddle;
+package com.jsoneditor.moddles;
 
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.openapi.ui.JBMenuItem;
@@ -10,11 +10,10 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.tree.TreeModelAdapter;
-import com.jsoneditor.AddOrEdit;
 import com.jsoneditor.CustomTreeCellRenderer;
-import com.jsoneditor.TreeNode;
+import com.jsoneditor.node.TreeNode;
 import com.jsoneditor.Undo;
-import com.jsoneditor.action.*;
+import com.jsoneditor.edits.*;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.OtherNode;
@@ -184,7 +183,7 @@ public class Right extends JBPanel {
                         // 双击叶子节点
                         if (select.isLeaf()) {
                             new AddOrEdit(parentPanel, select, 3, (node, selectNode) -> {
-                                ReplaceAction action = new ReplaceAction(tree, node, selectNode, false);
+                                ReplaceEdit action = new ReplaceEdit(tree, node, selectNode, false);
                                 action.doAction();
                                 Undo.addAction(action);
                             });
@@ -203,20 +202,20 @@ public class Right extends JBPanel {
                                 TreeNode target = (TreeNode) curNode;
                                 TreeNode movingNode = (TreeNode) movingPath.getLastPathComponent();
                                 TreeNode cloneNode = movingNode.clone();
-                                AddAction addAction;
+                                AddEdit addAction;
                                 if (target instanceof ObjectNode || target instanceof ArrayNode) {
-                                    addAction = new AddAction(tree, cloneNode, target, target.getChildCount());
+                                    addAction = new AddEdit(tree, cloneNode, target, target.getChildCount());
                                 } else {
                                     TreeNode parent = target.getParent();
                                     int newIndex = parent.getIndex(target);
                                     if (!parent.equals(movingNode.getParent()) || newIndex > parent.getIndex(movingNode)) {
                                         newIndex += 1;
                                     }
-                                    addAction = new AddAction(tree, cloneNode, parent, newIndex);
+                                    addAction = new AddEdit(tree, cloneNode, parent, newIndex);
                                 }
-                                DeleteAction delAction = new DeleteAction(tree, new TreeNode[]{movingNode});
+                                DeleteEdit delAction = new DeleteEdit(tree, new TreeNode[]{movingNode});
                                 // 一个拖拽动作等效为一个插入和删除节点动作
-                                DragAction dragAction = new DragAction(tree, addAction, delAction);
+                                DragEdit dragAction = new DragEdit(tree, addAction, delAction);
                                 dragAction.doAction();
                                 Undo.addAction(dragAction);
                             });
@@ -250,16 +249,16 @@ public class Right extends JBPanel {
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 new AddOrEdit(parentPanel, select, 1, (node, selectNode) -> {
-                    TreeAction action;
+                    TreeEdit edit;
                     if (selectNode instanceof StringNode || selectNode instanceof OtherNode) {
                         TreeNode newSelect = TreeNode.getNode(selectNode.key, new JSONObject(true));
                         newSelect.add(node);
-                        action = new ReplaceAction(tree, newSelect, selectNode, false);
+                        edit = new ReplaceEdit(tree, newSelect, selectNode, false);
                     } else {
-                        action = new AddAction(tree, node, selectNode, selectNode.getChildCount());
+                        edit = new AddEdit(tree, node, selectNode, selectNode.getChildCount());
                     }
-                    action.doAction();
-                    Undo.addAction(action);
+                    edit.doAction();
+                    Undo.addAction(edit);
                 });
             }
         });
@@ -270,9 +269,9 @@ public class Right extends JBPanel {
                 TreeNode parent = select.getParent();
                 new AddOrEdit(parentPanel, select, 2, (node, selectNode) -> {
                     int index = parent.getIndex(selectNode) + 1;
-                    AddAction action = new AddAction(tree, node, parent, index);
-                    action.doAction();
-                    Undo.addAction(action);
+                    AddEdit edit = new AddEdit(tree, node, parent, index);
+                    edit.doAction();
+                    Undo.addAction(edit);
                 });
             }
         });
@@ -288,9 +287,9 @@ public class Right extends JBPanel {
                             keepChildren = true;
                         }
                     }
-                    ReplaceAction action = new ReplaceAction(tree, node, selectNode, keepChildren);
-                    action.doAction();
-                    Undo.addAction(action);
+                    ReplaceEdit edit = new ReplaceEdit(tree, node, selectNode, keepChildren);
+                    edit.doAction();
+                    Undo.addAction(edit);
                 });
             }
         });
@@ -298,9 +297,9 @@ public class Right extends JBPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode[] selectedNodes = tree.getSelectedNodes(TreeNode.class, null);
-                DeleteAction action = new DeleteAction(tree, selectedNodes);
-                action.doAction();
-                Undo.addAction(action);
+                DeleteEdit edit = new DeleteEdit(tree, selectedNodes);
+                edit.doAction();
+                Undo.addAction(edit);
             }
         });
     }

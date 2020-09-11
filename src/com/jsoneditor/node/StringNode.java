@@ -1,7 +1,5 @@
 package com.jsoneditor.node;
 
-import com.jsoneditor.TreeNode;
-
 /**
  * @Description:
  * @Author: zhengt

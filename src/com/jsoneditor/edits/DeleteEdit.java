@@ -1,7 +1,7 @@
-package com.jsoneditor.action;
+package com.jsoneditor.edits;
 
 import com.intellij.ui.treeStructure.Tree;
-import com.jsoneditor.TreeNode;
+import com.jsoneditor.node.TreeNode;
 
 import javax.swing.undo.CannotUndoException;
 import java.util.LinkedList;
@@ -12,12 +12,12 @@ import java.util.List;
  * @Author: zhengt
  * @CreateDate: 2020/8/12 23:46
  */
-public class DeleteAction extends TreeAction {
+public class DeleteEdit extends TreeEdit {
 
     // 待删除的节点
     private List<NodeInfo> nodes;
 
-    public DeleteAction(Tree tree, TreeNode[] targetList) {
+    public DeleteEdit(Tree tree, TreeNode[] targetList) {
         super(tree);
         nodes = new LinkedList<>();
         for (TreeNode node : targetList) {

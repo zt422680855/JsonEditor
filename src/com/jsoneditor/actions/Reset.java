@@ -1,4 +1,4 @@
-package com.jsoneditor.buttons;
+package com.jsoneditor.actions;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
@@ -8,7 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.Constant;
-import com.jsoneditor.moddle.Left;
+import com.jsoneditor.moddles.Left;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,6 +30,6 @@ public class Reset extends AnActionButton {
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
         Object json = JSON.parse(Constant.TEMP, Feature.OrderedField);
-        left.textArea.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+        left.textPanel.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
     }
 }

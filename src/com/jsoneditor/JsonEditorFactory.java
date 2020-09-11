@@ -5,8 +5,6 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.content.ContentManagerAdapter;
-import com.intellij.ui.content.ContentManagerEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,14 +20,5 @@ public class JsonEditorFactory implements ToolWindowFactory {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(jsonEditor, "", true);
         toolWindow.getContentManager().addContent(content);
-        toolWindow.getContentManager().addContentManagerListener(new ContentManagerAdapter() {
-
-            @Override
-            public void selectionChanged(@NotNull ContentManagerEvent event) {
-                if (event.getOperation().equals(ContentManagerEvent.ContentOperation.add)) {
-                    jsonEditor.setContext();
-                }
-            }
-        });
     }
 }

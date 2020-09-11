@@ -1,11 +1,11 @@
-package com.jsoneditor.buttons;
+package com.jsoneditor.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.TreeUtils;
-import com.jsoneditor.moddle.Right;
+import com.jsoneditor.moddles.Right;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.tree.TreePath;

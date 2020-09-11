@@ -1,7 +1,7 @@
-package com.jsoneditor.action;
+package com.jsoneditor.edits;
 
 import com.intellij.ui.treeStructure.Tree;
-import com.jsoneditor.TreeNode;
+import com.jsoneditor.node.TreeNode;
 
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotUndoException;
@@ -13,7 +13,7 @@ import javax.swing.undo.CannotUndoException;
  * @Author: zhengt
  * @CreateDate: 2020/8/12 21:23
  */
-public class ReplaceAction extends TreeAction {
+public class ReplaceEdit extends TreeEdit {
 
     // 待添加的节点
     private TreeNode target;
@@ -24,7 +24,7 @@ public class ReplaceAction extends TreeAction {
     // 是否保留子节点
     private boolean keepChildren;
 
-    public ReplaceAction(Tree tree, TreeNode target, TreeNode source, boolean keepChildren) {
+    public ReplaceEdit(Tree tree, TreeNode target, TreeNode source, boolean keepChildren) {
         super(tree);
         this.target = target;
         this.source = source;

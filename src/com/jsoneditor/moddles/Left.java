@@ -1,10 +1,8 @@
-package com.jsoneditor.moddle;
+package com.jsoneditor.moddles;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
-import com.jsoneditor.Constant;
 
-import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -18,9 +16,12 @@ public class Left extends JBPanel {
 
     private GridBagLayout layout;
 
-    public JTextArea textArea = new JTextArea();
+    private Project project;
 
-    public Left(JBPanel panel) {
+    public TextPanel textPanel;
+
+    public Left(JBPanel panel, Project project) {
+        this.project = project;
         this.parentPanel = panel;
         this.layout = new GridBagLayout();
         setLayout(this.layout);
@@ -32,15 +33,12 @@ public class Left extends JBPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 100;
         c.weighty = 205;
-//        c.insets = JBUI.insets(3);
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
         parentPanel.add(this);
-        JBScrollPane scrollPane = new JBScrollPane(textArea);
-        textArea.setText(Constant.TEMP);
-        scrollPane.setVerticalScrollBarPolicy(JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        layout.setConstraints(scrollPane, c);
-        add(scrollPane);
+        textPanel = new TextPanel(project);
+        layout.setConstraints(textPanel, c);
+        add(textPanel);
     }
 
 }

@@ -1,7 +1,7 @@
-package com.jsoneditor.action;
+package com.jsoneditor.edits;
 
 import com.intellij.ui.treeStructure.Tree;
-import com.jsoneditor.TreeNode;
+import com.jsoneditor.node.TreeNode;
 import com.jsoneditor.node.ArrayNode;
 
 import javax.swing.tree.TreePath;
@@ -14,7 +14,7 @@ import javax.swing.undo.CannotUndoException;
  * @Author: zhengt
  * @CreateDate: 2020/8/11 22:14
  */
-public class AddAction extends TreeAction {
+public class AddEdit extends TreeEdit {
 
     // 待添加的节点
     protected TreeNode target;
@@ -25,7 +25,7 @@ public class AddAction extends TreeAction {
     // 添加到父节点下的位置
     private int index;
 
-    public AddAction(Tree tree, TreeNode target, TreeNode parent, int index) {
+    public AddEdit(Tree tree, TreeNode target, TreeNode parent, int index) {
         super(tree);
         this.target = target;
         this.parent = parent;

@@ -1,10 +1,10 @@
-package com.jsoneditor.buttons;
+package com.jsoneditor.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.AnActionButton;
-import com.jsoneditor.moddle.Middle;
-import com.jsoneditor.moddle.Right;
+import com.jsoneditor.moddles.Middle;
+import com.jsoneditor.moddles.Right;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 

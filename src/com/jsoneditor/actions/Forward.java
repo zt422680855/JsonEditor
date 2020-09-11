@@ -1,4 +1,4 @@
-package com.jsoneditor.buttons;
+package com.jsoneditor.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;

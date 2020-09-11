@@ -1,4 +1,4 @@
-package com.jsoneditor.buttons;
+package com.jsoneditor.actions;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
@@ -6,7 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.AnActionButton;
-import com.jsoneditor.moddle.Left;
+import com.jsoneditor.moddles.Left;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,24 +15,24 @@ import javax.swing.*;
 /**
  * @Description:
  * @Author: zhengt
- * @CreateDate: 2020/8/21 22:44
+ * @CreateDate: 2020/8/21 21:01
  */
-public class Compress extends AnActionButton {
+public class Format extends AnActionButton {
 
     private Left left;
 
-    public Compress(Left left) {
+    public Format(Left left) {
         this.left = left;
         Presentation presentation = getTemplatePresentation();
-        presentation.setIcon(Icons.COMPRESS);
-        presentation.setText("compress");
+        presentation.setIcon(Icons.FORMAT);
+        presentation.setText("format");
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
         try {
-            Object json = JSON.parse(left.textArea.getText(), Feature.OrderedField);
-            left.textArea.setText(JSON.toJSONString(json, SerializerFeature.WriteMapNullValue));
+            Object json = JSON.parse(left.textPanel.getText(), Feature.OrderedField);
+            left.textPanel.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(left.getParent(), "JSON format error.",
                     "error", JOptionPane.ERROR_MESSAGE);
