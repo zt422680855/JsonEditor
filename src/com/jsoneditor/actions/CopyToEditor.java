@@ -46,11 +46,14 @@ public class CopyToEditor extends AnAction {
         if (editor != null && psiFile != null) {
 //            Project project = editor.getProject();
             PsiElement selectElement = psiFile.findElementAt(editor.getCaretModel().getOffset());
-            PsiClass selectClass = PsiTreeUtil.getContextOfType(selectElement, PsiClass.class);
-            if (selectClass != null) {
-                JSONObject object = generateObj(selectClass);
+            PsiClass hosttClass = PsiTreeUtil.getContextOfType(selectElement, PsiClass.class);
+            if (hosttClass != null) {
+                PsiClass selectClass = getPsiClassByShortClassName(selectElement.getText(), hosttClass);
+                if (selectClass != null) {
+                    JSONObject object = generateObj(selectClass);
 
-                toolWindow.show(null);
+                    toolWindow.show(null);
+                }
             }
         }
     }
