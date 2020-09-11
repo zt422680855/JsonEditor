@@ -16,6 +16,12 @@ import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * @Description:
  * @Author: 19043204
@@ -82,12 +88,26 @@ public class CopyToEditor extends AnAction {
         }
     }
 
-    private PsiClass getPsiClassByShortClassName(String shortClassName) {
+    private PsiClass getPsiClassByShortClassName(String shortClassName, PsiClass hostClass) {
+        PsiJavaFile hostJavaFile = (PsiJavaFile) hostClass.getContainingFile();
+        PsiImportList importList = hostJavaFile.getImportList();
+        PsiImportStatement[] importStatements;
+        if (importList != null) {
+            importStatements = importList.getImportStatements();
+        } else {
+            importStatements = new PsiImportStatement[0];
+        }
+        Stream<String> qualifiedNames = Arrays.stream(importStatements).map(PsiImportStatement::getQualifiedName);
         PsiClass[] classes = PsiShortNamesCache.getInstance(project)
                 .getClassesByName(shortClassName, GlobalSearchScope.projectScope(project));
         for (PsiClass psiClass : classes) {
             PsiJavaFile javaFile = (PsiJavaFile) psiClass.getContainingFile();
             String packageName = javaFile.getPackageName();
+            String curQualifiedName = packageName + "." + psiClass.getName();
+            Optional<String> target = qualifiedNames.filter(curQualifiedName::equals).findFirst();
+            if (target.isPresent()) {
+                return psiClass;
+            }
         }
         return null;
     }
