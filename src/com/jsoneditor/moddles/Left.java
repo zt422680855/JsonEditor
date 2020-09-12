@@ -41,4 +41,8 @@ public class Left extends JBPanel {
         add(textPanel);
     }
 
+    public void setText(String text) {
+        textPanel.setText(text);
+    }
+
 }

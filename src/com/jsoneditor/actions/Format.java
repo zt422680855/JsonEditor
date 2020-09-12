@@ -7,10 +7,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.moddles.Left;
+import com.jsoneditor.notification.JsonEditorNotifier;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
 
 /**
  * @Description:
@@ -34,8 +33,7 @@ public class Format extends AnActionButton {
             Object json = JSON.parse(left.textPanel.getText(), Feature.OrderedField);
             left.textPanel.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(left.getParent(), "JSON format error.",
-                    "error", JOptionPane.ERROR_MESSAGE);
+            JsonEditorNotifier.error("JSON format error.");
         }
     }
 }

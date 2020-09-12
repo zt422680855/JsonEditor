@@ -23,13 +23,14 @@
   <idea-version since-build="173.0"/>
 
   <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="JSON Editor" secondary="true" icon="/icons/main-icon.svg"
+    <toolWindow id="JsonEditor" secondary="false" icon="/icons/main-icon.svg"
                 anchor="right" factoryClass="com.jsoneditor.JsonEditorFactory"/>
   </extensions>
 
   <actions>
-    <!-- Add your actions here -->
-
+    <action id="JsonEditor.CopyToEditor" class="com.jsoneditor.actions.CopyToEditor" text="CopyToEditor">
+      <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+    </action>
   </actions>
 
 </idea-plugin>

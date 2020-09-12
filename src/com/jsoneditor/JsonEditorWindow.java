@@ -46,11 +46,11 @@ public class JsonEditorWindow extends JBPanel {
         middle.toRight(left, right);
         middle.toLeft(left, right);
         middle.syncToRight.doClick();
-        addActions();
+        addTitleActions();
         setContext();
     }
 
-    private void addActions() {
+    private void addTitleActions() {
         Format format = new Format(left);
         Compress compress = new Compress(left);
         Reset reset = new Reset(left);
@@ -79,6 +79,18 @@ public class JsonEditorWindow extends JBPanel {
                 }
             }
         }
+    }
+
+    public void setText(String text) {
+        left.setText(text);
+    }
+
+    public void toRight() {
+        middle.syncToRight.doClick();
+    }
+
+    public void toLeft() {
+        middle.syncToLeft.doClick();
     }
 
 }

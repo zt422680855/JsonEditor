@@ -5,9 +5,10 @@ import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
-import com.jsoneditor.node.TreeNode;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
+import com.jsoneditor.node.TreeNode;
+import com.jsoneditor.notification.JsonEditorNotifier;
 import icons.Icons;
 
 import javax.swing.*;
@@ -25,11 +26,11 @@ public class Middle extends JBPanel {
 
     private GridBagLayout layout;
 
-    public JButton syncToRight = new JButton(){{
+    public JButton syncToRight = new JButton() {{
         setIcon(Icons.TO_RIGHT);
         setBorderPainted(false);
     }};
-    private JButton syncToLeft = new JButton(){{
+    public JButton syncToLeft = new JButton() {{
         setIcon(Icons.TO_LEFT);
         setBorderPainted(false);
     }};
@@ -71,8 +72,7 @@ public class Middle extends JBPanel {
                 right.tree.updateUI();
                 Undo.clear();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "JSON format error.",
-                        "error", JOptionPane.ERROR_MESSAGE);
+                JsonEditorNotifier.error("JSON format error.");
             }
         });
     }
