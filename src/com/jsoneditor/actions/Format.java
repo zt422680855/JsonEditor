@@ -30,8 +30,8 @@ public class Format extends AnActionButton {
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
         try {
-            Object json = JSON.parse(left.textPanel.getText(), Feature.OrderedField);
-            left.textPanel.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            Object json = JSON.parse(left.getText(), Feature.OrderedField);
+            left.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         } catch (Exception ex) {
             JsonEditorNotifier.error("JSON format error.");
         }

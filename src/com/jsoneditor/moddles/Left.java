@@ -18,7 +18,7 @@ public class Left extends JBPanel {
 
     private Project project;
 
-    public TextPanel textPanel;
+    private TextPanel textPanel;
 
     public Left(JBPanel panel, Project project) {
         this.project = project;
@@ -43,6 +43,10 @@ public class Left extends JBPanel {
 
     public void setText(String text) {
         textPanel.setText(text);
+    }
+
+    public String getText() {
+        return textPanel.getText();
     }
 
 }

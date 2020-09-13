@@ -30,6 +30,6 @@ public class Reset extends AnActionButton {
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
         Object json = JSON.parse(Constant.TEMP, Feature.OrderedField);
-        left.textPanel.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+        left.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
     }
 }

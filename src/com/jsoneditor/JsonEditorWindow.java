@@ -43,9 +43,8 @@ public class JsonEditorWindow extends JBPanel {
         this.left = new Left(this, project);
         this.middle = new Middle(this);
         this.right = new Right(this);
-        middle.toRight(left, right);
-        middle.toLeft(left, right);
-        middle.syncToRight.doClick();
+        middle.addListener(left, right);
+        toRight();
         addTitleActions();
         setContext();
     }
@@ -86,11 +85,11 @@ public class JsonEditorWindow extends JBPanel {
     }
 
     public void toRight() {
-        middle.syncToRight.doClick();
+        middle.toRight();
     }
 
     public void toLeft() {
-        middle.syncToLeft.doClick();
+        middle.toLeft();
     }
 
 }

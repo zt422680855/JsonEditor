@@ -85,13 +85,13 @@ public class CopyToEditor extends AnAction {
                 String name = field.getName();
                 PsiType type = field.getType();
                 String typeName = type.getPresentableText();
-                if (qualifiedCheck(type, "java.lang.String", project)) {
-                    obj.put(name, "");
-                } else if (qualifiedCheck(type, "java.util.Date", project)) {
-                    obj.put(name, System.currentTimeMillis());
-                } else if (type instanceof PsiClassType) {
+                if (type instanceof PsiClassType) {
                     PsiClassType classType = (PsiClassType) type;
-                    if (qualifiedCheck(classType, "java.lang.Integer", project) ||
+                    if (qualifiedCheck(classType, "java.lang.String", project)) {
+                        obj.put(name, "");
+                    } else if (qualifiedCheck(classType, "java.util.Date", project)) {
+                        obj.put(name, System.currentTimeMillis());
+                    } else if (qualifiedCheck(classType, "java.lang.Integer", project) ||
                             qualifiedCheck(classType, "java.lang.Long", project) ||
                             qualifiedCheck(classType, "java.lang.Short", project) ||
                             qualifiedCheck(classType, "java.lang.Byte", project)) {
@@ -101,7 +101,7 @@ public class CopyToEditor extends AnAction {
                     } else if (qualifiedCheck(classType, "java.lang.Double", project) ||
                             qualifiedCheck(classType, "java.lang.Float", project)) {
                         obj.put(name, 0.0);
-                    } else if (isCollection(classType, project)) {
+                    } else if (ancestorQualifiedCheck(classType, "java.util.Collection", project)) {
                         JSONArray arr = new JSONArray();
                         PsiType[] parameters = classType.getParameters();
                         if (parameters.length == 1) {
@@ -115,7 +115,7 @@ public class CopyToEditor extends AnAction {
                             }
                         }
                         obj.put(name, arr);
-                    } else if (isMap(classType, project)) {
+                    } else if (ancestorQualifiedCheck(classType, "java.util.Map", project)) {
                         obj.put(name, new JSONObject());
                     } else {
                         String className = classType.getClassName();
@@ -134,7 +134,9 @@ public class CopyToEditor extends AnAction {
                         PsiClassType elementClassType = (PsiClassType) arrayElementType;
                         PsiClass fieldClass = getPsiClassByShortClassName(elementClassType.getName(), psiClass, project);
                         if (fieldClass != null) {
-                            arr.add(generateObj(fieldClass, project));
+                            if (!psiClass.equals(fieldClass)) {
+                                arr.add(generateObj(fieldClass, project));
+                            }
                         }
                     }
                     obj.put(name, arr);
@@ -151,34 +153,10 @@ public class CopyToEditor extends AnAction {
                         value = typeName;
                     }
                     obj.put(name, value);
-                } else {
-                    Object value;
-                    if (qualifiedCheck(type, "java.lang.Integer", project) ||
-                            qualifiedCheck(type, "java.lang.Long", project) ||
-                            qualifiedCheck(type, "java.lang.Short", project) ||
-                            qualifiedCheck(type, "java.lang.Byte", project)) {
-                        value = 0;
-                    } else if (qualifiedCheck(type, "java.lang.Boolean", project)) {
-                        value = true;
-                    } else if (qualifiedCheck(type, "java.lang.Double", project) ||
-                            qualifiedCheck(type, "java.lang.Float", project)) {
-                        value = 0.0;
-                    } else {
-                        value = typeName;
-                    }
-                    obj.put(name, value);
                 }
             }
         }
         return obj;
-    }
-
-    private boolean isCollection(PsiType type, Project project) {
-        return ancestorQualifiedCheck(type, "java.util.Collection", project);
-    }
-
-    private boolean isMap(PsiType type, Project project) {
-        return ancestorQualifiedCheck(type, "java.util.Map", project);
     }
 
     private boolean ancestorQualifiedCheck(PsiType type, String ancestorQualifiedName, Project project) {
@@ -188,19 +166,9 @@ public class CopyToEditor extends AnAction {
         }
         PsiType[] superTypes = type.getSuperTypes();
         if (superTypes.length > 0) {
-            boolean supers = Arrays.stream(type.getSuperTypes()).anyMatch(t -> qualifiedCheck(t, ancestorQualifiedName, project));
-            if (supers) {
-                return supers;
-            } else {
-                for (PsiType sup : superTypes) {
-                    boolean ancestor = ancestorQualifiedCheck(sup, ancestorQualifiedName, project);
-                    if (ancestor) {
-                        return ancestor;
-                    }
-                }
-            }
+            return Arrays.stream(type.getSuperTypes()).anyMatch(t -> ancestorQualifiedCheck(t, ancestorQualifiedName, project));
         }
-        return Arrays.stream(type.getSuperTypes()).anyMatch(t -> qualifiedCheck(t, ancestorQualifiedName, project));
+        return false;
     }
 
     private boolean qualifiedCheck(PsiType type, String qualifiedName, Project project) {

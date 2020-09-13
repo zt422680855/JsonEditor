@@ -26,11 +26,11 @@ public class Middle extends JBPanel {
 
     private GridBagLayout layout;
 
-    public JButton syncToRight = new JButton() {{
+    private JButton syncToRight = new JButton() {{
         setIcon(Icons.TO_RIGHT);
         setBorderPainted(false);
     }};
-    public JButton syncToLeft = new JButton() {{
+    private JButton syncToLeft = new JButton() {{
         setIcon(Icons.TO_LEFT);
         setBorderPainted(false);
     }};
@@ -60,11 +60,11 @@ public class Middle extends JBPanel {
         add(syncToLeft);
     }
 
-    public void toRight(Left left, Right right) {
+    public void addListener(Left left, Right right) {
         syncToRight.addActionListener((e) -> {
             try {
                 TreeNode root;
-                Object parse = JSON.parse(left.textPanel.getText(), Feature.OrderedField);
+                Object parse = JSON.parse(left.getText(), Feature.OrderedField);
                 root = TreeNode.getNode("ROOT", parse);
                 right.setRoot(root);
                 TreeUtils.refreshTree(root);
@@ -75,14 +75,19 @@ public class Middle extends JBPanel {
                 JsonEditorNotifier.error("JSON format error.");
             }
         });
-    }
-
-    public void toLeft(Left left, Right right) {
         syncToLeft.addActionListener((e) -> {
             TreeNode root = right.getRoot();
             TreeUtils.refreshJson(root);
-            left.textPanel.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            left.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
+    }
+
+    public void toRight() {
+        syncToRight.doClick();
+    }
+
+    public void toLeft() {
+        syncToLeft.doClick();
     }
 
 }
