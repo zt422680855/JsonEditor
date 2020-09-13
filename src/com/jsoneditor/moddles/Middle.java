@@ -22,8 +22,6 @@ import java.awt.*;
  */
 public class Middle extends JBPanel {
 
-    private JBPanel parentPanel;
-
     private GridBagLayout layout;
 
     private JButton syncToRight = new JButton() {{
@@ -35,21 +33,14 @@ public class Middle extends JBPanel {
         setBorderPainted(false);
     }};
 
-    public Middle(JBPanel panel) {
-        this.parentPanel = panel;
+    public Middle() {
         this.layout = new GridBagLayout();
         setLayout(this.layout);
         paint();
     }
 
     private void paint() {
-        GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
         GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 5;
-        c.fill = GridBagConstraints.BOTH;
-        parentLayout.setConstraints(this, c);
-        parentPanel.add(this);
-        c = new GridBagConstraints();
         c.ipadx = -35;
         c.ipady = -1;
         c.gridwidth = GridBagConstraints.REMAINDER;

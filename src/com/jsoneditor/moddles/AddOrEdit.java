@@ -29,7 +29,7 @@ import com.jsoneditor.node.TreeNode;
  */
 public class AddOrEdit extends JDialog {
 
-    private JBPanel panel;
+    private Container container;
 
     private JBLabel typeLabel = new JBLabel("type");
 
@@ -58,8 +58,8 @@ public class AddOrEdit extends JDialog {
 
     private BiConsumer<TreeNode, TreeNode> callback;
 
-    public AddOrEdit(JBPanel panel, TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
-        this.panel = panel;
+    public AddOrEdit(Container container, TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
+        this.container = container;
         this.selectNode = node;
         this.callback = callback;
         // 1、2、3分别代表新增子节点、新增兄弟节点、编辑节点
@@ -105,7 +105,7 @@ public class AddOrEdit extends JDialog {
     private void openDialog() {
         setTitle(title);
         setSize(300, 180);
-        setLocationRelativeTo(panel);
+        setLocationRelativeTo(container);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         setModal(true);

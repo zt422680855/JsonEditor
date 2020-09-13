@@ -18,6 +18,7 @@ import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.content.Content;
 import com.jsoneditor.JsonEditorWindow;
+import com.jsoneditor.moddles.JsonEditorPanel;
 import com.jsoneditor.notification.JsonEditorNotifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,8 +63,8 @@ public class CopyToEditor extends AnAction {
                         Content[] contents = toolWindow.getContentManager().getContents();
                         Arrays.stream(contents).filter(c -> "JsonEditor".equals(c.getDisplayName())).findAny().ifPresent(content -> {
                             JComponent component = content.getComponent();
-                            if (component instanceof JsonEditorWindow) {
-                                JsonEditorWindow window = (JsonEditorWindow) component;
+                            if (component instanceof JsonEditorPanel) {
+                                JsonEditorPanel window = (JsonEditorPanel) component;
                                 window.setText(JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
                                 window.toRight();
                                 toolWindow.show(null);

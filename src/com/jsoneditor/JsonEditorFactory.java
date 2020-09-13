@@ -7,6 +7,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManagerAdapter;
 import com.intellij.ui.content.ContentManagerEvent;
+import com.jsoneditor.moddles.JsonEditorPanel;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,7 +19,8 @@ public class JsonEditorFactory implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        JsonEditorWindow jsonEditor = new JsonEditorWindow(project, toolWindow);
+//        JsonEditorWindow jsonEditor = new JsonEditorWindow(project, toolWindow);
+        JsonEditorPanel jsonEditor = new JsonEditorPanel(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(jsonEditor, "JsonEditor", false);
         toolWindow.getContentManager().addContent(content);

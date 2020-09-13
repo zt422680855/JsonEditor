@@ -40,8 +40,6 @@ import java.util.Optional;
  */
 public class Right extends JBPanel {
 
-    private JBPanel parentPanel;
-
     private GridBagLayout layout;
 
     private static final String DEFAULT_SEATCH_TEXT = "search...";
@@ -107,22 +105,21 @@ public class Right extends JBPanel {
     private JBMenuItem edit = new JBMenuItem("edit", Icons.EDIT);
     private JBMenuItem delete = new JBMenuItem("delete", Icons.DEL);
 
-    public Right(JBPanel panel) {
-        this.parentPanel = panel;
+    public Right() {
         this.layout = new GridBagLayout();
         setLayout(this.layout);
         paintRight();
     }
 
     private void paintRight() {
-        GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
+//        GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
+//        GridBagConstraints c = new GridBagConstraints();
+//        c.weightx = 100;
+//        c.weighty = 200;
+//        c.fill = GridBagConstraints.BOTH;
+//        parentLayout.setConstraints(this, c);
+//        parentPanel.add(this);
         GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 100;
-        c.weighty = 200;
-        c.fill = GridBagConstraints.BOTH;
-        parentLayout.setConstraints(this, c);
-        parentPanel.add(this);
-        c = new GridBagConstraints();
         c.weightx = 100;
         c.weighty = 2;
         c.fill = GridBagConstraints.BOTH;
@@ -182,7 +179,7 @@ public class Right extends JBPanel {
                     if (clickCount == 2) {
                         // 双击叶子节点
                         if (select.isLeaf()) {
-                            new AddOrEdit(parentPanel, select, 3, (node, selectNode) -> {
+                            new AddOrEdit(getParent(), select, 3, (node, selectNode) -> {
                                 ReplaceEdit action = new ReplaceEdit(tree, node, selectNode, false);
                                 action.doAction();
                                 Undo.addAction(action);
@@ -248,7 +245,7 @@ public class Right extends JBPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(parentPanel, select, 1, (node, selectNode) -> {
+                new AddOrEdit(getParent(), select, 1, (node, selectNode) -> {
                     TreeEdit edit;
                     if (selectNode instanceof StringNode || selectNode instanceof OtherNode) {
                         TreeNode newSelect = TreeNode.getNode(selectNode.key, new JSONObject(true));
@@ -267,7 +264,7 @@ public class Right extends JBPanel {
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 TreeNode parent = select.getParent();
-                new AddOrEdit(parentPanel, select, 2, (node, selectNode) -> {
+                new AddOrEdit(getParent(), select, 2, (node, selectNode) -> {
                     int index = parent.getIndex(selectNode) + 1;
                     AddEdit edit = new AddEdit(tree, node, parent, index);
                     edit.doAction();
@@ -279,7 +276,7 @@ public class Right extends JBPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(parentPanel, select, 3, (node, selectNode) -> {
+                new AddOrEdit(getParent(), select, 3, (node, selectNode) -> {
                     boolean keepChildren = false;
                     if (node instanceof ObjectNode || node instanceof ArrayNode) {
                         if (selectNode instanceof ObjectNode || selectNode instanceof ArrayNode) {

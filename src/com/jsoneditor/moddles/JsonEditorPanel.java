@@ -1,4 +1,4 @@
-package com.jsoneditor;
+package com.jsoneditor.moddles;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -6,28 +6,22 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.AnActionButton;
-import com.intellij.ui.components.JBPanel;
 import com.jsoneditor.actions.*;
-import com.jsoneditor.moddles.Left;
-import com.jsoneditor.moddles.Middle;
-import com.jsoneditor.moddles.Right;
 
-import java.awt.*;
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Description: 开发时iml文件module节点的type要等于PLUGIN_MODULE。
- * @Author: zhengtao
- * @CreateDate: 2020/5/7 22:44
+ * @Description:
+ * @Author: zhengt
+ * @CreateDate: 2020/9/13 12:19
  */
-public class JsonEditorWindow extends JBPanel {
+public class JsonEditorPanel extends JSplitPane {
 
     private Left left;
 
-    private Middle middle;
-
-    private Right right;
+    private RightPanel rightPanel;
 
     private Project project;
 
@@ -35,18 +29,21 @@ public class JsonEditorWindow extends JBPanel {
 
     private static Map<String, DefaultActionGroup[]> actionMap = new HashMap<>();
 
-    public JsonEditorWindow(Project project, ToolWindow toolWindow) {
+    public JsonEditorPanel(Project project, ToolWindow toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
-        setLayout(new GridBagLayout());
-
-//        this.left = new Left(this, project);
-        this.middle = new Middle();
-        this.right = new Right();
-        middle.addListener(left, right);
+        this.left = new Left(project);
+        this.rightPanel = new RightPanel();
+        setLeftComponent(this.left);
+        setRightComponent(this.rightPanel);
+        rightPanel.middle.addListener(left, rightPanel.right);
         toRight();
         addTitleActions();
         setContext();
+        setDividerLocation(0.4);
+        setOneTouchExpandable(true);
+        setContinuousLayout(true);
+        setOrientation(JSplitPane.HORIZONTAL_SPLIT);
     }
 
     private void addTitleActions() {
@@ -55,13 +52,13 @@ public class JsonEditorWindow extends JBPanel {
         Reset reset = new Reset(left);
         DefaultActionGroup leftAction = new DefaultActionGroup(format, compress, reset);
         leftAction.addSeparator();
-        Expand expand = new Expand(right);
-        Close close = new Close(right);
+        Expand expand = new Expand(rightPanel.right);
+        Close close = new Close(rightPanel.right);
         Back back = new Back();
         Forward forward = new Forward();
         DefaultActionGroup rightAction = new DefaultActionGroup(expand, close, back, forward);
         rightAction.addSeparator();
-        DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView(right, middle));
+        DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView(rightPanel.right, rightPanel.middle));
         DefaultActionGroup[] actions = new DefaultActionGroup[]{leftAction, rightAction, otherAction};
         actionMap.put(project.getName(), actions);
     }
@@ -85,11 +82,11 @@ public class JsonEditorWindow extends JBPanel {
     }
 
     public void toRight() {
-        middle.toRight();
+        rightPanel.middle.toRight();
     }
 
     public void toLeft() {
-        middle.toLeft();
+        rightPanel.middle.toLeft();
     }
 
 }
