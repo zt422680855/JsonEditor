@@ -19,8 +19,9 @@
   </change-notes>
 
   <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.java</depends>
 
-  <idea-version since-build="173.0"/>
+  <idea-version since-build="173.0" until-build="202.*"/>
 
   <extensions defaultExtensionNs="com.intellij">
     <toolWindow id="JsonEditor" secondary="false" icon="/icons/main-icon.svg"
