@@ -160,9 +160,8 @@ public class CopyToEditor extends AnAction {
     }
 
     private boolean ancestorQualifiedCheck(PsiType type, String ancestorQualifiedName, Project project) {
-        boolean self = qualifiedCheck(type, ancestorQualifiedName, project);
-        if (self) {
-            return self;
+        if (qualifiedCheck(type, ancestorQualifiedName, project)) {
+            return true;
         }
         PsiType[] superTypes = type.getSuperTypes();
         if (superTypes.length > 0) {
