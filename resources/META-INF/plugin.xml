@@ -1,37 +1,40 @@
 <idea-plugin>
-  <id>com.zt.json-editor</id>
-  <name>JSON Editor</name>
-  <version>2.3</version>
-  <vendor email="hj_zhengt@163.com" url="https://me.csdn.net/">zhengtao</vendor>
+    <id>com.zt.json-editor</id>
+    <name>JSON Editor</name>
+    <version>2.3</version>
+    <vendor email="hj_zhengt@163.com" url="https://me.csdn.net/">zhengtao</vendor>
 
-  <description><![CDATA[
-      JSON visual editing, support JSON dynamic add, modify, delete nodes and format functions.<br>
-    ]]></description>
+    <description>
+        <![CDATA[
+            JSON visual editing, support JSON dynamic add, modify, delete nodes and format functions.<br>
+        ]]>
+    </description>
 
-  <change-notes><![CDATA[
-      2020-08-04<br>
-      For the first time, there may be some small bugs. Hope more support.<br>
-      <br>
-      2020-08-12<br>
-      version: 1.6<br>
-      fix some bugs.<br>
-    ]]>
-  </change-notes>
+    <change-notes>
+        <![CDATA[
+          2020-08-04<br>
+          For the first time, there may be some small bugs. Hope more support.<br>
+          <br>
+          2020-08-12<br>
+          version: 1.6<br>
+          fix some bugs.<br>
+        ]]>
+    </change-notes>
 
-  <depends>com.intellij.modules.platform</depends>
-  <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
 
-  <idea-version since-build="173.0" until-build="202.*"/>
+    <idea-version since-build="173.0" until-build="202.*"/>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <toolWindow id="JsonEditor" secondary="false" icon="/icons/main-icon.svg"
-                anchor="right" factoryClass="com.jsoneditor.JsonEditorFactory"/>
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="JsonEditor" secondary="false" icon="/icons/main-icon.svg"
+                    anchor="right" factoryClass="com.jsoneditor.JsonEditorFactory"/>
+    </extensions>
 
-  <actions>
-    <action id="JsonEditor.CopyToEditor" class="com.jsoneditor.actions.CopyToEditor" text="CopyToEditor">
-      <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-    </action>
-  </actions>
+    <actions>
+        <action id="JsonEditor.CopyToEditor" class="com.jsoneditor.actions.CopyToEditor" text="CopyToEditor">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+    </actions>
 
 </idea-plugin>
