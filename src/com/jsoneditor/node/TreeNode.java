@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
 import com.intellij.ui.treeStructure.Tree;
+import com.jsoneditor.Utils;
 
 import javax.swing.tree.TreePath;
 import java.io.Serializable;
@@ -40,9 +41,17 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
         } else if (value instanceof JSONArray) {
             node = new ArrayNode(key, value);
         } else if (value instanceof String) {
-            node = new StringNode(key, value);
+            if (Utils.canConvertToDate(value)) {
+                node = new DateNode(key, value);
+            } else {
+                node = new StringNode(key, value);
+            }
         } else {
-            node = new OtherNode(key, value);
+            if (Utils.canConvertToDate(value)) {
+                node = new DateNode(key, value);
+            } else {
+                node = new OtherNode(key, value);
+            }
         }
         return node;
     }

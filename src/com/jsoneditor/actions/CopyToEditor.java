@@ -109,7 +109,7 @@ public class CopyToEditor extends AnAction {
                             if (genericType instanceof PsiClassType) {
                                 PsiClassType genericClassType = (PsiClassType) genericType;
                                 PsiClass fieldClass = getPsiClassByShortClassName(genericClassType.getName(), psiClass, project);
-                                if (fieldClass != null) {
+                                if (!psiClass.equals(fieldClass)) {
                                     arr.add(generateObj(fieldClass, project));
                                 }
                             }
@@ -120,7 +120,7 @@ public class CopyToEditor extends AnAction {
                     } else {
                         String className = classType.getClassName();
                         PsiClass fieldClass = getPsiClassByShortClassName(className, psiClass, project);
-                        if (fieldClass != null) {
+                        if (!psiClass.equals(fieldClass)) {
                             obj.put(name, generateObj(fieldClass, project));
                         } else {
                             obj.put(name, typeName);

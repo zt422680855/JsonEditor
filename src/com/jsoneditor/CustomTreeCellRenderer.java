@@ -1,6 +1,7 @@
 package com.jsoneditor;
 
 import com.jsoneditor.node.ArrayNode;
+import com.jsoneditor.node.DateNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.TreeNode;
 import icons.Icons;
@@ -42,6 +43,8 @@ public class CustomTreeCellRenderer extends DefaultTreeCellRenderer {
                 icon = Icons.OBJECT;
             } else if (value instanceof ArrayNode) {
                 icon = Icons.ARRAY;
+            } else if (value instanceof DateNode) {
+                icon = Icons.DATE;
             } else {
                 icon = Icons.AUTO;
             }

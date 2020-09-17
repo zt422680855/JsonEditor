@@ -7,20 +7,21 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
+import com.jsoneditor.Constant;
+import com.jsoneditor.Constant.DateFormat;
+import com.jsoneditor.Constant.SelectItem;
+import com.jsoneditor.Utils;
+import com.jsoneditor.node.*;
+import com.michaelbaranov.microba.calendar.DatePicker;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.function.BiConsumer;
-
-import com.jsoneditor.Constant.SelectItem;
-import com.jsoneditor.Utils;
-import com.jsoneditor.node.ArrayNode;
-import com.jsoneditor.node.ObjectNode;
-import com.jsoneditor.node.StringNode;
-import com.jsoneditor.node.TreeNode;
 
 /**
  * @Description:
@@ -37,6 +38,7 @@ public class AddOrEdit extends JDialog {
         addItem(SelectItem.String);
         addItem(SelectItem.Object);
         addItem(SelectItem.Array);
+        addItem(SelectItem.Date);
         addItem(SelectItem.Other);
     }};
 
@@ -47,6 +49,29 @@ public class AddOrEdit extends JDialog {
     private JBTextField value = new JBTextField();
 
     private JBLabel valueLabel = new JBLabel("value");
+
+    private DatePicker datePicker = new DatePicker() {{
+        setDateFormat(new SimpleDateFormat(Constant.DateFormat.SEVEN.getFormat()));
+        setVisible(false);
+    }};
+
+    private JBLabel datePickerLabel = new JBLabel("value") {{
+        setVisible(false);
+    }};
+
+    private ComboBox<String> dateFormat = new ComboBox<String>() {{
+        addItem(Constant.DateFormat.DEFAULT.getFormat());
+        addItem(Constant.DateFormat.ONE.getFormat());
+        addItem(Constant.DateFormat.TWO.getFormat());
+        addItem(Constant.DateFormat.THREE.getFormat());
+        addItem(Constant.DateFormat.FOUR.getFormat());
+        addItem(Constant.DateFormat.FIVE.getFormat());
+        addItem(Constant.DateFormat.SIX.getFormat());
+        addItem(Constant.DateFormat.SEVEN.getFormat());
+        addItem(Constant.DateFormat.EIGHT.getFormat());
+        addItem(Constant.DateFormat.NINE.getFormat());
+        setVisible(false);
+    }};
 
     private JButton ok = new JButton("ok");
 
@@ -88,6 +113,21 @@ public class AddOrEdit extends JDialog {
                 valueLabel.setVisible(false);
             } else if (node instanceof StringNode) {
                 type.setSelectedItem(SelectItem.String);
+            } else if (node instanceof DateNode) {
+                type.setSelectedItem(SelectItem.Date);
+                value.setVisible(false);
+                valueLabel.setVisible(false);
+                datePickerLabel.setVisible(true);
+                datePicker.setVisible(true);
+                dateFormat.setVisible(true);
+                DateNode dateNode = (DateNode) node;
+                try {
+                    datePicker.setDate(dateNode.date);
+                    datePicker.setDateFormat(new SimpleDateFormat(dateNode.format));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                dateFormat.setSelectedItem(dateNode.format);
             } else {
                 type.setSelectedItem(SelectItem.Other);
             }
@@ -104,7 +144,7 @@ public class AddOrEdit extends JDialog {
 
     private void openDialog() {
         setTitle(title);
-        setSize(300, 180);
+        setSize(300, 200);
         setLocationRelativeTo(panel);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -119,7 +159,6 @@ public class AddOrEdit extends JDialog {
         c.weightx = 20;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
-        c.gridwidth = 2;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = JBUI.insets(0, 0, 5, 15);
         layout.setConstraints(type, c);
@@ -130,7 +169,6 @@ public class AddOrEdit extends JDialog {
         c.weightx = 20;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
-        c.gridwidth = 2;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = JBUI.insets(0, 0, 5, 15);
         layout.setConstraints(key, c);
@@ -141,14 +179,30 @@ public class AddOrEdit extends JDialog {
         c.weightx = 20;
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.BOTH;
-        c.gridwidth = 2;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = JBUI.insets(0, 0, 5, 15);
         layout.setConstraints(value, c);
         c = new GridBagConstraints();
-        c.weightx = 30;
+        c.weightx = 10;
+        c.anchor = GridBagConstraints.CENTER;
+        layout.setConstraints(datePickerLabel, c);
+        c.weightx = 20;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = JBUI.insets(0, 0, 5, 15);
+        layout.setConstraints(datePicker, c);
+        c.weightx = 20;
         c.gridx = 1;
-        c.gridy = 3;
+        c.gridy = 4;
+        c.anchor = GridBagConstraints.WEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridwidth = GridBagConstraints.REMAINDER;
+        c.insets = JBUI.insets(0, 0, 5, 15);
+        layout.setConstraints(dateFormat, c);
+        c = new GridBagConstraints();
+        c.weightx = 10;
+        c.gridx = 1;
+        c.gridy = 5;
         c.anchor = GridBagConstraints.EAST;
         c.insets = JBUI.insets(10, 0, 5, 0);
         layout.setConstraints(ok, c);
@@ -165,22 +219,42 @@ public class AddOrEdit extends JDialog {
         p.add(key);
         p.add(valueLabel);
         p.add(value);
+        p.add(datePickerLabel);
+        p.add(datePicker);
+        p.add(dateFormat);
         p.add(ok);
         p.add(cancel);
-        addAction();
+        addListener();
         setVisible(true);
     }
 
-    private void addAction() {
+    private void addListener() {
         type.addItemListener((e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 SelectItem select = (SelectItem) type.getSelectedItem();
-                if (SelectItem.Object.equals(select) || SelectItem.Array.equals(select)) {
+                if (SelectItem.Object.equals(select) || SelectItem.Array.equals(select) || SelectItem.Date.equals(select)) {
                     value.setVisible(false);
                     valueLabel.setVisible(false);
                 } else {
                     value.setVisible(true);
                     valueLabel.setVisible(true);
+                }
+                if (SelectItem.Date.equals(select)) {
+                    datePicker.setVisible(true);
+                    datePickerLabel.setVisible(true);
+                    dateFormat.setVisible(true);
+                } else {
+                    datePicker.setVisible(false);
+                    datePickerLabel.setVisible(false);
+                    dateFormat.setVisible(false);
+                }
+            }
+        });
+        dateFormat.addItemListener((e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                String curFormat = (String) dateFormat.getSelectedItem();
+                if (curFormat != null && !curFormat.equals(DateFormat.DEFAULT.getFormat())) {
+                    datePicker.setDateFormat(new SimpleDateFormat(curFormat));
                 }
             }
         });
@@ -188,15 +262,24 @@ public class AddOrEdit extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String nodeKey = key.getText();
-                Object nodeValue;
+                TreeNode returnNode;
                 SelectItem nodeType = (SelectItem) type.getSelectedItem();
                 if (SelectItem.Object.equals(nodeType)) {
-                    nodeValue = new JSONObject(true);
+                    returnNode = new ObjectNode(nodeKey, new JSONObject(true));
                 } else if (SelectItem.Array.equals(nodeType)) {
-                    nodeValue = new JSONArray();
+                    returnNode = new ArrayNode(nodeKey, new JSONArray());
                 } else if (SelectItem.String.equals(nodeType)) {
-                    nodeValue = value.getText();
+                    returnNode = new StringNode(nodeKey, value.getText());
+                } else if (SelectItem.Date.equals(nodeType)) {
+                    Date date = datePicker.getDate();
+                    String selectedFormat = (String) dateFormat.getSelectedItem();
+                    if (DateFormat.DEFAULT.getFormat().equals(selectedFormat)) {
+                        returnNode = new DateNode(nodeKey, date.getTime());
+                    } else {
+                        returnNode = new DateNode(nodeKey, date, selectedFormat);
+                    }
                 } else {
+                    Object nodeValue;
                     String valueStr = value.getText();
                     if ("".equals(valueStr)) {
                         nodeValue = null;
@@ -211,8 +294,8 @@ public class AddOrEdit extends JDialog {
                     } else {
                         nodeValue = value.getText();
                     }
+                    returnNode = new OtherNode(nodeKey, nodeValue);
                 }
-                TreeNode returnNode = TreeNode.getNode(nodeKey, nodeValue);
                 callback.accept(returnNode, selectNode);
                 AddOrEdit.this.dispose();
             }

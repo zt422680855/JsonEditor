@@ -1,5 +1,7 @@
 package com.jsoneditor;
 
+import java.util.regex.Pattern;
+
 /**
  * @Description:
  * @Author: zhengt
@@ -13,7 +15,42 @@ public interface Constant {
         Object,
         Array,
         String,
+        Date,
         Other;
+
+    }
+
+    enum DateFormat {
+
+        // format types
+        DEFAULT("Timestamp", Pattern.compile("^[\\d]{11,12}$")),
+        ONE("yyyy-MM-dd", Pattern.compile("^[\\d]{4}-[\\d]{2}-[\\d]{2}$")),
+        TWO("yyyy/MM/dd", Pattern.compile("^[\\d]{4}/[\\d]{2}/[\\d]{2}$")),
+        THREE("yyyyMMdd", Pattern.compile("^[\\d]{8}$")),
+        FOUR("yyyy-MM-dd HH:mm:ss", Pattern.compile("^[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}$")),
+        FIVE("yyyy/MM/dd HH:mm:ss", Pattern.compile("^[\\d]{4}/[\\d]{2}/[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}$")),
+        SIX("yyyyMMddHHmmss", Pattern.compile("^[\\d]{14}$")),
+        SEVEN("yyyy-MM-dd HH:mm:ss SSS", Pattern.compile("^[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2} [\\d]{3}$")),
+        EIGHT("yyyy/MM/dd HH:mm:ss SSS", Pattern.compile("^[\\d]{4}/[\\d]{2}/[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2} [\\d]{3}$")),
+        NINE("yyyyMMddHHmmssSSS", Pattern.compile("^[\\d]{17}$")),
+        ;
+
+        private String format;
+
+        private Pattern pattern;
+
+        DateFormat(String format, Pattern pattern) {
+            this.format = format;
+            this.pattern = pattern;
+        }
+
+        public String getFormat() {
+            return format;
+        }
+
+        public Pattern getPattern() {
+            return pattern;
+        }
 
     }
 
@@ -22,6 +59,9 @@ public interface Constant {
             "\t\"age\":18,\n" +
             "\t\"isHandsome\":true,\n" +
             "\t\"email\":\"hj_zhengt@163.com\",\n" +
+            "\t\"timestamp\":1598963565962,\n" +
+            "\t\"oneDate\":\"2009-09-01 14:22:41\",\n" +
+            "\t\"birthday\":\"1991-10-01\",\n" +
             "\t\"address\":{\n" +
             "\t\t\"country\":\"China\",\n" +
             "\t\t\"province\":\"jiangsu\",\n" +
