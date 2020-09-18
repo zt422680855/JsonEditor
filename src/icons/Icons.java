@@ -16,6 +16,7 @@ public interface Icons {
 
     Icon ADD = IconLoader.getIcon("/icons/add.png");
     Icon EDIT = IconLoader.getIcon("/icons/edit.png");
+    Icon COPY = IconLoader.getIcon("/icons/copy.png");
     Icon DEL = IconLoader.getIcon("/icons/del.png");
 
     Icon OBJECT = IconLoader.getIcon("/icons/object.png");

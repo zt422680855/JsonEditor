@@ -104,6 +104,7 @@ public class Right extends JBPanel {
     private JBPopupMenu contextMenus = new JBPopupMenu();
     private JBMenuItem addSub = new JBMenuItem("add child", Icons.ADD);
     private JBMenuItem addSibling = new JBMenuItem("add sibling", Icons.ADD);
+    private JBMenuItem copy = new JBMenuItem("copy", Icons.COPY);
     private JBMenuItem edit = new JBMenuItem("edit", Icons.EDIT);
     private JBMenuItem delete = new JBMenuItem("delete", Icons.DEL);
 
@@ -169,10 +170,12 @@ public class Right extends JBPanel {
                 if (e.isMetaDown()) {
                     if (select.isRoot()) {
                         addSibling.setVisible(false);
+                        copy.setVisible(false);
                         edit.setVisible(false);
                         delete.setVisible(false);
                     } else {
                         addSibling.setVisible(true);
+                        copy.setVisible(true);
                         edit.setVisible(true);
                         delete.setVisible(true);
                     }
@@ -242,6 +245,7 @@ public class Right extends JBPanel {
     private void initContextMenu() {
         contextMenus.add(addSub);
         contextMenus.add(addSibling);
+        contextMenus.add(copy);
         contextMenus.add(edit);
         contextMenus.add(delete);
         addSub.addMouseListener(new MouseAdapter() {
@@ -273,6 +277,19 @@ public class Right extends JBPanel {
                     edit.doAction();
                     Undo.addAction(edit);
                 });
+            }
+        });
+        copy.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
+                TreeNode copyNode = select.clone();
+                TreeNode parent = select.getParent();
+                int index = parent.getIndex(select) + 1;
+                AddEdit edit = new AddEdit(tree, copyNode, parent, index);
+                edit.doAction();
+                tree.setSelectionPath(new TreePath(copyNode.getPath()));
+                Undo.addAction(edit);
             }
         });
         edit.addMouseListener(new MouseAdapter() {
