@@ -27,6 +27,8 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
@@ -104,9 +106,11 @@ public class Right extends JBPanel {
     private JBPopupMenu contextMenus = new JBPopupMenu();
     private JBMenuItem addSub = new JBMenuItem("add child", Icons.ADD);
     private JBMenuItem addSibling = new JBMenuItem("add sibling", Icons.ADD);
-    private JBMenuItem copy = new JBMenuItem("copy", Icons.COPY);
     private JBMenuItem edit = new JBMenuItem("edit", Icons.EDIT);
     private JBMenuItem delete = new JBMenuItem("delete", Icons.DEL);
+    private JBMenuItem copy = new JBMenuItem("copy", Icons.COPY);
+    private JBMenuItem copyKey = new JBMenuItem("copy key", Icons.COPY_KEY);
+    private JBMenuItem copyValue = new JBMenuItem("copy value", Icons.COPY_VALUE);
 
     public Right(JBPanel panel) {
         this.parentPanel = panel;
@@ -171,11 +175,15 @@ public class Right extends JBPanel {
                     if (select.isRoot()) {
                         addSibling.setVisible(false);
                         copy.setVisible(false);
+                        copyKey.setVisible(false);
+                        copyValue.setVisible(false);
                         edit.setVisible(false);
                         delete.setVisible(false);
                     } else {
                         addSibling.setVisible(true);
                         copy.setVisible(true);
+                        copyKey.setVisible(true);
+                        copyValue.setVisible(true);
                         edit.setVisible(true);
                         delete.setVisible(true);
                     }
@@ -245,9 +253,12 @@ public class Right extends JBPanel {
     private void initContextMenu() {
         contextMenus.add(addSub);
         contextMenus.add(addSibling);
-        contextMenus.add(copy);
         contextMenus.add(edit);
         contextMenus.add(delete);
+        contextMenus.addSeparator();
+        contextMenus.add(copy);
+        contextMenus.add(copyKey);
+        contextMenus.add(copyValue);
         addSub.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -279,19 +290,6 @@ public class Right extends JBPanel {
                 });
             }
         });
-        copy.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                TreeNode copyNode = select.clone();
-                TreeNode parent = select.getParent();
-                int index = parent.getIndex(select) + 1;
-                AddEdit edit = new AddEdit(tree, copyNode, parent, index);
-                edit.doAction();
-                tree.setSelectionPath(new TreePath(copyNode.getPath()));
-                Undo.addAction(edit);
-            }
-        });
         edit.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -317,6 +315,33 @@ public class Right extends JBPanel {
                 DeleteEdit edit = new DeleteEdit(tree, selectedNodes);
                 edit.doAction();
                 Undo.addAction(edit);
+            }
+        });
+        copy.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
+                TreeNode copyNode = select.clone();
+                TreeNode parent = select.getParent();
+                int index = parent.getIndex(select) + 1;
+                AddEdit edit = new AddEdit(tree, copyNode, parent, index);
+                edit.doAction();
+                tree.setSelectionPath(new TreePath(copyNode.getPath()));
+                Undo.addAction(edit);
+            }
+        });
+        copyKey.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(select.key.toString()), null);
+            }
+        });
+        copyValue.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(select.value.toString()), null);
             }
         });
     }

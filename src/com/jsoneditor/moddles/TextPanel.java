@@ -8,8 +8,6 @@ import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.colors.ColorKey;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.highlighter.EditorHighlighter;
 import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
@@ -20,10 +18,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.util.LocalTimeCounter;
 import com.jsoneditor.Constant;
+
+import javax.swing.*;
 
 /**
  * @Description:
@@ -69,8 +68,6 @@ public class TextPanel extends NonOpaquePanel {
     private void editorSettings(EditorEx editor) {
         editor.setHorizontalScrollbarVisible(true);
         editor.setVerticalScrollbarVisible(true);
-        EditorColorsScheme colorsScheme = editor.getColorsScheme();
-        colorsScheme.setColor(ColorKey.find("JSON.Braces"), JBColor.BLACK);
         EditorSettings settings = editor.getSettings();
         settings.setAdditionalLinesCount(0);
         settings.setAdditionalColumnsCount(1);
@@ -98,5 +95,13 @@ public class TextPanel extends NonOpaquePanel {
                 UndoConfirmationPolicy.DEFAULT,
                 document
         );
+    }
+
+    public void resetScrollBarPosition() {
+        JScrollPane scrollPane = editor.getScrollPane();
+        JScrollBar horizontalScrollBar = scrollPane.getHorizontalScrollBar();
+        horizontalScrollBar.setValue(horizontalScrollBar.getMinimum());
+        JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
+        verticalScrollBar.setValue(verticalScrollBar.getMinimum());
     }
 }

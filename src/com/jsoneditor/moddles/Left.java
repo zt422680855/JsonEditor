@@ -49,4 +49,8 @@ public class Left extends JBPanel {
         return textPanel.getText();
     }
 
+    public void resetScrollBarPosition() {
+        textPanel.resetScrollBarPosition();
+    }
+
 }

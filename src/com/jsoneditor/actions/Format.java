@@ -32,6 +32,7 @@ public class Format extends AnActionButton {
         try {
             Object json = JSON.parse(left.getText(), Feature.OrderedField);
             left.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            left.resetScrollBarPosition();
         } catch (Exception ex) {
             JsonEditorNotifier.error("JSON format error.");
         }
