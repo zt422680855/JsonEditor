@@ -8,8 +8,11 @@ import com.jsoneditor.Utils;
 
 import javax.swing.tree.TreePath;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @Description:
@@ -67,6 +70,10 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     @Override
     public TreeNode getParent() {
         return (TreeNode) super.getParent();
+    }
+
+    public List<TreeNode> getFullPath() {
+        return Arrays.stream(super.getPath()).map(item -> (TreeNode) item).collect(Collectors.toList());
     }
 
     @Override

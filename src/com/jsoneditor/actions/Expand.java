@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.TreeUtils;
+import com.jsoneditor.moddles.ModdleContext;
 import com.jsoneditor.moddles.Right;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,10 +18,7 @@ import javax.swing.tree.TreePath;
  */
 public class Expand extends AnActionButton {
 
-    private Right right;
-
-    public Expand(Right right) {
-        this.right = right;
+    public Expand() {
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(AllIcons.Actions.Expandall);
         presentation.setText("expend");
@@ -28,6 +26,6 @@ public class Expand extends AnActionButton {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
-        TreeUtils.expandTree(right.tree, new TreePath(right.getRoot()));
+        ModdleContext.expandTree();
     }
 }

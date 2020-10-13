@@ -30,8 +30,6 @@ import java.util.function.BiConsumer;
  */
 public class AddOrEdit extends JDialog {
 
-    private JBPanel panel;
-
     private JBLabel typeLabel = new JBLabel("type");
 
     private ComboBox<SelectItem> type = new ComboBox<SelectItem>() {{
@@ -83,8 +81,7 @@ public class AddOrEdit extends JDialog {
 
     private BiConsumer<TreeNode, TreeNode> callback;
 
-    public AddOrEdit(JBPanel panel, TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
-        this.panel = panel;
+    public AddOrEdit(TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
         this.selectNode = node;
         this.callback = callback;
         // 1、2、3分别代表新增子节点、新增兄弟节点、编辑节点
@@ -145,7 +142,7 @@ public class AddOrEdit extends JDialog {
     private void openDialog() {
         setTitle(title);
         setSize(300, 200);
-        setLocationRelativeTo(panel);
+        setLocationRelativeTo(ModdleContext.getParent());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         setModal(true);

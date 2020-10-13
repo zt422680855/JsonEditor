@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.moddles.Left;
+import com.jsoneditor.moddles.ModdleContext;
 import com.jsoneditor.notification.JsonEditorNotifier;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +19,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Format extends AnActionButton {
 
-    private Left left;
-
-    public Format(Left left) {
-        this.left = left;
+    public Format() {
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(Icons.FORMAT);
         presentation.setText("format");
@@ -30,9 +28,9 @@ public class Format extends AnActionButton {
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
         try {
-            Object json = JSON.parse(left.getText(), Feature.OrderedField);
-            left.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-            left.resetScrollBarPosition();
+            Object json = JSON.parse(ModdleContext.getText(), Feature.OrderedField);
+            ModdleContext.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            ModdleContext.resetScrollBarPosition();
         } catch (Exception ex) {
             JsonEditorNotifier.error("JSON format error.");
         }

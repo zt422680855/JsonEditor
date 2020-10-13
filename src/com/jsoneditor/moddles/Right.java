@@ -5,19 +5,14 @@ import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.tree.TreeModelAdapter;
 import com.jsoneditor.CustomTreeCellRenderer;
-import com.jsoneditor.node.TreeNode;
 import com.jsoneditor.Undo;
 import com.jsoneditor.edits.*;
-import com.jsoneditor.node.ArrayNode;
-import com.jsoneditor.node.ObjectNode;
-import com.jsoneditor.node.OtherNode;
-import com.jsoneditor.node.StringNode;
+import com.jsoneditor.node.*;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +22,6 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -40,13 +34,11 @@ import java.util.Optional;
  * @Author: zhengt
  * @CreateDate: 2020/8/17 21:51
  */
-public class Right extends JBPanel {
-
-    private JBPanel parentPanel;
-
-    private GridBagLayout layout;
+public class Right extends JsonEditorModdle {
 
     private static final String DEFAULT_SEATCH_TEXT = "search...";
+
+    private JsonEditorModdle parent;
 
     private JBTextField search = new JBTextField(DEFAULT_SEATCH_TEXT) {{
         setForeground(JBColor.GRAY);
@@ -112,21 +104,21 @@ public class Right extends JBPanel {
     private JBMenuItem copyKey = new JBMenuItem("copy key", Icons.COPY_KEY);
     private JBMenuItem copyValue = new JBMenuItem("copy value", Icons.COPY_VALUE);
 
-    public Right(JBPanel panel) {
-        this.parentPanel = panel;
-        this.layout = new GridBagLayout();
-        setLayout(this.layout);
-        paintRight();
+    public Right(JsonEditorModdle parent) {
+        this.parent = parent;
+        paint();
     }
 
-    private void paintRight() {
-        GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
+    private void paint() {
+        GridBagLayout layout = new GridBagLayout();
+        setLayout(layout);
+        GridBagLayout parentLayout = (GridBagLayout) parent.getLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 100;
         c.weighty = 200;
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
-        parentPanel.add(this);
+        parent.add(this);
         c = new GridBagConstraints();
         c.weightx = 100;
         c.weighty = 2;
@@ -193,12 +185,14 @@ public class Right extends JBPanel {
                     if (clickCount == 2) {
                         // 双击叶子节点
                         if (select.isLeaf()) {
-                            new AddOrEdit(parentPanel, select, 3, (node, selectNode) -> {
+                            new AddOrEdit(select, 3, (node, selectNode) -> {
                                 ReplaceEdit action = new ReplaceEdit(tree, node, selectNode, false);
                                 action.doAction();
                                 Undo.addAction(action);
                             });
                         }
+                    } else {
+                        ModdleContext.scrollToText(select.getFullPath());
                     }
                 }
             }
@@ -263,7 +257,7 @@ public class Right extends JBPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(parentPanel, select, 1, (node, selectNode) -> {
+                new AddOrEdit(select, 1, (node, selectNode) -> {
                     TreeEdit edit;
                     if (selectNode instanceof StringNode || selectNode instanceof OtherNode) {
                         TreeNode newSelect = TreeNode.getNode(selectNode.key, new JSONObject(true));
@@ -282,7 +276,7 @@ public class Right extends JBPanel {
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 TreeNode parent = select.getParent();
-                new AddOrEdit(parentPanel, select, 2, (node, selectNode) -> {
+                new AddOrEdit(select, 2, (node, selectNode) -> {
                     int index = parent.getIndex(selectNode) + 1;
                     AddEdit edit = new AddEdit(tree, node, parent, index);
                     edit.doAction();
@@ -294,7 +288,7 @@ public class Right extends JBPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(parentPanel, select, 3, (node, selectNode) -> {
+                new AddOrEdit(select, 3, (node, selectNode) -> {
                     boolean keepChildren = false;
                     if (node instanceof ObjectNode || node instanceof ArrayNode) {
                         if (selectNode instanceof ObjectNode || selectNode instanceof ArrayNode) {
@@ -334,7 +328,7 @@ public class Right extends JBPanel {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(select.key.toString()), null);
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(select.key), null);
             }
         });
         copyValue.addMouseListener(new MouseAdapter() {

@@ -35,30 +35,23 @@ public class JsonEditorNotifier {
     }
 
     private static void notify(String content, NotificationType notificationType) {
-        Notification notification = NOTIFICATION_GROUP.createNotification("JsonEditor", content, notificationType, null);
+        Notification notification = NOTIFICATION_GROUP.createNotification("JsonEditor Tip", content, notificationType, null);
         notification.notify(null);
     }
 
-    public static void hintNotify(Editor editor, String message, long position, Runnable notifier) {
+    public static void hintInfo(Editor editor, String message) {
         if (message != null && !"".equals(message.trim())) {
-            if (position <= (long) editor.getDocument().getTextLength() && position >= 0L) {
-                editor.getCaretModel().moveToOffset((int) position);
-            }
             ScrollingModel scrollingModel = editor.getScrollingModel();
             scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE);
-            scrollingModel.runActionOnScrollingFinished(notifier);
+            HintManager.getInstance().showInformationHint(editor, message);
         }
     }
 
-    public static void hintInfo(Editor editor, String message) {
-        hintNotify(editor, message, -1L, () -> {
-            HintManager.getInstance().showInformationHint(editor, message);
-        });
-    }
-
     public static void hintError(Editor editor, String message) {
-        hintNotify(editor, message, -1, () -> {
+        if (message != null && !"".equals(message.trim())) {
+            ScrollingModel scrollingModel = editor.getScrollingModel();
+            scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE);
             HintManager.getInstance().showErrorHint(editor, message);
-        });
+        }
     }
 }

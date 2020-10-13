@@ -3,8 +3,8 @@ package com.jsoneditor.moddles;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
 import com.jsoneditor.node.TreeNode;
@@ -20,11 +20,9 @@ import java.awt.*;
  * @Author: zhengt
  * @CreateDate: 2020/8/17 21:51
  */
-public class Middle extends JBPanel {
+public class Middle extends JsonEditorModdle {
 
-    private JBPanel parentPanel;
-
-    private GridBagLayout layout;
+    private JsonEditorModdle parent;
 
     private JButton syncToRight = new JButton() {{
         setIcon(Icons.TO_RIGHT);
@@ -35,20 +33,20 @@ public class Middle extends JBPanel {
         setBorderPainted(false);
     }};
 
-    public Middle(JBPanel panel) {
-        this.parentPanel = panel;
-        this.layout = new GridBagLayout();
-        setLayout(this.layout);
+    public Middle(JsonEditorModdle parent) {
+        this.parent = parent;
         paint();
     }
 
     private void paint() {
-        GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
+        GridBagLayout layout = new GridBagLayout();
+        setLayout(layout);
+        GridBagLayout parentLayout = (GridBagLayout) parent.getLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 5;
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
-        parentPanel.add(this);
+        parent.add(this);
         c = new GridBagConstraints();
         c.ipadx = -35;
         c.ipady = -1;
@@ -60,25 +58,25 @@ public class Middle extends JBPanel {
         add(syncToLeft);
     }
 
-    public void addListener(Left left, Right right) {
+    public void addListener() {
         syncToRight.addActionListener((e) -> {
             try {
                 TreeNode root;
-                Object parse = JSON.parse(left.getText(), Feature.OrderedField);
+                Object parse = JSON.parse(ModdleContext.getText(), Feature.OrderedField);
                 root = TreeNode.getNode("ROOT", parse);
-                right.setRoot(root);
+                ModdleContext.setRoot(root);
                 TreeUtils.refreshTree(root);
-                right.tree.expandPath(new TreePath(root.getPath()));
-                right.tree.updateUI();
+                ModdleContext.expandNode(new TreePath(root.getPath()));
+                ModdleContext.updateTree();
                 Undo.clear();
             } catch (Exception ex) {
                 JsonEditorNotifier.error("JSON format error.");
             }
         });
         syncToLeft.addActionListener((e) -> {
-            TreeNode root = right.getRoot();
+            TreeNode root = ModdleContext.getRoot();
             TreeUtils.refreshJson(root);
-            left.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            ModdleContext.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
     }
 

@@ -20,7 +20,7 @@ public class JsonEditorFactory implements ToolWindowFactory {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         JsonEditorWindow jsonEditor = new JsonEditorWindow(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(jsonEditor, "JsonEditor", false);
+        Content content = contentFactory.createContent(jsonEditor, project.getName(), false);
         toolWindow.getContentManager().addContent(content);
         toolWindow.getContentManager().addContentManagerListener(new ContentManagerAdapter() {
 

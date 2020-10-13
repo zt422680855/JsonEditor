@@ -1,7 +1,7 @@
 package com.jsoneditor.moddles;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBPanel;
+import com.jsoneditor.JsonEditorWindow;
+import com.jsoneditor.node.TreeNode;
 
 import java.awt.*;
 
@@ -10,33 +10,28 @@ import java.awt.*;
  * @Author: zhengt
  * @CreateDate: 2020/8/17 21:48
  */
-public class Left extends JBPanel {
+public class Left extends JsonEditorModdle {
 
-    private JBPanel parentPanel;
-
-    private GridBagLayout layout;
-
-    private Project project;
+    private JsonEditorModdle parent;
 
     private TextPanel textPanel;
 
-    public Left(JBPanel panel, Project project) {
-        this.project = project;
-        this.parentPanel = panel;
-        this.layout = new GridBagLayout();
-        setLayout(this.layout);
+    public Left(JsonEditorModdle parent) {
+        this.parent = parent;
         paint();
     }
 
     private void paint() {
-        GridBagLayout parentLayout = (GridBagLayout) parentPanel.getLayout();
+        GridBagLayout layout = new GridBagLayout();
+        setLayout(layout);
+        GridBagLayout parentLayout = (GridBagLayout) parent.getLayout();
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 100;
         c.weighty = 205;
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
-        parentPanel.add(this);
-        textPanel = new TextPanel(project);
+        parent.add(this);
+        textPanel = new TextPanel(ModdleContext.getProject());
         layout.setConstraints(textPanel, c);
         add(textPanel);
     }
@@ -51,6 +46,14 @@ public class Left extends JBPanel {
 
     public void resetScrollBarPosition() {
         textPanel.resetScrollBarPosition();
+    }
+
+    public void scrollToText(java.util.List<TreeNode> path) {
+        try {
+            textPanel.scrollToText(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

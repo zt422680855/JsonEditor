@@ -7,7 +7,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -18,6 +17,7 @@ import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.content.Content;
 import com.jsoneditor.JsonEditorWindow;
+import com.jsoneditor.moddles.ModdleContext;
 import com.jsoneditor.notification.JsonEditorNotifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,11 +39,10 @@ public class CopyToEditor extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        DataContext ctx = e.getDataContext();
-        Editor editor = ctx.getData(CommonDataKeys.EDITOR);
-        PsiFile psiFile = ctx.getData(CommonDataKeys.PSI_FILE);
+        Editor editor = e.getData(CommonDataKeys.EDITOR);
+        PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
         if (editor != null && psiFile != null) {
-            Project project = editor.getProject();
+            Project project = e.getProject();
             if (project != null) {
                 ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
                 ToolWindow toolWindow = toolWindowManager.getToolWindow("JsonEditor");
@@ -60,17 +59,16 @@ public class CopyToEditor extends AnAction {
                     if (selectClass != null) {
                         JSONObject object = generateObj(selectClass, project);
                         Content[] contents = toolWindow.getContentManager().getContents();
-                        Arrays.stream(contents).filter(c -> "JsonEditor".equals(c.getDisplayName())).findAny().ifPresent(content -> {
+                        Arrays.stream(contents).filter(c -> project.getName().equals(c.getDisplayName())).findAny().ifPresent(content -> {
                             JComponent component = content.getComponent();
                             if (component instanceof JsonEditorWindow) {
-                                JsonEditorWindow window = (JsonEditorWindow) component;
-                                window.setText(JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-                                window.toRight();
+                                ModdleContext.setText(JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+                                ModdleContext.toRight();
                                 toolWindow.show(null);
                             }
                         });
                     } else {
-                        JsonEditorNotifier.hintError(editor, selectText + " is not a class or is not a project class.");
+                        JsonEditorNotifier.warning(selectText + " is not a class or it is not a project class.");
                     }
                 }
             }

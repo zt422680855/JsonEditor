@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.Constant;
 import com.jsoneditor.moddles.Left;
+import com.jsoneditor.moddles.ModdleContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,10 +19,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Reset extends AnActionButton {
 
-    private Left left;
-
-    public Reset(Left left) {
-        this.left = left;
+    public Reset() {
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(AllIcons.Actions.Rollback);
         presentation.setText("reset");
@@ -30,6 +28,6 @@ public class Reset extends AnActionButton {
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
         Object json = JSON.parse(Constant.TEMP, Feature.OrderedField);
-        left.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+        ModdleContext.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
     }
 }

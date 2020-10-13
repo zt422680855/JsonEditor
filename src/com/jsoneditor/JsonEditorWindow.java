@@ -6,11 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.AnActionButton;
-import com.intellij.ui.components.JBPanel;
 import com.jsoneditor.actions.*;
-import com.jsoneditor.moddles.Left;
-import com.jsoneditor.moddles.Middle;
-import com.jsoneditor.moddles.Right;
+import com.jsoneditor.moddles.*;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -21,7 +18,7 @@ import java.util.Map;
  * @Author: zhengtao
  * @CreateDate: 2020/5/7 22:44
  */
-public class JsonEditorWindow extends JBPanel {
+public class JsonEditorWindow extends JsonEditorModdle {
 
     private Left left;
 
@@ -36,27 +33,31 @@ public class JsonEditorWindow extends JBPanel {
     private static Map<String, DefaultActionGroup[]> actionMap = new HashMap<>();
 
     public JsonEditorWindow(Project project, ToolWindow toolWindow) {
-        this.project = project;
-        this.toolWindow = toolWindow;
         setLayout(new GridBagLayout());
 
-        this.left = new Left(this, project);
+        this.project = project;
+        ModdleContext.setProject(project);
+        this.toolWindow = toolWindow;
+        ModdleContext.setToolWindow(toolWindow);
+
+        this.left = new Left(this);
         this.middle = new Middle(this);
         this.right = new Right(this);
-        middle.addListener(left, right);
-        toRight();
+        ModdleContext.addModdle(left, middle, right);
+        ModdleContext.toRight();
+
         addTitleActions();
         setContext();
     }
 
     private void addTitleActions() {
-        Format format = new Format(left);
-        Compress compress = new Compress(left);
-        Reset reset = new Reset(left);
+        Format format = new Format();
+        Compress compress = new Compress();
+        Reset reset = new Reset();
         DefaultActionGroup leftAction = new DefaultActionGroup(format, compress, reset);
         leftAction.addSeparator();
-        Expand expand = new Expand(right);
-        Close close = new Close(right);
+        Expand expand = new Expand();
+        Close close = new Close();
         Back back = new Back();
         Forward forward = new Forward();
         DefaultActionGroup rightAction = new DefaultActionGroup(expand, close, back, forward);
@@ -78,18 +79,6 @@ public class JsonEditorWindow extends JBPanel {
                 }
             }
         }
-    }
-
-    public void setText(String text) {
-        left.setText(text);
-    }
-
-    public void toRight() {
-        middle.toRight();
-    }
-
-    public void toLeft() {
-        middle.toLeft();
     }
 
 }
