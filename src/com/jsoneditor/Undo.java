@@ -2,7 +2,6 @@ package com.jsoneditor;
 
 import com.jsoneditor.edits.TreeEdit;
 
-import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 /**
@@ -27,7 +26,7 @@ public class Undo {
             if (UNDO_MANAGER.canUndo()) {
                 UNDO_MANAGER.undo();
             }
-        } catch (CannotUndoException ex) {
+        } catch (Exception ex) {
         }
     }
 
@@ -36,7 +35,7 @@ public class Undo {
             if (UNDO_MANAGER.canRedo()) {
                 UNDO_MANAGER.redo();
             }
-        } catch (CannotUndoException ex) {
+        } catch (Exception ex) {
         }
     }
 

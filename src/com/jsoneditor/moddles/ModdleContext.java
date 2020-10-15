@@ -2,6 +2,7 @@ package com.jsoneditor.moddles;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.treeStructure.Tree;
 import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.node.TreeNode;
@@ -64,7 +65,7 @@ public class ModdleContext {
         return parent;
     }
 
-    // left
+    /* left */
     public static void setText(String text) {
         left.setText(text);
     }
@@ -81,7 +82,7 @@ public class ModdleContext {
         left.scrollToText(path);
     }
 
-    // middle
+    /* middle */
     public static void toRight() {
         middle.toRight();
     }
@@ -94,7 +95,11 @@ public class ModdleContext {
         middle.addListener();
     }
 
-    // right
+    /* right */
+    public static Tree getTree() {
+        return right.tree;
+    }
+
     public static TreeNode getRoot() {
         DefaultTreeModel model = (DefaultTreeModel) right.tree.getModel();
         return (TreeNode) model.getRoot();

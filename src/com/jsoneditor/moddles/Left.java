@@ -1,6 +1,5 @@
 package com.jsoneditor.moddles;
 
-import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.node.TreeNode;
 
 import java.awt.*;

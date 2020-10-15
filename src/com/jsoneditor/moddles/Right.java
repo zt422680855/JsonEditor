@@ -107,6 +107,7 @@ public class Right extends JsonEditorModdle {
     public Right(JsonEditorModdle parent) {
         this.parent = parent;
         paint();
+        initContextMenu();
     }
 
     private void paint() {
@@ -135,7 +136,6 @@ public class Right extends JsonEditorModdle {
         scrollPane.setVerticalScrollBarPolicy(JBScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         layout.setConstraints(scrollPane, c);
         add(scrollPane);
-        initContextMenu();
     }
 
     private void initTree() {

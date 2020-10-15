@@ -120,7 +120,9 @@ public class AddOrEdit extends JDialog {
                 DateNode dateNode = (DateNode) node;
                 try {
                     datePicker.setDate(dateNode.date);
-                    datePicker.setDateFormat(new SimpleDateFormat(dateNode.format));
+                    if (!DateFormat.DEFAULT.getFormat().equals(dateNode.format)) {
+                        datePicker.setDateFormat(new SimpleDateFormat(dateNode.format));
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

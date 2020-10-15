@@ -43,7 +43,7 @@ public class JsonEditorWindow extends JsonEditorModdle {
         this.left = new Left(this);
         this.middle = new Middle(this);
         this.right = new Right(this);
-        ModdleContext.addModdle(left, middle, right);
+        ModdleContext.addModdle(left, middle, right, this);
         ModdleContext.toRight();
 
         addTitleActions();

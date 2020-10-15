@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.util.ui.JBUI;
-import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
 import com.jsoneditor.node.TreeNode;

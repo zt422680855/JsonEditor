@@ -7,8 +7,6 @@ import com.intellij.ui.AnActionButton;
 import com.jsoneditor.Undo;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.undo.CannotUndoException;
-
 /**
  * @Description:
  * @Author: zhengt
@@ -24,9 +22,6 @@ public class Back extends AnActionButton {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent actionEvent) {
-        try {
-            Undo.undo();
-        } catch (CannotUndoException ex) {
-        }
+        Undo.undo();
     }
 }
