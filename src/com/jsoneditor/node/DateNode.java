@@ -15,58 +15,65 @@ public class DateNode extends TreeNode {
     // 1 显示为时间戳，2 显示为字符串，默认显示为时间戳
     public String format;
 
-    public Date date;
+    public Date value;
 
-    public DateNode(String key, Object value) {
-        super(key, value);
-        if (value instanceof Long) {
+    public DateNode(String key, String value) {
+        super(key);
+        DateFormat format = Utils.getFormat(value);
+        if (format != null) {
+            this.format = format.getFormat();
+            Date d = Utils.strToDate(value, this.format);
+            this.value = d != null ? d : new Date();
+        } else {
             this.format = DateFormat.DEFAULT.getFormat();
-            this.date = new Date((Long) value);
-        } else if (value instanceof String) {
-            String v = (String) value;
-            DateFormat format = Utils.getFormat(v);
-            if (format != null) {
-                this.format = format.getFormat();
-                Date d = Utils.strToDate(v, this.format);
-                this.date = d != null ? d : new Date();
-            } else {
-                this.format = DateFormat.DEFAULT.getFormat();
-                this.date = new Date();
-            }
+            this.value = new Date();
         }
         updateNode();
     }
 
     public DateNode(String key, Long value) {
-        super(key, value);
+        super(key);
         this.format = DateFormat.DEFAULT.getFormat();
-        this.date = new Date(value);
+        this.value = new Date(value);
         updateNode();
     }
 
     public DateNode(String key, Date date, String dateFormat) {
-        super(key, null);
-        value = Utils.dateToStr(date, dateFormat);
+        super(key);
         this.format = dateFormat;
-        this.date = date;
+        this.value = date;
         updateNode();
     }
 
     @Override
-    public void updateNode() {
+    public void setLabel() {
         TreeNode parent = getParent();
         if (parent == null || parent instanceof ObjectNode) {
-            label = key + " : " + value.toString();
+            label = key + " : " + toString();
         } else if (parent instanceof ArrayNode) {
-            label = parent.getIndex(this) + " : " + value.toString();
+            label = parent.getIndex(this) + " : " + toString();
         }
-        super.updateNode();
+        setUserObject(this.label);
     }
 
     @Override
     public DateNode clone() {
-        DateNode node = new DateNode(key, value);
+        DateNode node = new DateNode(key, value, format);
         node.filter = filter;
         return node;
+    }
+
+    @Override
+    public Date getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        if (DateFormat.DEFAULT.getFormat().equals(format)) {
+            return String.valueOf(value.getTime());
+        } else {
+            return Utils.dateToStr(value, format);
+        }
     }
 }

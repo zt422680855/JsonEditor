@@ -1,5 +1,7 @@
 package com.jsoneditor.node;
 
+import com.alibaba.fastjson.JSONArray;
+
 import java.util.Enumeration;
 
 /**
@@ -9,17 +11,16 @@ import java.util.Enumeration;
  */
 public class ArrayNode extends TreeNode {
 
-    public ArrayNode() {
+    public JSONArray value;
 
-    }
-
-    public ArrayNode(String key, Object value) {
-        super(key, value);
+    public ArrayNode(String key, JSONArray value) {
+        super(key);
+        this.value = value;
         updateNode();
     }
 
     @Override
-    public void updateNode() {
+    public void setLabel() {
         int childCount = getChildCount();
         TreeNode parent = getParent();
         if (parent == null || parent instanceof ObjectNode) {
@@ -27,7 +28,7 @@ public class ArrayNode extends TreeNode {
         } else if (parent instanceof ArrayNode) {
             label = parent.getIndex(this) + " : " + "[" + childCount + "]";
         }
-        super.updateNode();
+        setUserObject(this.label);
     }
 
     @Override
@@ -39,5 +40,15 @@ public class ArrayNode extends TreeNode {
             node.add(currNode.clone());
         }
         return node;
+    }
+
+    @Override
+    public JSONArray getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return value.toString();
     }
 }

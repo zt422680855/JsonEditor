@@ -7,24 +7,23 @@ package com.jsoneditor.node;
  */
 public class StringNode extends TreeNode {
 
-    public StringNode() {
+    public String value;
 
-    }
-
-    public StringNode(String key, Object value) {
-        super(key, value);
+    public StringNode(String key, String value) {
+        super(key);
+        this.value = value;
         updateNode();
     }
 
     @Override
-    public void updateNode() {
+    public void setLabel() {
         TreeNode parent = getParent();
         if (parent == null || parent instanceof ObjectNode) {
-            label = key + " : " + (value != null ? value.toString() : "");
+            label = key + " : " + value;
         } else if (parent instanceof ArrayNode) {
-            label = parent.getIndex(this) + " : " + (value != null ? value.toString() : "");
+            label = parent.getIndex(this) + " : " + value;
         }
-        super.updateNode();
+        setUserObject(this.label);
     }
 
     @Override
@@ -32,5 +31,15 @@ public class StringNode extends TreeNode {
         StringNode node = new StringNode(key, value);
         node.filter = filter;
         return node;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 }

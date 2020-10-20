@@ -23,8 +23,6 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
 
     public String key;
 
-    public Object value;
-
     public String label;
 
     public boolean filter = false;
@@ -32,26 +30,27 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     public TreeNode() {
     }
 
-    public TreeNode(String key, Object value) {
+    public TreeNode(String key) {
         this.key = key;
-        this.value = value;
     }
 
     public static TreeNode getNode(String key, Object value) {
         TreeNode node;
-        if (value instanceof JSONObject) {
-            node = new ObjectNode(key, value);
+        if (value == null) {
+            node = new NullNode(key);
+        } else if (value instanceof JSONObject) {
+            node = new ObjectNode(key, (JSONObject) value);
         } else if (value instanceof JSONArray) {
-            node = new ArrayNode(key, value);
+            node = new ArrayNode(key, (JSONArray) value);
         } else if (value instanceof String) {
             if (Utils.canConvertToDate(value)) {
-                node = new DateNode(key, value);
+                node = new DateNode(key, (String) value);
             } else {
-                node = new StringNode(key, value);
+                node = new StringNode(key, (String) value);
             }
         } else {
             if (Utils.canConvertToDate(value)) {
-                node = new DateNode(key, value);
+                node = new DateNode(key, (Long) value);
             } else {
                 node = new OtherNode(key, value);
             }
@@ -60,12 +59,14 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     }
 
     public void updateNode() {
-        setUserObject(label);
+        setLabel();
         for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
             TreeNode currNode = (TreeNode) e.nextElement();
             currNode.updateNode();
         }
     }
+
+    public abstract void setLabel();
 
     @Override
     public TreeNode getParent() {
@@ -107,5 +108,7 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
             add((TreeNode) another.getFirstChild());
         }
     }
+
+    public abstract Object getValue();
 
 }

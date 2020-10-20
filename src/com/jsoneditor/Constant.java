@@ -55,7 +55,7 @@ public interface Constant {
     }
 
     String TEMP = "{\n" +
-            "\t\"name\":\"zhengt\",\n" +
+            "\t\"name\":\"zhengtao\",\n" +
             "\t\"age\":18,\n" +
             "\t\"isHandsome\":true,\n" +
             "\t\"email\":\"hj_zhengt@163.com\",\n" +
@@ -64,8 +64,8 @@ public interface Constant {
             "\t\"birthday\":\"1991-10-01\",\n" +
             "\t\"address\":{\n" +
             "\t\t\"country\":\"China\",\n" +
-            "\t\t\"province\":\"jiangsu\",\n" +
-            "\t\t\"city\":\"nanjing\"\n" +
+            "\t\t\"province\":\"anhui\",\n" +
+            "\t\t\"city\":\"mingguang\"\n" +
             "\t},\n" +
             "\t\"hobbys\":[\n" +
             "\t\t{\n" +

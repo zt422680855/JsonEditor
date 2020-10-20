@@ -75,7 +75,7 @@ public class Middle extends JsonEditorModdle {
         syncToLeft.addActionListener((e) -> {
             TreeNode root = ModdleContext.getRoot();
             TreeUtils.refreshJson(root);
-            ModdleContext.setText(JSON.toJSONString(root.value, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            ModdleContext.setText(JSON.toJSONString(root.getValue(), SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
     }
 

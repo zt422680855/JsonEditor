@@ -119,7 +119,7 @@ public class AddOrEdit extends JDialog {
                 dateFormat.setVisible(true);
                 DateNode dateNode = (DateNode) node;
                 try {
-                    datePicker.setDate(dateNode.date);
+                    datePicker.setDate(dateNode.value);
                     if (!DateFormat.DEFAULT.getFormat().equals(dateNode.format)) {
                         datePicker.setDateFormat(new SimpleDateFormat(dateNode.format));
                     }
@@ -137,7 +137,7 @@ public class AddOrEdit extends JDialog {
             }
         }
         key.setText(opt != 3 ? "key" : node.key);
-        value.setText(opt != 3 ? "value" : (node.value == null ? "null" : node.value.toString()));
+        value.setText(opt != 3 ? "value" : node.toString());
         openDialog();
     }
 
@@ -293,7 +293,11 @@ public class AddOrEdit extends JDialog {
                     } else {
                         nodeValue = value.getText();
                     }
-                    returnNode = new OtherNode(nodeKey, nodeValue);
+                    if (nodeValue == null) {
+                        returnNode = new NullNode(nodeKey);
+                    } else {
+                        returnNode = new OtherNode(nodeKey, nodeValue);
+                    }
                 }
                 callback.accept(returnNode, selectNode);
                 AddOrEdit.this.dispose();

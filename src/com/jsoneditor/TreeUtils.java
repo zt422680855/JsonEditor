@@ -20,59 +20,45 @@ public class TreeUtils {
 
     public static void refreshJson(TreeNode node) {
         if (node instanceof ObjectNode) {
-            JSONObject obj = (JSONObject) node.value;
+            JSONObject obj = (JSONObject) node.getValue();
             obj.clear();
             for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
                 TreeNode currNode = (TreeNode) e.nextElement();
-                if ("null".equals(currNode.value)) {
-                    if (currNode instanceof OtherNode) {
-                        currNode.value = null;
-                    }
-                }
-                obj.put(currNode.key, currNode.value);
+                obj.put(currNode.key, currNode.getValue());
                 refreshJson(currNode);
             }
         } else if (node instanceof ArrayNode) {
-            JSONArray array = (JSONArray) node.value;
+            JSONArray array = (JSONArray) node.getValue();
             array.clear();
             for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
                 TreeNode currNode = (TreeNode) e.nextElement();
-                if ("null".equals(currNode.value)) {
-                    currNode.value = null;
-                }
-                array.add(currNode.value);
+                array.add(currNode.getValue());
                 refreshJson(currNode);
             }
         }
     }
 
     public static void refreshTree(TreeNode node) {
+        node.setLabel();
         node.removeAllChildren();
-        if (node.value instanceof JSONObject) {
-            JSONObject object = (JSONObject) node.value;
-            node.label = node.key + " : " + "{" + object.size() + "}";
+        Object value = node.getValue();
+        if (value instanceof JSONObject) {
+            JSONObject object = (JSONObject) value;
             object.forEach((k, v) -> {
                 TreeNode subNode = TreeNode.getNode(k, v);
                 node.add(subNode);
                 refreshTree(subNode);
             });
-        } else if (node.value instanceof JSONArray) {
-            JSONArray array = (JSONArray) node.value;
-            node.label = node.key + " : " + "[" + array.size() + "]";
+        } else if (value instanceof JSONArray) {
+            JSONArray array = (JSONArray) value;
             for (int i = 0; i < array.size(); i++) {
-                String k = i + "";
+                String k = String.valueOf(i);
                 Object v = array.get(i);
                 TreeNode subNode = TreeNode.getNode(k, v);
                 node.add(subNode);
                 refreshTree(subNode);
             }
-        } else {
-            if (node.value == null) {
-                node.value = "null";
-            }
-            node.label = node.key + " : " + node.value.toString();
         }
-        node.setUserObject(node.label);
     }
 
     public static void expandTree(Tree tree, TreePath parent) {
