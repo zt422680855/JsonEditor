@@ -28,27 +28,27 @@ public class DateNode extends TreeNode {
             this.format = DateFormat.DEFAULT.getFormat();
             this.value = new Date();
         }
-        updateNode();
+//        updateNode();
     }
 
     public DateNode(String key, Long value) {
         super(key);
         this.format = DateFormat.DEFAULT.getFormat();
         this.value = new Date(value);
-        updateNode();
+//        updateNode();
     }
 
     public DateNode(String key, Date date, String dateFormat) {
         super(key);
         this.format = dateFormat;
         this.value = date;
-        updateNode();
+//        updateNode();
     }
 
     @Override
     public void setLabel() {
         TreeNode parent = getParent();
-        if (parent == null || parent instanceof ObjectNode) {
+        if (parent instanceof ObjectNode) {
             label = key + " : " + toString();
         } else if (parent instanceof ArrayNode) {
             label = parent.getIndex(this) + " : " + toString();
@@ -64,8 +64,12 @@ public class DateNode extends TreeNode {
     }
 
     @Override
-    public Date getValue() {
-        return value;
+    public Object getValue() {
+        if (DateFormat.DEFAULT.getFormat().equals(format)) {
+            return value.getTime();
+        } else {
+            return Utils.dateToStr(value, format);
+        }
     }
 
     @Override

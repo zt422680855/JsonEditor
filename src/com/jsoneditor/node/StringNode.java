@@ -12,13 +12,13 @@ public class StringNode extends TreeNode {
     public StringNode(String key, String value) {
         super(key);
         this.value = value;
-        updateNode();
+//        updateNode();
     }
 
     @Override
     public void setLabel() {
         TreeNode parent = getParent();
-        if (parent == null || parent instanceof ObjectNode) {
+        if (parent instanceof ObjectNode) {
             label = key + " : " + value;
         } else if (parent instanceof ArrayNode) {
             label = parent.getIndex(this) + " : " + value;

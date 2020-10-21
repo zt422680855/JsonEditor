@@ -20,14 +20,14 @@ public class ObjectNode extends TreeNode {
     public ObjectNode(String key, JSONObject value) {
         super(key);
         this.value = value;
-        updateNode();
+//        updateNode();
     }
 
     @Override
     public void setLabel() {
         int childCount = getChildCount();
         TreeNode parent = getParent();
-        if (parent == null || parent instanceof ObjectNode) {
+        if (isRoot() || parent instanceof ObjectNode) {
             label = key + " : " + "{" + childCount + "}";
         } else if (parent instanceof ArrayNode) {
             label = parent.getIndex(this) + " : " + "{" + childCount + "}";

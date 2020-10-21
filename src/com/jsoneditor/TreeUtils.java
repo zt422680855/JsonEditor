@@ -3,6 +3,7 @@ package com.jsoneditor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.Tree;
+import com.jsoneditor.moddles.ModdleContext;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.OtherNode;
@@ -39,7 +40,6 @@ public class TreeUtils {
     }
 
     public static void refreshTree(TreeNode node) {
-        node.setLabel();
         node.removeAllChildren();
         Object value = node.getValue();
         if (value instanceof JSONObject) {
@@ -58,6 +58,9 @@ public class TreeUtils {
                 node.add(subNode);
                 refreshTree(subNode);
             }
+        }
+        if (node.isRoot()) {
+            node.updateNode();
         }
     }
 
