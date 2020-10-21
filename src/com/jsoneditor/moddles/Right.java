@@ -335,7 +335,7 @@ public class Right extends JsonEditorModdle {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(select.toString()), null);
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(select.valueString()), null);
             }
         });
     }

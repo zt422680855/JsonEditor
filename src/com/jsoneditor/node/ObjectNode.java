@@ -20,7 +20,6 @@ public class ObjectNode extends TreeNode {
     public ObjectNode(String key, JSONObject value) {
         super(key);
         this.value = value;
-//        updateNode();
     }
 
     @Override
@@ -28,11 +27,10 @@ public class ObjectNode extends TreeNode {
         int childCount = getChildCount();
         TreeNode parent = getParent();
         if (isRoot() || parent instanceof ObjectNode) {
-            label = key + " : " + "{" + childCount + "}";
+            setUserObject(key + " : " + "{" + childCount + "}");
         } else if (parent instanceof ArrayNode) {
-            label = parent.getIndex(this) + " : " + "{" + childCount + "}";
+            setUserObject(parent.getIndex(this) + " : " + "{" + childCount + "}");
         }
-        setUserObject(this.label);
     }
 
     @Override
@@ -52,7 +50,7 @@ public class ObjectNode extends TreeNode {
     }
 
     @Override
-    public String toString() {
+    public String valueString() {
         return value.toString();
     }
 }

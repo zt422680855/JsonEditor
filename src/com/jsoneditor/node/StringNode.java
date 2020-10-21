@@ -12,18 +12,16 @@ public class StringNode extends TreeNode {
     public StringNode(String key, String value) {
         super(key);
         this.value = value;
-//        updateNode();
     }
 
     @Override
     public void setLabel() {
         TreeNode parent = getParent();
         if (parent instanceof ObjectNode) {
-            label = key + " : " + value;
+            setUserObject(key + " : " + value);
         } else if (parent instanceof ArrayNode) {
-            label = parent.getIndex(this) + " : " + value;
+            setUserObject(parent.getIndex(this) + " : " + value);
         }
-        setUserObject(this.label);
     }
 
     @Override
@@ -39,7 +37,7 @@ public class StringNode extends TreeNode {
     }
 
     @Override
-    public String toString() {
+    public String valueString() {
         return value;
     }
 }

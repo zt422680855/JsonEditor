@@ -12,18 +12,16 @@ public class OtherNode extends TreeNode {
     public OtherNode(String key, Object value) {
         super(key);
         this.value = value;
-//        updateNode();
     }
 
     @Override
     public void setLabel() {
         TreeNode parent = getParent();
         if (parent instanceof ObjectNode) {
-            label = key + " : " + (value != null ? value.toString() : null);
+            setUserObject(key + " : " + valueString());
         } else if (parent instanceof ArrayNode) {
-            label = parent.getIndex(this) + " : " + (value != null ? value.toString() : null);
+            setUserObject(parent.getIndex(this) + " : " + valueString());
         }
-        setUserObject(this.label);
     }
 
     @Override
@@ -39,7 +37,7 @@ public class OtherNode extends TreeNode {
     }
 
     @Override
-    public String toString() {
+    public String valueString() {
         return value != null ? value.toString() : "null";
     }
 }

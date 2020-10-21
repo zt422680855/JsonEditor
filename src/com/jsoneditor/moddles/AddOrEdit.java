@@ -137,7 +137,7 @@ public class AddOrEdit extends JDialog {
             }
         }
         key.setText(opt != 3 ? "key" : node.key);
-        value.setText(opt != 3 ? "value" : node.toString());
+        value.setText(opt != 3 ? "value" : node.valueString());
         openDialog();
     }
 

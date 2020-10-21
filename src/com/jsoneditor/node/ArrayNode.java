@@ -16,7 +16,6 @@ public class ArrayNode extends TreeNode {
     public ArrayNode(String key, JSONArray value) {
         super(key);
         this.value = value;
-//        updateNode();
     }
 
     @Override
@@ -24,11 +23,10 @@ public class ArrayNode extends TreeNode {
         int childCount = getChildCount();
         TreeNode parent = getParent();
         if (isRoot() || parent instanceof ObjectNode) {
-            label = key + " : " + "[" + childCount + "]";
+            setUserObject(key + " : " + "[" + childCount + "]");
         } else if (parent instanceof ArrayNode) {
-            label = parent.getIndex(this) + " : " + "[" + childCount + "]";
+            setUserObject(parent.getIndex(this) + " : " + "[" + childCount + "]");
         }
-        setUserObject(this.label);
     }
 
     @Override
@@ -48,7 +46,7 @@ public class ArrayNode extends TreeNode {
     }
 
     @Override
-    public String toString() {
+    public String valueString() {
         return value.toString();
     }
 }
