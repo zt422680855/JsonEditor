@@ -22,14 +22,15 @@ public class JsonEditorFactory implements ToolWindowFactory {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(jsonEditor, project.getName(), false);
         toolWindow.getContentManager().addContent(content);
-        toolWindow.getContentManager().addContentManagerListener(new ContentManagerAdapter() {
-
-            @Override
-            public void selectionChanged(@NotNull ContentManagerEvent event) {
-                if (event.getOperation().equals(ContentManagerEvent.ContentOperation.add)) {
-                    jsonEditor.setContext();
-                }
-            }
-        });
+//        toolWindow.getContentManager().addContentManagerListener(new ContentManagerAdapter() {
+//
+//            @Override
+//            public void selectionChanged(@NotNull ContentManagerEvent event) {
+//                if (event.getOperation().equals(ContentManagerEvent.ContentOperation.add)) {
+//                    jsonEditor.setContext();
+//                }
+//            }
+//        });
+        jsonEditor.addTitleActions();
     }
 }

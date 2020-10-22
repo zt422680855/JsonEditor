@@ -46,11 +46,11 @@ public class JsonEditorWindow extends JsonEditorModdle {
         ModdleContext.addModdle(left, middle, right, this);
         ModdleContext.toRight();
 
-        addTitleActions();
-        setContext();
+//        addTitleActions();
+//        setContext();
     }
 
-    private void addTitleActions() {
+    public void addTitleActions() {
         Format format = new Format();
         Compress compress = new Compress();
         Reset reset = new Reset();
@@ -64,21 +64,23 @@ public class JsonEditorWindow extends JsonEditorModdle {
         rightAction.addSeparator();
         DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView(right, middle));
         DefaultActionGroup[] actions = new DefaultActionGroup[]{leftAction, rightAction, otherAction};
-        actionMap.put(project.getName(), actions);
+//        actionMap.put(project.getName(), actions);
+        ToolWindowEx ex = (ToolWindowEx) toolWindow;
+        ex.setTitleActions(actions);
     }
 
-    public void setContext() {
-        DefaultActionGroup[] groups = actionMap.get(project.getName());
-        ToolWindowEx ex = (ToolWindowEx) toolWindow;
-        ex.setTitleActions(groups);
-        for (DefaultActionGroup g : groups) {
-            AnAction[] children = g.getChildren(null);
-            for (AnAction child : children) {
-                if (child instanceof AnActionButton) {
-                    ((AnActionButton) child).setContextComponent(this);
-                }
-            }
-        }
-    }
+//    public void setContext() {
+//        DefaultActionGroup[] groups = actionMap.get(project.getName());
+//        ToolWindowEx ex = (ToolWindowEx) toolWindow;
+//        ex.setTitleActions(groups);
+//        for (DefaultActionGroup g : groups) {
+//            AnAction[] children = g.getChildren(null);
+//            for (AnAction child : children) {
+//                if (child instanceof AnActionButton) {
+//                    ((AnActionButton) child).setContextComponent(this);
+//                }
+//            }
+//        }
+//    }
 
 }
