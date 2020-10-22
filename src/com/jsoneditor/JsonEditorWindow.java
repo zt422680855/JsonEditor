@@ -28,7 +28,7 @@ public class JsonEditorWindow extends JsonEditorModdle {
 
     private ToolWindow toolWindow;
 
-    private static Map<String, DefaultActionGroup[]> actionMap = new HashMap<>();
+    private static Map<Project, DefaultActionGroup[]> actionMap = new HashMap<>();
 
     public JsonEditorWindow(Project project, ToolWindow toolWindow) {
         super(project);
@@ -61,14 +61,14 @@ public class JsonEditorWindow extends JsonEditorModdle {
         rightAction.addSeparator();
         DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView(right, middle));
         DefaultActionGroup[] actions = new DefaultActionGroup[]{leftAction, rightAction, otherAction};
-        actionMap.put(project.getName(), actions);
+        actionMap.put(project, actions);
         ToolWindowEx ex = (ToolWindowEx) toolWindow;
         ex.setTitleActions(actions);
         setContext();
     }
 
     public void setContext() {
-        DefaultActionGroup[] groups = actionMap.get(project.getName());
+        DefaultActionGroup[] groups = actionMap.get(project);
         ToolWindowEx ex = (ToolWindowEx) toolWindow;
         ex.setTitleActions(groups);
         for (DefaultActionGroup g : groups) {
