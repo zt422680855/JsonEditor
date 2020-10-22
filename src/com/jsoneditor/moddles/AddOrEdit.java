@@ -49,7 +49,7 @@ public class AddOrEdit extends JDialog {
     private JBLabel valueLabel = new JBLabel("value");
 
     private DatePicker datePicker = new DatePicker() {{
-        setDateFormat(new SimpleDateFormat(Constant.DateFormat.SEVEN.getFormat()));
+        setDateFormat(new SimpleDateFormat(Constant.DateFormat.FIVE.getFormat()));
         setVisible(false);
     }};
 
@@ -65,9 +65,6 @@ public class AddOrEdit extends JDialog {
         addItem(Constant.DateFormat.FOUR.getFormat());
         addItem(Constant.DateFormat.FIVE.getFormat());
         addItem(Constant.DateFormat.SIX.getFormat());
-        addItem(Constant.DateFormat.SEVEN.getFormat());
-        addItem(Constant.DateFormat.EIGHT.getFormat());
-        addItem(Constant.DateFormat.NINE.getFormat());
         setVisible(false);
     }};
 

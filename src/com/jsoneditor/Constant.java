@@ -26,13 +26,10 @@ public interface Constant {
         DEFAULT("Timestamp", Pattern.compile("^[\\d]{11,12}$")),
         ONE("yyyy-MM-dd", Pattern.compile("^[\\d]{4}-[\\d]{2}-[\\d]{2}$")),
         TWO("yyyy/MM/dd", Pattern.compile("^[\\d]{4}/[\\d]{2}/[\\d]{2}$")),
-        THREE("yyyyMMdd", Pattern.compile("^[\\d]{8}$")),
-        FOUR("yyyy-MM-dd HH:mm:ss", Pattern.compile("^[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}$")),
-        FIVE("yyyy/MM/dd HH:mm:ss", Pattern.compile("^[\\d]{4}/[\\d]{2}/[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}$")),
-        SIX("yyyyMMddHHmmss", Pattern.compile("^[\\d]{14}$")),
-        SEVEN("yyyy-MM-dd HH:mm:ss SSS", Pattern.compile("^[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2} [\\d]{3}$")),
-        EIGHT("yyyy/MM/dd HH:mm:ss SSS", Pattern.compile("^[\\d]{4}/[\\d]{2}/[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2} [\\d]{3}$")),
-        NINE("yyyyMMddHHmmssSSS", Pattern.compile("^[\\d]{17}$")),
+        THREE("yyyy-MM-dd HH:mm:ss", Pattern.compile("^[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}$")),
+        FOUR("yyyy/MM/dd HH:mm:ss", Pattern.compile("^[\\d]{4}/[\\d]{2}/[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}$")),
+        FIVE("yyyy-MM-dd HH:mm:ss SSS", Pattern.compile("^[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2} [\\d]{3}$")),
+        SIX("yyyy/MM/dd HH:mm:ss SSS", Pattern.compile("^[\\d]{4}/[\\d]{2}/[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2} [\\d]{3}$")),
         ;
 
         private String format;
