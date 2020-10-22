@@ -68,7 +68,7 @@ public class CopyToEditor extends AnAction {
                             }
                         });
                     } else {
-                        JsonEditorNotifier.warning(selectText + " is not a class or it is not a project class.");
+                        JsonEditorNotifier.warning("'" + selectText + "' is not a class or it is not a project class.");
                     }
                 }
             }
