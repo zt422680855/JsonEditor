@@ -10,7 +10,7 @@ import java.util.Date;
  * @Author: zhengt
  * @CreateDate: 2020/9/16 22:04
  */
-public class DateNode extends TreeNode {
+public final class DateNode extends LeafNode {
 
     // 1 显示为时间戳，2 显示为字符串，默认显示为时间戳
     public String format;
@@ -31,32 +31,17 @@ public class DateNode extends TreeNode {
     }
 
     public DateNode(String key, Long value) {
-        super(key);
-        this.format = DateFormat.DEFAULT.getFormat();
-        this.value = new Date(value);
+        this(key, new Date(value));
+    }
+
+    public DateNode(String key, Date date) {
+        this(key, date, DateFormat.DEFAULT.getFormat());
     }
 
     public DateNode(String key, Date date, String dateFormat) {
         super(key);
         this.format = dateFormat;
         this.value = date;
-    }
-
-    @Override
-    public void setLabel() {
-        TreeNode parent = getParent();
-        if (parent instanceof ObjectNode) {
-            setUserObject(key + " : " + valueString());
-        } else if (parent instanceof ArrayNode) {
-            setUserObject(parent.getIndex(this) + " : " + valueString());
-        }
-    }
-
-    @Override
-    public DateNode clone() {
-        DateNode node = new DateNode(key, value, format);
-        node.filter = filter;
-        return node;
     }
 
     @Override
@@ -69,11 +54,10 @@ public class DateNode extends TreeNode {
     }
 
     @Override
-    public String valueString() {
-        if (DateFormat.DEFAULT.getFormat().equals(format)) {
-            return String.valueOf(value.getTime());
-        } else {
-            return Utils.dateToStr(value, format);
-        }
+    public DateNode clone() {
+        DateNode node = new DateNode(key, value, format);
+        node.filter = filter;
+        return node;
     }
+
 }

@@ -25,9 +25,6 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
 
     public boolean filter = false;
 
-    public TreeNode() {
-    }
-
     public TreeNode(String key) {
         this.key = key;
     }
@@ -109,6 +106,8 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
 
     public abstract Object getValue();
 
-    public abstract String valueString();
+    public String valueString() {
+        return getValue().toString();
+    }
 
 }

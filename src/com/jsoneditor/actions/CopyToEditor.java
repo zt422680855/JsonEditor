@@ -114,7 +114,7 @@ public class CopyToEditor extends AnAction {
                         }
                         obj.put(name, arr);
                     } else if (ancestorQualifiedCheck(classType, "java.util.Map", project)) {
-                        obj.put(name, new JSONObject());
+                        obj.put(name, new JSONObject(true));
                     } else {
                         String className = classType.getClassName();
                         PsiClass fieldClass = getPsiClassByShortClassName(className, psiClass, project);

@@ -273,7 +273,7 @@ public class AddOrEdit extends JDialog {
                     Date date = datePicker.getDate();
                     String selectedFormat = (String) dateFormat.getSelectedItem();
                     if (DateFormat.DEFAULT.getFormat().equals(selectedFormat)) {
-                        returnNode = new DateNode(nodeKey, date.getTime());
+                        returnNode = new DateNode(nodeKey, date);
                     } else {
                         returnNode = new DateNode(nodeKey, date, selectedFormat);
                     }
@@ -282,7 +282,7 @@ public class AddOrEdit extends JDialog {
                     String valueStr = value.getText();
                     if ("".equals(valueStr)) {
                         nodeValue = null;
-                    } else if ("true".equalsIgnoreCase(valueStr) || "false".equalsIgnoreCase(valueStr)) {
+                    } else if (Boolean.TRUE.toString().equalsIgnoreCase(valueStr) || Boolean.FALSE.toString().equalsIgnoreCase(valueStr)) {
                         nodeValue = Boolean.parseBoolean(valueStr);
                     } else if (Utils.isInteger(valueStr)) {
                         nodeValue = Long.parseLong(valueStr);

@@ -5,10 +5,26 @@ package com.jsoneditor.node;
  * @Author: zhengt
  * @CreateDate: 2020/10/20 22:31
  */
-public class NullNode extends OtherNode {
+public final class NullNode extends OtherNode {
 
     public NullNode(String key) {
         super(key, null);
     }
 
+    @Override
+    public Object getValue() {
+        return null;
+    }
+
+    @Override
+    public String valueString() {
+        return "null";
+    }
+
+    @Override
+    public NullNode clone() {
+        NullNode node = new NullNode(key);
+        node.filter = this.filter;
+        return node;
+    }
 }

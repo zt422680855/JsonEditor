@@ -5,7 +5,7 @@ package com.jsoneditor.node;
  * @Author: zhengt
  * @CreateDate: 2020/8/5 22:16
  */
-public class OtherNode extends TreeNode {
+public class OtherNode extends LeafNode {
 
     public Object value;
 
@@ -15,13 +15,8 @@ public class OtherNode extends TreeNode {
     }
 
     @Override
-    public void setLabel() {
-        TreeNode parent = getParent();
-        if (parent instanceof ObjectNode) {
-            setUserObject(key + " : " + valueString());
-        } else if (parent instanceof ArrayNode) {
-            setUserObject(parent.getIndex(this) + " : " + valueString());
-        }
+    public Object getValue() {
+        return value;
     }
 
     @Override
@@ -31,13 +26,4 @@ public class OtherNode extends TreeNode {
         return node;
     }
 
-    @Override
-    public Object getValue() {
-        return value;
-    }
-
-    @Override
-    public String valueString() {
-        return value != null ? value.toString() : "null";
-    }
 }

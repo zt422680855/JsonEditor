@@ -9,7 +9,9 @@ import java.util.Enumeration;
  * @Author: zhengt
  * @CreateDate: 2020/8/5 22:08
  */
-public class ArrayNode extends TreeNode {
+public final class ArrayNode extends ContainerNode {
+
+    private static final String FORMATTER = "%s : [%d]";
 
     public JSONArray value;
 
@@ -19,14 +21,13 @@ public class ArrayNode extends TreeNode {
     }
 
     @Override
-    public void setLabel() {
-        int childCount = getChildCount();
-        TreeNode parent = getParent();
-        if (isRoot() || parent instanceof ObjectNode) {
-            setUserObject(key + " : " + "[" + childCount + "]");
-        } else if (parent instanceof ArrayNode) {
-            setUserObject(parent.getIndex(this) + " : " + "[" + childCount + "]");
-        }
+    public String getFormatter() {
+        return FORMATTER;
+    }
+
+    @Override
+    public JSONArray getValue() {
+        return value;
     }
 
     @Override
@@ -40,13 +41,4 @@ public class ArrayNode extends TreeNode {
         return node;
     }
 
-    @Override
-    public JSONArray getValue() {
-        return value;
-    }
-
-    @Override
-    public String valueString() {
-        return value.toString();
-    }
 }

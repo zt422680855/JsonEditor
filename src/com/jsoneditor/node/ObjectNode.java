@@ -9,12 +9,15 @@ import java.util.Enumeration;
  * @Author: zhengt
  * @CreateDate: 2020/8/5 22:08
  */
-public class ObjectNode extends TreeNode {
+public final class ObjectNode extends ContainerNode {
+
+    private static final String FORMATTER = "%s : {%d}";
 
     public JSONObject value;
 
     public ObjectNode() {
-
+        super("key");
+        this.value = new JSONObject(true);
     }
 
     public ObjectNode(String key, JSONObject value) {
@@ -23,14 +26,13 @@ public class ObjectNode extends TreeNode {
     }
 
     @Override
-    public void setLabel() {
-        int childCount = getChildCount();
-        TreeNode parent = getParent();
-        if (isRoot() || parent instanceof ObjectNode) {
-            setUserObject(key + " : " + "{" + childCount + "}");
-        } else if (parent instanceof ArrayNode) {
-            setUserObject(parent.getIndex(this) + " : " + "{" + childCount + "}");
-        }
+    public String getFormatter() {
+        return FORMATTER;
+    }
+
+    @Override
+    public JSONObject getValue() {
+        return value;
     }
 
     @Override
@@ -44,13 +46,4 @@ public class ObjectNode extends TreeNode {
         return node;
     }
 
-    @Override
-    public JSONObject getValue() {
-        return value;
-    }
-
-    @Override
-    public String valueString() {
-        return value.toString();
-    }
 }
