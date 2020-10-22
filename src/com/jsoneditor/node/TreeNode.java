@@ -1,10 +1,7 @@
 package com.jsoneditor.node;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
 import com.intellij.ui.treeStructure.Tree;
-import com.jsoneditor.Utils;
 
 import javax.swing.tree.TreePath;
 import java.io.Serializable;
@@ -27,30 +24,6 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
 
     public TreeNode(String key) {
         this.key = key;
-    }
-
-    public static TreeNode getNode(String key, Object value) {
-        TreeNode node;
-        if (value == null) {
-            node = new NullNode(key);
-        } else if (value instanceof JSONObject) {
-            node = new ObjectNode(key, (JSONObject) value);
-        } else if (value instanceof JSONArray) {
-            node = new ArrayNode(key, (JSONArray) value);
-        } else if (value instanceof String) {
-            if (Utils.canConvertToDate(value)) {
-                node = new DateNode(key, (String) value);
-            } else {
-                node = new StringNode(key, (String) value);
-            }
-        } else {
-            if (Utils.canConvertToDate(value)) {
-                node = new DateNode(key, (Long) value);
-            } else {
-                node = new OtherNode(key, value);
-            }
-        }
-        return node;
     }
 
     public void updateNode() {

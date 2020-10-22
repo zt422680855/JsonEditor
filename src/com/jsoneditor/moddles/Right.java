@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.tree.TreeModelAdapter;
 import com.jsoneditor.CustomTreeCellRenderer;
+import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
 import com.jsoneditor.edits.*;
 import com.jsoneditor.node.*;
@@ -260,7 +261,7 @@ public class Right extends JsonEditorModdle {
                 new AddOrEdit(select, 1, (node, selectNode) -> {
                     TreeEdit edit;
                     if (selectNode instanceof StringNode || selectNode instanceof OtherNode) {
-                        TreeNode newSelect = TreeNode.getNode(selectNode.key, new JSONObject(true));
+                        TreeNode newSelect = TreeUtils.getNode(selectNode.key, new JSONObject(true));
                         newSelect.add(node);
                         edit = new ReplaceEdit(tree, newSelect, selectNode, false);
                     } else {

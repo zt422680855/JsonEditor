@@ -3,9 +3,7 @@ package com.jsoneditor;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.intellij.ui.treeStructure.Tree;
-import com.jsoneditor.node.ArrayNode;
-import com.jsoneditor.node.ObjectNode;
-import com.jsoneditor.node.TreeNode;
+import com.jsoneditor.node.*;
 
 import javax.swing.tree.TreePath;
 import java.util.Enumeration;
@@ -16,6 +14,30 @@ import java.util.Enumeration;
  * @CreateDate: 2020/8/17 22:32
  */
 public class TreeUtils {
+
+    public static TreeNode getNode(String key, Object value) {
+        TreeNode node;
+        if (value == null) {
+            node = new NullNode(key);
+        } else if (value instanceof JSONObject) {
+            node = new ObjectNode(key, (JSONObject) value);
+        } else if (value instanceof JSONArray) {
+            node = new ArrayNode(key, (JSONArray) value);
+        } else if (value instanceof String) {
+            if (Utils.canConvertToDate(value)) {
+                node = new DateNode(key, (String) value);
+            } else {
+                node = new StringNode(key, (String) value);
+            }
+        } else {
+            if (Utils.canConvertToDate(value)) {
+                node = new DateNode(key, (Long) value);
+            } else {
+                node = new OtherNode(key, value);
+            }
+        }
+        return node;
+    }
 
     public static void refreshJson(TreeNode node) {
         if (node instanceof ObjectNode) {
@@ -43,7 +65,7 @@ public class TreeUtils {
         if (value instanceof JSONObject) {
             JSONObject object = (JSONObject) value;
             object.forEach((k, v) -> {
-                TreeNode subNode = TreeNode.getNode(k, v);
+                TreeNode subNode = getNode(k, v);
                 node.add(subNode);
                 refreshTree(subNode);
             });
@@ -52,7 +74,7 @@ public class TreeUtils {
             for (int i = 0; i < array.size(); i++) {
                 String k = String.valueOf(i);
                 Object v = array.get(i);
-                TreeNode subNode = TreeNode.getNode(k, v);
+                TreeNode subNode = getNode(k, v);
                 node.add(subNode);
                 refreshTree(subNode);
             }
@@ -64,24 +86,20 @@ public class TreeUtils {
 
     public static void expandTree(Tree tree, TreePath parent) {
         TreeNode node = (TreeNode) parent.getLastPathComponent();
-        if (node.getChildCount() >= 0) {
-            for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
-                TreeNode n = (TreeNode) e.nextElement();
-                TreePath path = parent.pathByAddingChild(n);
-                expandTree(tree, path);
-            }
+        for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
+            TreeNode n = (TreeNode) e.nextElement();
+            TreePath path = parent.pathByAddingChild(n);
+            expandTree(tree, path);
         }
         tree.expandPath(parent);
     }
 
     public static void collapseTree(Tree tree, TreePath parent) {
         TreeNode node = (TreeNode) parent.getLastPathComponent();
-        if (node.getChildCount() >= 0) {
-            for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
-                TreeNode n = (TreeNode) e.nextElement();
-                TreePath path = parent.pathByAddingChild(n);
-                collapseTree(tree, path);
-            }
+        for (Enumeration<?> e = node.children(); e.hasMoreElements(); ) {
+            TreeNode n = (TreeNode) e.nextElement();
+            TreePath path = parent.pathByAddingChild(n);
+            collapseTree(tree, path);
         }
         tree.collapsePath(parent);
     }

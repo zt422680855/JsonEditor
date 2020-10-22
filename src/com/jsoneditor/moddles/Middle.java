@@ -62,7 +62,7 @@ public class Middle extends JsonEditorModdle {
             try {
                 TreeNode root;
                 Object parse = JSON.parse(ModdleContext.getText(), Feature.OrderedField);
-                root = TreeNode.getNode("ROOT", parse);
+                root = TreeUtils.getNode("ROOT", parse);
                 ModdleContext.setRoot(root);
                 TreeUtils.refreshTree(root);
                 ModdleContext.expandNode(new TreePath(root.getPath()));
