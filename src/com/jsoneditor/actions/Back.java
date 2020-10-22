@@ -21,7 +21,7 @@ public class Back extends AnActionButton {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent actionEvent) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
         Undo.undo();
     }
 }

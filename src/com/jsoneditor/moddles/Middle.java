@@ -3,6 +3,7 @@ package com.jsoneditor.moddles;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
@@ -32,7 +33,8 @@ public class Middle extends JsonEditorModdle {
         setBorderPainted(false);
     }};
 
-    public Middle(JsonEditorModdle parent) {
+    public Middle(Project project, JsonEditorModdle parent) {
+        super(project);
         this.parent = parent;
         paint();
     }
@@ -61,21 +63,21 @@ public class Middle extends JsonEditorModdle {
         syncToRight.addActionListener((e) -> {
             try {
                 TreeNode root;
-                Object parse = JSON.parse(ModdleContext.getText(), Feature.OrderedField);
+                Object parse = JSON.parse(ModdleContext.getText(project), Feature.OrderedField);
                 root = TreeUtils.getNode("ROOT", parse);
-                ModdleContext.setRoot(root);
+                ModdleContext.setRoot(project, root);
                 TreeUtils.refreshTree(root);
-                ModdleContext.expandNode(new TreePath(root.getPath()));
-                ModdleContext.updateTree();
+                ModdleContext.expandNode(project, new TreePath(root.getPath()));
+                ModdleContext.updateTree(project);
                 Undo.clear();
             } catch (Exception ex) {
                 JsonEditorNotifier.error("JSON format error.");
             }
         });
         syncToLeft.addActionListener((e) -> {
-            TreeNode root = ModdleContext.getRoot();
+            TreeNode root = ModdleContext.getRoot(project);
             TreeUtils.refreshJson(root);
-            ModdleContext.setText(JSON.toJSONString(root.getValue(), SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            ModdleContext.setText(project, JSON.toJSONString(root.getValue(), SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
     }
 

@@ -62,8 +62,8 @@ public class CopyToEditor extends AnAction {
                         Arrays.stream(contents).filter(c -> project.getName().equals(c.getDisplayName())).findAny().ifPresent(content -> {
                             JComponent component = content.getComponent();
                             if (component instanceof JsonEditorWindow) {
-                                ModdleContext.setText(JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-                                ModdleContext.toRight();
+                                ModdleContext.setText(project, JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+                                ModdleContext.toRight(project);
                                 toolWindow.show(null);
                             }
                         });

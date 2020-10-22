@@ -3,6 +3,7 @@ package com.jsoneditor.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.Undo;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,8 @@ public class Forward extends AnActionButton {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent actionEvent) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
         Undo.redo();
     }
 }

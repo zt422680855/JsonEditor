@@ -26,25 +26,23 @@ public class JsonEditorWindow extends JsonEditorModdle {
 
     private Right right;
 
-    private Project project;
-
     private ToolWindow toolWindow;
 
     private static Map<String, DefaultActionGroup[]> actionMap = new HashMap<>();
 
     public JsonEditorWindow(Project project, ToolWindow toolWindow) {
+        super(project);
         setLayout(new GridBagLayout());
 
         this.project = project;
-        ModdleContext.setProject(project);
         this.toolWindow = toolWindow;
-        ModdleContext.setToolWindow(toolWindow);
 
-        this.left = new Left(this);
-        this.middle = new Middle(this);
-        this.right = new Right(this);
-        ModdleContext.addModdle(left, middle, right, this);
-        ModdleContext.toRight();
+        this.left = new Left(project, this);
+        this.middle = new Middle(project, this);
+        this.right = new Right(project, this);
+        ModdleContext.addModdle(project, left, middle, right, this);
+        ModdleContext.addListener(project);
+        ModdleContext.toRight(project);
 
         addTitleActions();
     }

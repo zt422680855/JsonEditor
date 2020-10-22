@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.Constant;
 import com.jsoneditor.moddles.Left;
@@ -26,8 +27,9 @@ public class Reset extends AnActionButton {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent actionEvent) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
         Object json = JSON.parse(Constant.TEMP, Feature.OrderedField);
-        ModdleContext.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+        ModdleContext.setText(project, JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
     }
 }

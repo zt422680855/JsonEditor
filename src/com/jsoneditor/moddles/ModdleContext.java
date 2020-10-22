@@ -10,6 +10,8 @@ import com.jsoneditor.node.TreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description:
@@ -18,112 +20,103 @@ import java.util.List;
  */
 public class ModdleContext {
 
-    private static Project project;
+    private static Map<Project, ModdleContext> contextMap = new ConcurrentHashMap<>();
 
-    private static ToolWindow toolWindow;
+    private Project project;
 
-    private static JsonEditorWindow parent;
+    private ToolWindow toolWindow;
 
-    private static Left left;
+    private JsonEditorWindow parent;
 
-    private static Middle middle;
+    private Left left;
 
-    private static Right right;
+    private Middle middle;
 
-    public static void addModdle(JsonEditorModdle... moddles) {
+    private Right right;
+
+    public static void addModdle(Project project, JsonEditorModdle... moddles) {
+        ModdleContext ctx = new ModdleContext();
         for (JsonEditorModdle moddle : moddles) {
             if (moddle instanceof JsonEditorWindow) {
-                parent = (JsonEditorWindow) moddle;
+                ctx.parent = (JsonEditorWindow) moddle;
             } else if (moddle instanceof Left) {
-                left = (Left) moddle;
+                ctx.left = (Left) moddle;
             } else if (moddle instanceof Middle) {
-                middle = (Middle) moddle;
+                ctx.middle = (Middle) moddle;
             } else if (moddle instanceof Right) {
-                right = (Right) moddle;
+                ctx.right = (Right) moddle;
             }
         }
-        addListener();
+        contextMap.put(project, ctx);
     }
 
-    public static void setProject(Project project) {
-        ModdleContext.project = project;
+    public static ModdleContext getContext(Project project) {
+        return contextMap.get(project);
     }
 
-    public static Project getProject() {
-        return project;
-    }
-
-    public static void setToolWindow(ToolWindow toolWindow) {
-        ModdleContext.toolWindow = toolWindow;
-    }
-
-    public static ToolWindow getToolWindow() {
-        return toolWindow;
-    }
-
-    public static JsonEditorWindow getParent() {
-        return parent;
+    public static JsonEditorWindow getParent(Project project) {
+        return getContext(project).parent;
     }
 
     /* left */
-    public static void setText(String text) {
-        left.setText(text);
+    public static void setText(Project project, String text) {
+        getContext(project).left.setText(text);
     }
 
-    public static String getText() {
-        return left.getText();
+    public static String getText(Project project) {
+        return getContext(project).left.getText();
     }
 
-    public static void resetScrollBarPosition() {
-        left.resetScrollBarPosition();
+    public static void resetScrollBarPosition(Project project) {
+        getContext(project).left.resetScrollBarPosition();
     }
 
-    public static void scrollToText(List<TreeNode> path) {
-        left.scrollToText(path);
+    public static void scrollToText(Project project, List<TreeNode> path) {
+        getContext(project).left.scrollToText(path);
     }
 
     /* middle */
-    public static void toRight() {
-        middle.toRight();
+    public static void toRight(Project project) {
+        getContext(project).middle.toRight();
     }
 
-    public static void toLeft() {
-        middle.toLeft();
+    public static void toLeft(Project project) {
+        getContext(project).middle.toLeft();
     }
 
-    public static void addListener() {
-        middle.addListener();
+    public static void addListener(Project project) {
+        getContext(project).middle.addListener();
     }
 
     /* right */
-    public static Tree getTree() {
-        return right.tree;
+    public static Tree getTree(Project project) {
+        return getContext(project).right.tree;
     }
 
-    public static TreeNode getRoot() {
-        DefaultTreeModel model = (DefaultTreeModel) right.tree.getModel();
+    public static TreeNode getRoot(Project project) {
+        DefaultTreeModel model = (DefaultTreeModel) getContext(project).right.tree.getModel();
         return (TreeNode) model.getRoot();
     }
 
-    public static void setRoot(TreeNode root) {
-        DefaultTreeModel model = (DefaultTreeModel) right.tree.getModel();
+    public static void setRoot(Project project, TreeNode root) {
+        DefaultTreeModel model = (DefaultTreeModel) getContext(project).right.tree.getModel();
         model.setRoot(root);
     }
 
-    public static void expandTree() {
-        TreeUtils.expandTree(right.tree, new TreePath(getRoot()));
+    public static void expandTree(Project project) {
+        TreeUtils.expandTree(getContext(project).right.tree, new TreePath(getRoot(project)));
     }
 
-    public static void collapseTree() {
-        TreeUtils.collapseTree(right.tree, new TreePath(getRoot()));
+    public static void collapseTree(Project project) {
+        TreeUtils.collapseTree(getContext(project).right.tree, new TreePath(getRoot(project)));
     }
 
-    public static void expandNode(TreePath path) {
-        right.tree.expandPath(path);
+    public static void expandNode(Project project, TreePath path) {
+        getContext(project).right.tree.expandPath(path);
     }
 
-    public static void updateTree() {
-        right.tree.updateUI();
+    public static void updateTree(Project project) {
+        getContext(project).right.tree.updateUI();
     }
 
 }

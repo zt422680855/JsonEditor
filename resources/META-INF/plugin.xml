@@ -36,7 +36,7 @@
     </extensions>
 
     <actions>
-        <action id="JsonEditor.CopyToEditor" class="com.jsoneditor.actions.CopyToEditor" text="CopyToEditor">
+        <action id="JsonEditor.CopyToEditor" class="com.jsoneditor.actions.CopyToEditor" text="Copy To Editor">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>

@@ -5,8 +5,8 @@ import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
-import com.jsoneditor.moddles.Left;
 import com.jsoneditor.moddles.ModdleContext;
 import com.jsoneditor.notification.JsonEditorNotifier;
 import icons.Icons;
@@ -26,11 +26,12 @@ public class Format extends AnActionButton {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent actionEvent) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
         try {
-            Object json = JSON.parse(ModdleContext.getText(), Feature.OrderedField);
-            ModdleContext.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-            ModdleContext.resetScrollBarPosition();
+            Project project = e.getProject();
+            Object json = JSON.parse(ModdleContext.getText(project), Feature.OrderedField);
+            ModdleContext.setText(project, JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            ModdleContext.resetScrollBarPosition(project);
         } catch (Exception ex) {
             JsonEditorNotifier.error("JSON format error.");
         }

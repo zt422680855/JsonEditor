@@ -1,5 +1,6 @@
 package com.jsoneditor.moddles;
 
+import com.intellij.openapi.project.Project;
 import com.jsoneditor.node.TreeNode;
 
 import java.awt.*;
@@ -15,7 +16,8 @@ public class Left extends JsonEditorModdle {
 
     private TextPanel textPanel;
 
-    public Left(JsonEditorModdle parent) {
+    public Left(Project project, JsonEditorModdle parent) {
+        super(project);
         this.parent = parent;
         paint();
     }
@@ -30,7 +32,7 @@ public class Left extends JsonEditorModdle {
         c.fill = GridBagConstraints.BOTH;
         parentLayout.setConstraints(this, c);
         parent.add(this);
-        textPanel = new TextPanel(ModdleContext.getProject());
+        textPanel = new TextPanel(project);
         layout.setConstraints(textPanel, c);
         add(textPanel);
     }

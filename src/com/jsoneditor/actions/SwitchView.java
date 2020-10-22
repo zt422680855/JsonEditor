@@ -30,7 +30,7 @@ public class SwitchView extends AnActionButton {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent actionEvent) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
         right.setVisible(!right.isShowing());
         middle.setVisible(!middle.isShowing());
         switchIcon();

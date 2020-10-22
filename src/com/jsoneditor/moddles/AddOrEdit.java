@@ -2,6 +2,7 @@ package com.jsoneditor.moddles;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -29,6 +30,8 @@ import java.util.function.BiConsumer;
  * @CreateDate: 2020/8/17 21:37
  */
 public class AddOrEdit extends JDialog {
+
+    private Project project;
 
     private JBLabel typeLabel = new JBLabel("type");
 
@@ -78,7 +81,8 @@ public class AddOrEdit extends JDialog {
 
     private BiConsumer<TreeNode, TreeNode> callback;
 
-    public AddOrEdit(TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
+    public AddOrEdit(Project project, TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
+        this.project = project;
         this.selectNode = node;
         this.callback = callback;
         // 1、2、3分别代表新增子节点、新增兄弟节点、编辑节点
@@ -141,7 +145,7 @@ public class AddOrEdit extends JDialog {
     private void openDialog() {
         setTitle(title);
         setSize(300, 200);
-        setLocationRelativeTo(ModdleContext.getParent());
+        setLocationRelativeTo(ModdleContext.getParent(project));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         setModal(true);
