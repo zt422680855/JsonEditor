@@ -24,6 +24,6 @@ public class Forward extends AnActionButton {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
-        Undo.redo();
+        Undo.redo(project);
     }
 }

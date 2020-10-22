@@ -69,7 +69,7 @@ public class Middle extends JsonEditorModdle {
                 TreeUtils.refreshTree(root);
                 ModdleContext.expandNode(project, new TreePath(root.getPath()));
                 ModdleContext.updateTree(project);
-                Undo.clear();
+                Undo.clear(project);
             } catch (Exception ex) {
                 JsonEditorNotifier.error("JSON format error.");
             }

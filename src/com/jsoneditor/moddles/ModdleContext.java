@@ -1,7 +1,6 @@
 package com.jsoneditor.moddles;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.treeStructure.Tree;
 import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.TreeUtils;
@@ -21,10 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModdleContext {
 
     private static Map<Project, ModdleContext> contextMap = new ConcurrentHashMap<>();
-
-    private Project project;
-
-    private ToolWindow toolWindow;
 
     private JsonEditorWindow parent;
 

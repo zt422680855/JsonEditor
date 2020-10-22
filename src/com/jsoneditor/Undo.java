@@ -1,8 +1,11 @@
 package com.jsoneditor;
 
+import com.intellij.openapi.project.Project;
 import com.jsoneditor.edits.TreeEdit;
 
 import javax.swing.undo.UndoManager;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Description:
@@ -11,35 +14,42 @@ import javax.swing.undo.UndoManager;
  */
 public class Undo {
 
-    private static final UndoManager UNDO_MANAGER = new UndoManager();
+    private static Map<Project, UndoManager> undoManagerMap = new ConcurrentHashMap<>();
 
-    static {
-        UNDO_MANAGER.setLimit(10);
+    public static void addAction(Project project, TreeEdit action) {
+        UndoManager undoManager = undoManagerMap.get(project);
+        if (undoManager == null) {
+            undoManager = new UndoManager();
+            undoManager.setLimit(10);
+            undoManagerMap.put(project, undoManager);
+        }
+        undoManager.addEdit(action);
     }
 
-    public static void addAction(TreeEdit action) {
-        UNDO_MANAGER.addEdit(action);
-    }
-
-    public static void undo() {
+    public static void undo(Project project) {
         try {
-            if (UNDO_MANAGER.canUndo()) {
-                UNDO_MANAGER.undo();
+            UndoManager undoManager = undoManagerMap.get(project);
+            if (undoManager != null && undoManager.canUndo()) {
+                undoManager.undo();
             }
         } catch (Exception ex) {
         }
     }
 
-    public static void redo() {
+    public static void redo(Project project) {
         try {
-            if (UNDO_MANAGER.canRedo()) {
-                UNDO_MANAGER.redo();
+            UndoManager undoManager = undoManagerMap.get(project);
+            if (undoManager != null && undoManager.canRedo()) {
+                undoManager.redo();
             }
         } catch (Exception ex) {
         }
     }
 
-    public static void clear() {
-        UNDO_MANAGER.discardAllEdits();
+    public static void clear(Project project) {
+        UndoManager undoManager = undoManagerMap.get(project);
+        if (undoManager != null) {
+            undoManager.discardAllEdits();
+        }
     }
 }

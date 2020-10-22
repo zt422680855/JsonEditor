@@ -191,7 +191,7 @@ public class Right extends JsonEditorModdle {
                             new AddOrEdit(project, select, 3, (node, selectNode) -> {
                                 ReplaceEdit action = new ReplaceEdit(tree, node, selectNode, false);
                                 action.doAction();
-                                Undo.addAction(action);
+                                Undo.addAction(project, action);
                             });
                         }
                     } else {
@@ -225,7 +225,7 @@ public class Right extends JsonEditorModdle {
                                 // 一个拖拽动作等效为一个插入和删除节点动作
                                 DragEdit dragAction = new DragEdit(tree, addAction, delAction);
                                 dragAction.doAction();
-                                Undo.addAction(dragAction);
+                                Undo.addAction(project, dragAction);
                             });
                         }
                     }
@@ -270,7 +270,7 @@ public class Right extends JsonEditorModdle {
                         edit = new AddEdit(tree, node, selectNode, selectNode.getChildCount());
                     }
                     edit.doAction();
-                    Undo.addAction(edit);
+                    Undo.addAction(project, edit);
                 });
             }
         });
@@ -283,7 +283,7 @@ public class Right extends JsonEditorModdle {
                     int index = parent.getIndex(selectNode) + 1;
                     AddEdit edit = new AddEdit(tree, node, parent, index);
                     edit.doAction();
-                    Undo.addAction(edit);
+                    Undo.addAction(project, edit);
                 });
             }
         });
@@ -301,7 +301,7 @@ public class Right extends JsonEditorModdle {
                     }
                     ReplaceEdit edit = new ReplaceEdit(tree, node, selectNode, keepChildren);
                     edit.doAction();
-                    Undo.addAction(edit);
+                    Undo.addAction(project, edit);
                 });
             }
         });
@@ -311,7 +311,7 @@ public class Right extends JsonEditorModdle {
                 TreeNode[] selectedNodes = tree.getSelectedNodes(TreeNode.class, null);
                 DeleteEdit edit = new DeleteEdit(tree, selectedNodes);
                 edit.doAction();
-                Undo.addAction(edit);
+                Undo.addAction(project, edit);
             }
         });
         copy.addMouseListener(new MouseAdapter() {
@@ -324,7 +324,7 @@ public class Right extends JsonEditorModdle {
                 AddEdit edit = new AddEdit(tree, copyNode, parent, index);
                 edit.doAction();
                 tree.setSelectionPath(new TreePath(copyNode.getPath()));
-                Undo.addAction(edit);
+                Undo.addAction(project, edit);
             }
         });
         copyKey.addMouseListener(new MouseAdapter() {

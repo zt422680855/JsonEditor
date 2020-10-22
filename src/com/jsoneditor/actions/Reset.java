@@ -9,7 +9,6 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
 import com.jsoneditor.Constant;
-import com.jsoneditor.moddles.Left;
 import com.jsoneditor.moddles.ModdleContext;
 import org.jetbrains.annotations.NotNull;
 
