@@ -3,10 +3,7 @@ package com.jsoneditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.content.ContentManagerAdapter;
-import com.intellij.ui.content.ContentManagerEvent;
+import com.intellij.ui.content.*;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,8 +18,9 @@ public class JsonEditorFactory implements ToolWindowFactory {
         JsonEditorWindow jsonEditor = new JsonEditorWindow(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(jsonEditor, project.getName(), false);
-        toolWindow.getContentManager().addContent(content);
-        toolWindow.getContentManager().addContentManagerListener(new ContentManagerAdapter() {
+        ContentManager contentManager = toolWindow.getContentManager();
+        contentManager.addContent(content);
+        contentManager.addContentManagerListener(new ContentManagerAdapter() {
 
             @Override
             public void selectionChanged(@NotNull ContentManagerEvent event) {

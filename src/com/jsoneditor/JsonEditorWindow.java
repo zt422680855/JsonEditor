@@ -62,8 +62,6 @@ public class JsonEditorWindow extends JsonEditorModdle {
         DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView(right, middle));
         DefaultActionGroup[] actions = new DefaultActionGroup[]{leftAction, rightAction, otherAction};
         actionMap.put(project, actions);
-        ToolWindowEx ex = (ToolWindowEx) toolWindow;
-        ex.setTitleActions(actions);
         setContext();
     }
 
