@@ -37,7 +37,7 @@ public final class ObjectNode extends ContainerNode {
 
     @Override
     public ObjectNode clone() {
-        ObjectNode node = new ObjectNode(key, value);
+        ObjectNode node = new ObjectNode(key, (JSONObject) value.clone());
         node.filter = this.filter;
         for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
             TreeNode currNode = (TreeNode) e.nextElement();

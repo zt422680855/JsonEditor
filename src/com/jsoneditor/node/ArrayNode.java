@@ -32,7 +32,7 @@ public final class ArrayNode extends ContainerNode {
 
     @Override
     public ArrayNode clone() {
-        ArrayNode node = new ArrayNode(key, value);
+        ArrayNode node = new ArrayNode(key, (JSONArray) value.clone());
         node.filter = this.filter;
         for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
             TreeNode currNode = (TreeNode) e.nextElement();

@@ -40,10 +40,10 @@ public class SwitchView extends AnActionButton {
         Presentation presentation = getTemplatePresentation();
         if (isShow) {
             isShow = false;
-            presentation.setIcon(Icons.HIDE);
+            presentation.setSelectedIcon(Icons.HIDE);
         } else {
             isShow = true;
-            presentation.setIcon(Icons.SHOW);
+            presentation.setSelectedIcon(Icons.SHOW);
         }
     }
 
