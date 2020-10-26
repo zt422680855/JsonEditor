@@ -119,47 +119,48 @@ public class TextPanel extends NonOpaquePanel {
             return;
         }
         JsonValue jsonValue = json;
-        for (Iterator<TreeNode> it = path.iterator(); it.hasNext(); ) {
-            TreeNode node = it.next();
-            if (node.isRoot()) {
-                continue;
-            }
-            TreeNode parent = node.getParent();
-            int index = parent.getIndex(node);
-            if (jsonValue != null) {
-                if (parent instanceof ObjectNode && jsonValue instanceof JsonObject) {
-                    JsonObject obj = (JsonObject) jsonValue;
-                    List<JsonProperty> propertyList = obj.getPropertyList();
-                    JsonProperty property = propertyList.stream().filter(p -> node.key.equals(p.getName())).findFirst().orElse(null);
-                    if (property != null) {
-                        jsonValue = property.getValue();
-                        if (!it.hasNext()) {
-                            SelectionModel selectionModel = editor.getSelectionModel();
-                            TextRange range = property.getTextRange();
-                            selectionModel.setSelection(range.getStartOffset(), range.getEndOffset());
-                            ScrollingModel scrollingModel = editor.getScrollingModel();
-                            CaretModel caretModel = editor.getCaretModel();
-                            caretModel.moveToOffset(range.getStartOffset());
-                            scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE);
+        if (path.size() == 1) {
+            scrollToSelection(jsonValue.getTextRange());
+        } else {
+            for (Iterator<TreeNode> it = path.iterator(); it.hasNext(); ) {
+                TreeNode node = it.next();
+                if (node.isRoot()) {
+                    continue;
+                }
+                TreeNode parent = node.getParent();
+                int index = parent.getIndex(node);
+                if (jsonValue != null) {
+                    if (parent instanceof ObjectNode && jsonValue instanceof JsonObject) {
+                        JsonObject obj = (JsonObject) jsonValue;
+                        List<JsonProperty> propertyList = obj.getPropertyList();
+                        JsonProperty property = propertyList.stream().filter(p -> node.key.equals(p.getName())).findFirst().orElse(null);
+                        if (property != null) {
+                            jsonValue = property.getValue();
+                            if (!it.hasNext()) {
+                                scrollToSelection(property.getTextRange());
+                            }
                         }
-                    }
-                } else if (parent instanceof ArrayNode && jsonValue instanceof JsonArray) {
-                    JsonArray arr = (JsonArray) jsonValue;
-                    List<JsonValue> valueList = arr.getValueList();
-                    if (valueList.size() > index) {
-                        jsonValue = valueList.get(index);
-                        if (!it.hasNext()) {
-                            SelectionModel selectionModel = editor.getSelectionModel();
-                            TextRange range = jsonValue.getTextRange();
-                            selectionModel.setSelection(range.getStartOffset(), range.getEndOffset());
-                            ScrollingModel scrollingModel = editor.getScrollingModel();
-                            CaretModel caretModel = editor.getCaretModel();
-                            caretModel.moveToOffset(range.getStartOffset());
-                            scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE);
+                    } else if (parent instanceof ArrayNode && jsonValue instanceof JsonArray) {
+                        JsonArray arr = (JsonArray) jsonValue;
+                        List<JsonValue> valueList = arr.getValueList();
+                        if (valueList.size() > index) {
+                            jsonValue = valueList.get(index);
+                            if (!it.hasNext()) {
+                                scrollToSelection(jsonValue.getTextRange());
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private void scrollToSelection(TextRange range) {
+        SelectionModel selectionModel = editor.getSelectionModel();
+        selectionModel.setSelection(range.getStartOffset(), range.getEndOffset());
+        ScrollingModel scrollingModel = editor.getScrollingModel();
+        CaretModel caretModel = editor.getCaretModel();
+        caretModel.moveToOffset(range.getStartOffset());
+        scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE);
     }
 }

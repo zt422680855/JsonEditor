@@ -68,7 +68,7 @@ public class CopyToEditor extends AnAction {
                             }
                         });
                     } else {
-                        JsonEditorNotifier.warning("'" + selectText + "' is not a class or it is not a project class.");
+                        JsonEditorNotifier.warning("'" + selectText + "' is not a class or it is not a user's class.");
                     }
                 }
             }
@@ -87,7 +87,7 @@ public class CopyToEditor extends AnAction {
                     PsiClassType classType = (PsiClassType) type;
                     if (qualifiedCheck(classType, "java.lang.String", project)) {
                         obj.put(name, "");
-                    } else if (qualifiedCheck(classType, "java.util.Date", project)) {
+                    } else if (ancestorQualifiedCheck(classType, "java.util.Date", project)) {
                         obj.put(name, System.currentTimeMillis());
                     } else if (qualifiedCheck(classType, "java.lang.Integer", project) ||
                             qualifiedCheck(classType, "java.lang.Long", project) ||
