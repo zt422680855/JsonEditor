@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * @Author: zhengt
  * @CreateDate: 2020/5/22 22:39
  */
-public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements Serializable, Cloneable {
+public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements Serializable {
 
     public String key;
 
