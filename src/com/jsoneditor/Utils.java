@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
-    private final static Pattern INTEGER_REGX = Pattern.compile("^[-\\+]?[\\d]*$");
+    private final static Pattern INTEGER_REGX = Pattern.compile("^[-+]?[\\d]*$");
 
-    private final static Pattern FLOAT_REGX = Pattern.compile("^[-\\+]?[.\\d]*$");
+    private final static Pattern FLOAT_REGX = Pattern.compile("^[-+]?[.\\d]*$");
 
     public static boolean isInteger(String str) {
         return INTEGER_REGX.matcher(str).matches();
