@@ -20,10 +20,8 @@ public final class StringNode extends LeafNode {
     }
 
     @Override
-    public StringNode clone() {
-        StringNode node = new StringNode(key, value);
-        node.filter = filter;
-        return node;
+    public StringNode getCloneNode() {
+        return new StringNode(key, value);
     }
 
 }

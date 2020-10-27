@@ -21,4 +21,9 @@ public abstract class LeafNode extends TreeNode {
         }
     }
 
+    @Override
+    public boolean isContainer() {
+        return false;
+    }
+
 }

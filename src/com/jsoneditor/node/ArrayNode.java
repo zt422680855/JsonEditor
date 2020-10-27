@@ -2,8 +2,6 @@ package com.jsoneditor.node;
 
 import com.alibaba.fastjson.JSONArray;
 
-import java.util.Enumeration;
-
 /**
  * @Description:
  * @Author: zhengt
@@ -31,14 +29,8 @@ public final class ArrayNode extends ContainerNode {
     }
 
     @Override
-    public ArrayNode clone() {
-        ArrayNode node = new ArrayNode(key, (JSONArray) value.clone());
-        node.filter = this.filter;
-        for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
-            TreeNode currNode = (TreeNode) e.nextElement();
-            node.add(currNode.clone());
-        }
-        return node;
+    public ArrayNode getCloneNode() {
+        return new ArrayNode(key, (JSONArray) value.clone());
     }
 
 }

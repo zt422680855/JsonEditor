@@ -52,8 +52,20 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
 
     @Override
     public TreeNode clone() {
-        return new ObjectNode();
+        TreeNode node = getCloneNode();
+        node.filter = filter;
+        if (isContainer()) {
+            for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
+                TreeNode currNode = (TreeNode) e.nextElement();
+                node.add(currNode.clone());
+            }
+        }
+        return node;
     }
+
+    public abstract TreeNode getCloneNode();
+
+    public abstract boolean isContainer();
 
     public void recursionOption(Consumer<TreeNode> consumer) {
         consumer.accept(this);

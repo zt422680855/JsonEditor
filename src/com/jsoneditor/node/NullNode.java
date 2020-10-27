@@ -22,9 +22,7 @@ public final class NullNode extends OtherNode {
     }
 
     @Override
-    public NullNode clone() {
-        NullNode node = new NullNode(key);
-        node.filter = this.filter;
-        return node;
+    public NullNode getCloneNode() {
+        return new NullNode(key);
     }
 }

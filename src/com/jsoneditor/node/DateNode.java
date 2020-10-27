@@ -54,10 +54,8 @@ public final class DateNode extends LeafNode {
     }
 
     @Override
-    public DateNode clone() {
-        DateNode node = new DateNode(key, value, format);
-        node.filter = filter;
-        return node;
+    public DateNode getCloneNode() {
+        return new DateNode(key, value, format);
     }
 
 }

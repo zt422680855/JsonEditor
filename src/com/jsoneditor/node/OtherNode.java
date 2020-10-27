@@ -20,10 +20,8 @@ public class OtherNode extends LeafNode {
     }
 
     @Override
-    public OtherNode clone() {
-        OtherNode node = new OtherNode(key, value);
-        node.filter = this.filter;
-        return node;
+    public OtherNode getCloneNode() {
+        return new OtherNode(key, value);
     }
 
 }
