@@ -61,8 +61,8 @@ public interface Constant {
             "\t\"birthday\":\"1991-10-01\",\n" +
             "\t\"address\":{\n" +
             "\t\t\"country\":\"China\",\n" +
-            "\t\t\"province\":\"anhui\",\n" +
-            "\t\t\"city\":\"mingguang\"\n" +
+            "\t\t\"province\":\"AnHui\",\n" +
+            "\t\t\"city\":\"MingGuang\"\n" +
             "\t},\n" +
             "\t\"hobbys\":[\n" +
             "\t\t{\n" +

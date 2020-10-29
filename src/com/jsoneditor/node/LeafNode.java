@@ -1,5 +1,9 @@
 package com.jsoneditor.node;
 
+import icons.Icons;
+
+import javax.swing.*;
+
 /**
  * @Description: 叶子节点
  * @Author: zhengt
@@ -24,6 +28,11 @@ public abstract class LeafNode extends TreeNode {
     @Override
     public boolean isContainer() {
         return false;
+    }
+
+    @Override
+    public Icon icon() {
+        return Icons.AUTO;
     }
 
 }

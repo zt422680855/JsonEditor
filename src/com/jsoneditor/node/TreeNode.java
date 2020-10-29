@@ -3,6 +3,7 @@ package com.jsoneditor.node;
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
 import com.intellij.ui.treeStructure.Tree;
 
+import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -27,11 +28,7 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     }
 
     public void updateNode() {
-        setLabel();
-        for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
-            TreeNode currNode = (TreeNode) e.nextElement();
-            currNode.updateNode();
-        }
+        recursiveOperation(TreeNode::setLabel);
     }
 
     public abstract void setLabel();
@@ -67,11 +64,11 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
 
     public abstract boolean isContainer();
 
-    public void recursionOption(Consumer<TreeNode> consumer) {
+    public void recursiveOperation(Consumer<TreeNode> consumer) {
         consumer.accept(this);
         for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
             TreeNode child = (TreeNode) e.nextElement();
-            child.recursionOption(consumer);
+            child.recursiveOperation(consumer);
         }
     }
 
@@ -94,5 +91,7 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     public String valueString() {
         return getValue().toString();
     }
+
+    public abstract Icon icon();
 
 }

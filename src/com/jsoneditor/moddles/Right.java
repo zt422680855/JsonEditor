@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.Tree;
@@ -69,7 +70,7 @@ public class Right extends JsonEditorModdle {
                 TreeNode root = getRoot();
                 String text = search.getText();
                 if (!DEFAULT_SEATCH_TEXT.equals(text) && text.length() >= 3) {
-                    root.recursionOption((node) -> {
+                    root.recursiveOperation((node) -> {
                         String userObject = node.getUserObject();
                         javax.swing.tree.TreeNode[] nodes = ((DefaultTreeModel) tree.getModel()).getPathToRoot(node);
                         TreePath path = new TreePath(nodes);
@@ -86,7 +87,7 @@ public class Right extends JsonEditorModdle {
                         }
                     });
                 } else {
-                    root.recursionOption((node) -> node.filter = false);
+                    root.recursiveOperation((node) -> node.filter = false);
                 }
                 tree.updateUI();
             }
@@ -96,6 +97,8 @@ public class Right extends JsonEditorModdle {
 
     public Tree tree;
     private TreePath movingPath;
+    private JBLabel movingLabel = new JBLabel();
+    private final JWindow window = new JWindow();
 
     private JBPopupMenu contextMenus = new JBPopupMenu();
     private JBMenuItem addSub = new JBMenuItem("add child", Icons.ADD);
@@ -230,6 +233,9 @@ public class Right extends JsonEditorModdle {
                         }
                     }
                     movingPath = null;
+
+                    window.remove(movingLabel);
+                    window.setVisible(false);
                 }
             }
         });
@@ -242,8 +248,24 @@ public class Right extends JsonEditorModdle {
                     if (pathWhenPressed != null) {
                         movingPath = pathWhenPressed;
                     }
+                } else {
+                    TreeNode node = (TreeNode) movingPath.getLastPathComponent();
+                    movingLabel.setText(node.getText());
+                    movingLabel.setIcon(node.icon());
+                    int x = e.getPoint().x - movingLabel.getWidth() / 3;
+                    int y = e.getPoint().y - movingLabel.getHeight() / 2;
+
+                    window.add(movingLabel);
+                    window.pack();
+
+                    Point pt = new Point(x, y);
+                    Component c = (Component) e.getSource();
+                    SwingUtilities.convertPointToScreen(pt, c);
+                    window.setLocation(pt);
+                    window.setVisible(true);
                 }
             }
+
         });
     }
 

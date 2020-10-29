@@ -1,12 +1,10 @@
 package com.jsoneditor.moddles;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.Tree;
 import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.node.TreeNode;
 
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.util.List;
 import java.util.Map;
@@ -84,18 +82,12 @@ public class ModdleContext {
     }
 
     /* right */
-    public static Tree getTree(Project project) {
-        return getContext(project).right.tree;
-    }
-
     public static TreeNode getRoot(Project project) {
-        DefaultTreeModel model = (DefaultTreeModel) getContext(project).right.tree.getModel();
-        return (TreeNode) model.getRoot();
+        return getContext(project).right.getRoot();
     }
 
     public static void setRoot(Project project, TreeNode root) {
-        DefaultTreeModel model = (DefaultTreeModel) getContext(project).right.tree.getModel();
-        model.setRoot(root);
+        getContext(project).right.setRoot(root);
     }
 
     public static void expandTree(Project project) {

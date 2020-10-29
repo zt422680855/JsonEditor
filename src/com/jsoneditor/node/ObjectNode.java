@@ -1,6 +1,9 @@
 package com.jsoneditor.node;
 
 import com.alibaba.fastjson.JSONObject;
+import icons.Icons;
+
+import javax.swing.*;
 
 /**
  * @Description:
@@ -31,6 +34,11 @@ public final class ObjectNode extends ContainerNode {
     @Override
     public ObjectNode getCloneNode() {
         return new ObjectNode(key, (JSONObject) value.clone());
+    }
+
+    @Override
+    public Icon icon() {
+        return Icons.OBJECT;
     }
 
 }

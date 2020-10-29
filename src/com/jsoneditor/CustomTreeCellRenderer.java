@@ -1,8 +1,5 @@
 package com.jsoneditor;
 
-import com.jsoneditor.node.ArrayNode;
-import com.jsoneditor.node.DateNode;
-import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.TreeNode;
 import icons.Icons;
 
@@ -34,22 +31,7 @@ public class CustomTreeCellRenderer extends DefaultTreeCellRenderer {
 
         // icon
         TreeNode node = (TreeNode) value;
-        Icon icon;
-        if (node.filter) {
-            // 搜索时，选中的节点
-            icon = Icons.SELECT;
-        } else {
-            if (value instanceof ObjectNode) {
-                icon = Icons.OBJECT;
-            } else if (value instanceof ArrayNode) {
-                icon = Icons.ARRAY;
-            } else if (value instanceof DateNode) {
-                icon = Icons.DATE;
-            } else {
-                icon = Icons.AUTO;
-            }
-        }
-        setIcon(icon);
+        setIcon(node.filter ? Icons.SELECT : node.icon());
         return this;
     }
 }

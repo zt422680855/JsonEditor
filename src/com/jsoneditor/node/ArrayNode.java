@@ -1,6 +1,9 @@
 package com.jsoneditor.node;
 
 import com.alibaba.fastjson.JSONArray;
+import icons.Icons;
+
+import javax.swing.*;
 
 /**
  * @Description:
@@ -31,6 +34,11 @@ public final class ArrayNode extends ContainerNode {
     @Override
     public ArrayNode getCloneNode() {
         return new ArrayNode(key, (JSONArray) value.clone());
+    }
+
+    @Override
+    public Icon icon() {
+        return Icons.ARRAY;
     }
 
 }

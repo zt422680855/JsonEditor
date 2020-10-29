@@ -2,7 +2,9 @@ package com.jsoneditor.node;
 
 import com.jsoneditor.Constant.DateFormat;
 import com.jsoneditor.Utils;
+import icons.Icons;
 
+import javax.swing.*;
 import java.util.Date;
 
 /**
@@ -56,6 +58,11 @@ public final class DateNode extends LeafNode {
     @Override
     public DateNode getCloneNode() {
         return new DateNode(key, value, format);
+    }
+
+    @Override
+    public Icon icon() {
+        return Icons.DATE;
     }
 
 }
