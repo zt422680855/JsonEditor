@@ -28,7 +28,11 @@ public class ModdleContext {
     private Right right;
 
     public static void addModdle(Project project, JsonEditorModdle... moddles) {
-        ModdleContext ctx = new ModdleContext();
+        ModdleContext ctx = getContext(project);
+        if (ctx == null) {
+            ctx = new ModdleContext();
+            contextMap.put(project, ctx);
+        }
         for (JsonEditorModdle moddle : moddles) {
             if (moddle instanceof JsonEditorWindow) {
                 ctx.parent = (JsonEditorWindow) moddle;
@@ -40,7 +44,6 @@ public class ModdleContext {
                 ctx.right = (Right) moddle;
             }
         }
-        contextMap.put(project, ctx);
     }
 
     public static ModdleContext getContext(Project project) {
