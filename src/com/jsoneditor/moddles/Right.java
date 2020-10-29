@@ -98,7 +98,9 @@ public class Right extends JsonEditorModdle {
     public Tree tree;
     private TreePath movingPath;
     private JBLabel movingLabel = new JBLabel();
-    private final JWindow window = new JWindow();
+    private final JWindow window = new JWindow(){{
+        setPreferredSize(new Dimension(300, 30));
+    }};
 
     private JBPopupMenu contextMenus = new JBPopupMenu();
     private JBMenuItem addSub = new JBMenuItem("add child", Icons.ADD);
