@@ -1,7 +1,6 @@
 package com.jsoneditor;
 
 import com.jsoneditor.node.TreeNode;
-import icons.Icons;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -31,7 +30,7 @@ public class CustomTreeCellRenderer extends DefaultTreeCellRenderer {
 
         // icon
         TreeNode node = (TreeNode) value;
-        setIcon(node.filter ? Icons.SELECT : node.icon());
+        setIcon(node.icon());
         return this;
     }
 }

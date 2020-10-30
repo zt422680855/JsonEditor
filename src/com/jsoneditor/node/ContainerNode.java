@@ -24,9 +24,4 @@ public abstract class ContainerNode extends TreeNode {
 
     public abstract String getFormatter();
 
-    @Override
-    public boolean isContainer() {
-        return true;
-    }
-
 }

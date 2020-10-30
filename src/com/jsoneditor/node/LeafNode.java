@@ -26,11 +26,6 @@ public abstract class LeafNode extends TreeNode {
     }
 
     @Override
-    public boolean isContainer() {
-        return false;
-    }
-
-    @Override
     public Icon displayIcon() {
         return Icons.AUTO;
     }

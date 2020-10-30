@@ -52,7 +52,7 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     public TreeNode clone() {
         TreeNode node = getCloneNode();
         node.filter = filter;
-        if (isContainer()) {
+        if (this instanceof ContainerNode) {
             for (Enumeration<?> e = children(); e.hasMoreElements(); ) {
                 TreeNode currNode = (TreeNode) e.nextElement();
                 node.add(currNode.clone());
@@ -62,8 +62,6 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
     }
 
     public abstract TreeNode getCloneNode();
-
-    public abstract boolean isContainer();
 
     public void recursiveOperation(Consumer<TreeNode> consumer) {
         consumer.accept(this);
