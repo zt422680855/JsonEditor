@@ -2,6 +2,7 @@ package com.jsoneditor.node;
 
 import com.intellij.ui.treeStructure.PatchedDefaultMutableTreeNode;
 import com.intellij.ui.treeStructure.Tree;
+import icons.Icons;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -72,11 +73,11 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
         }
     }
 
-    public void enpandByNode(Tree tree) {
+    public void expandByNode(Tree tree) {
         tree.expandPath(new TreePath(getPath()));
         TreeNode parent = getParent();
         if (parent != null) {
-            parent.enpandByNode(tree);
+            parent.expandByNode(tree);
         }
     }
 
@@ -92,6 +93,10 @@ public abstract class TreeNode extends PatchedDefaultMutableTreeNode implements 
         return getValue().toString();
     }
 
-    public abstract Icon icon();
+    public Icon icon() {
+        return filter ? Icons.SELECT : displayIcon();
+    }
+
+    public abstract Icon displayIcon();
 
 }

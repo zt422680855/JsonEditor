@@ -31,7 +31,7 @@ public abstract class LeafNode extends TreeNode {
     }
 
     @Override
-    public Icon icon() {
+    public Icon displayIcon() {
         return Icons.AUTO;
     }
 

@@ -61,7 +61,7 @@ public final class DateNode extends LeafNode {
     }
 
     @Override
-    public Icon icon() {
+    public Icon displayIcon() {
         return Icons.DATE;
     }
 

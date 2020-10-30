@@ -37,7 +37,7 @@ public final class ArrayNode extends ContainerNode {
     }
 
     @Override
-    public Icon icon() {
+    public Icon displayIcon() {
         return Icons.ARRAY;
     }
 
