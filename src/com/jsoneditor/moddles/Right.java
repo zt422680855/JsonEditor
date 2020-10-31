@@ -41,8 +41,6 @@ public class Right extends JsonEditorModdle {
 
     private static final String DEFAULT_SEATCH_TEXT = "search...";
 
-    private JsonEditorModdle parent;
-
     private JBTextField search = new JBTextField(DEFAULT_SEATCH_TEXT) {{
         setForeground(JBColor.GRAY);
         addFocusListener(new FocusAdapter() {
@@ -98,7 +96,7 @@ public class Right extends JsonEditorModdle {
     public Tree tree;
     private TreePath movingPath;
     private JBLabel movingLabel = new JBLabel();
-    private final JWindow window = new JWindow(){{
+    private final JWindow window = new JWindow() {{
         setPreferredSize(new Dimension(300, 30));
     }};
 
@@ -112,8 +110,7 @@ public class Right extends JsonEditorModdle {
     private JBMenuItem copyValue = new JBMenuItem("copy value", Icons.COPY_VALUE);
 
     public Right(Project project, JsonEditorModdle parent) {
-        super(project);
-        this.parent = parent;
+        super(project, parent);
         paint();
         initContextMenu();
     }

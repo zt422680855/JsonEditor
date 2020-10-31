@@ -79,9 +79,6 @@ public class TreeUtils {
                 refreshTree(subNode);
             }
         }
-        if (node.isRoot()) {
-            node.updateNode();
-        }
     }
 
     public static void expandTree(Tree tree, TreePath parent) {

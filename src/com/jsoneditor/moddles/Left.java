@@ -12,13 +12,10 @@ import java.awt.*;
  */
 public class Left extends JsonEditorModdle {
 
-    private JsonEditorModdle parent;
-
     private TextPanel textPanel;
 
     public Left(Project project, JsonEditorModdle parent) {
-        super(project);
-        this.parent = parent;
+        super(project, parent);
         paint();
     }
 

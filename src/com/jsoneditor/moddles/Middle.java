@@ -22,8 +22,6 @@ import java.awt.*;
  */
 public class Middle extends JsonEditorModdle {
 
-    private JsonEditorModdle parent;
-
     private JButton syncToRight = new JButton() {{
         setIcon(Icons.TO_RIGHT);
         setBorderPainted(false);
@@ -34,8 +32,7 @@ public class Middle extends JsonEditorModdle {
     }};
 
     public Middle(Project project, JsonEditorModdle parent) {
-        super(project);
-        this.parent = parent;
+        super(project, parent);
         paint();
     }
 
@@ -67,6 +64,7 @@ public class Middle extends JsonEditorModdle {
                 root = TreeUtils.getNode("ROOT", parse);
                 ModdleContext.setRoot(project, root);
                 TreeUtils.refreshTree(root);
+                root.updateNode();
                 ModdleContext.expandNode(project, new TreePath(root.getPath()));
                 ModdleContext.updateTree(project);
                 Undo.clear(project);

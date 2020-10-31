@@ -7,6 +7,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -19,6 +20,7 @@ import com.intellij.ui.content.Content;
 import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.moddles.ModdleContext;
 import com.jsoneditor.notification.JsonEditorNotifier;
+import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -34,7 +36,8 @@ import java.util.stream.Collectors;
 public class CopyToEditor extends AnAction {
 
     public CopyToEditor() {
-
+        Presentation presentation = getTemplatePresentation();
+        presentation.setIcon(Icons.COPY);
     }
 
     @Override
