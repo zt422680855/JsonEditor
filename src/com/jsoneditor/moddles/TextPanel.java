@@ -25,7 +25,9 @@ import com.jsoneditor.Constant;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.TreeNode;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -50,10 +52,9 @@ public class TextPanel extends NonOpaquePanel {
         PsiFileFactory factory = PsiFileFactory.getInstance(project);
         this.psiFile = factory.createFileFromText("JSON." + fileType.getDefaultExtension(),
                 fileType, "", LocalTimeCounter.currentTime(), true, false);
-        DaemonCodeAnalyzer.getInstance(project).setHighlightingEnabled(psiFile, false);
+        DaemonCodeAnalyzer.getInstance(project).setHighlightingEnabled(psiFile, true);
         this.document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
-        EditorFactory editorFactory = EditorFactory.getInstance();
-        this.editor = (EditorEx) editorFactory.createEditor(document, project);
+        this.editor = (EditorEx) EditorFactory.getInstance().createEditor(document, project);
         EditorHighlighterFactory highlighterFactory = EditorHighlighterFactory.getInstance();
         VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(this.document);
         EditorHighlighter highlighter;
@@ -113,46 +114,45 @@ public class TextPanel extends NonOpaquePanel {
 
     public void scrollToText(List<TreeNode> path) {
         PsiElement[] wholeJson = psiFile.getChildren();
-        // 一个文件中只有一个json
-        JsonValue json = (JsonValue) wholeJson[0];
-        if (!(json instanceof JsonContainer)) {
-            return;
-        }
-        JsonValue jsonValue = json;
-        if (path.size() == 1) {
-            scrollToSelection(jsonValue.getTextRange());
-        } else {
-            for (Iterator<TreeNode> it = path.iterator(); it.hasNext(); ) {
-                TreeNode node = it.next();
-                if (node.isRoot()) {
-                    continue;
-                }
-                TreeNode parent = node.getParent();
-                int index = parent.getIndex(node);
-                if (jsonValue != null) {
-                    if (parent instanceof ObjectNode && jsonValue instanceof JsonObject) {
-                        JsonObject obj = (JsonObject) jsonValue;
-                        List<JsonProperty> propertyList = obj.getPropertyList();
-                        JsonProperty property = propertyList.stream().filter(p -> node.key.equals(p.getName())).findFirst().orElse(null);
-                        if (property != null) {
-                            jsonValue = property.getValue();
-                            if (!it.hasNext()) {
-                                scrollToSelection(property.getTextRange());
+        Arrays.stream(wholeJson).filter(ele ->
+                StringUtils.isNotBlank(ele.getText()) && ele instanceof JsonContainer
+        ).findFirst().ifPresent(first -> {
+            JsonValue jsonValue = (JsonValue) first;
+            if (path.size() == 1) {
+                scrollToSelection(jsonValue.getTextRange());
+            } else {
+                for (Iterator<TreeNode> it = path.iterator(); it.hasNext(); ) {
+                    TreeNode node = it.next();
+                    if (node.isRoot()) {
+                        continue;
+                    }
+                    TreeNode parent = node.getParent();
+                    int index = parent.getIndex(node);
+                    if (jsonValue != null) {
+                        if (parent instanceof ObjectNode && jsonValue instanceof JsonObject) {
+                            JsonObject obj = (JsonObject) jsonValue;
+                            List<JsonProperty> propertyList = obj.getPropertyList();
+                            JsonProperty property = propertyList.stream().filter(p -> node.key.equals(p.getName())).findFirst().orElse(null);
+                            if (property != null) {
+                                jsonValue = property.getValue();
+                                if (!it.hasNext()) {
+                                    scrollToSelection(property.getTextRange());
+                                }
                             }
-                        }
-                    } else if (parent instanceof ArrayNode && jsonValue instanceof JsonArray) {
-                        JsonArray arr = (JsonArray) jsonValue;
-                        List<JsonValue> valueList = arr.getValueList();
-                        if (valueList.size() > index) {
-                            jsonValue = valueList.get(index);
-                            if (!it.hasNext()) {
-                                scrollToSelection(jsonValue.getTextRange());
+                        } else if (parent instanceof ArrayNode && jsonValue instanceof JsonArray) {
+                            JsonArray arr = (JsonArray) jsonValue;
+                            List<JsonValue> valueList = arr.getValueList();
+                            if (valueList.size() > index) {
+                                jsonValue = valueList.get(index);
+                                if (!it.hasNext()) {
+                                    scrollToSelection(jsonValue.getTextRange());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
+        });
     }
 
     private void scrollToSelection(TextRange range) {
