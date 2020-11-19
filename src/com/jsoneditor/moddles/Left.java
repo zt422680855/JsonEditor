@@ -1,5 +1,6 @@
 package com.jsoneditor.moddles;
 
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
 import com.jsoneditor.node.TreeNode;
 
@@ -22,16 +23,17 @@ public class Left extends JsonEditorModdle {
     private void paint() {
         GridBagLayout layout = new GridBagLayout();
         setLayout(layout);
-        GridBagLayout parentLayout = (GridBagLayout) parent.getLayout();
         GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 100;
-        c.weighty = 205;
+        c.weightx = 1;
+        c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
-        parentLayout.setConstraints(this, c);
-        parent.add(this);
         textPanel = new TextPanel(project);
         layout.setConstraints(textPanel, c);
         add(textPanel);
+    }
+
+    public EditorEx getEditor() {
+        return this.textPanel.getEditor();
     }
 
     public void setText(String text) {

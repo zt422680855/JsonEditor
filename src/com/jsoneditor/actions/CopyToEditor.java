@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @Description:
+ * @Description: 将用户自己的类转为json文本显示在json editor中
  * @Author: zhengt
  * @CreateDate: 2020/9/9 22:19
  */

@@ -5,15 +5,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
-import com.jsoneditor.TreeUtils;
 import com.jsoneditor.moddles.ModdleContext;
-import com.jsoneditor.moddles.Right;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.tree.TreePath;
-
 /**
- * @Description:
+ * @Description: 关闭右边的JTree
  * @Author: zhengt
  * @CreateDate: 2020/8/21 22:53
  */

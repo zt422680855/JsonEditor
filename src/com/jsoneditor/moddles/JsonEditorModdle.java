@@ -12,11 +12,13 @@ public class JsonEditorModdle extends JBPanel {
 
     protected Project project;
 
-    protected JsonEditorModdle parent;
+    public JsonEditorModdle parent;
 
     public JsonEditorModdle(Project project, JsonEditorModdle parent) {
         this.project = project;
-        this.parent = parent;
+        if (parent != null) {
+            this.parent = parent;
+        }
     }
 
     public JsonEditorModdle(Project project) {

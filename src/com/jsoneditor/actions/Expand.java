@@ -9,7 +9,7 @@ import com.jsoneditor.moddles.ModdleContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @Description:
+ * @Description: 展开右边的JTree
  * @Author: zhengt
  * @CreateDate: 2020/8/21 22:49
  */

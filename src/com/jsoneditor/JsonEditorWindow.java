@@ -9,7 +9,8 @@ import com.intellij.ui.AnActionButton;
 import com.jsoneditor.actions.*;
 import com.jsoneditor.moddles.*;
 
-import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,8 @@ public class JsonEditorWindow extends JsonEditorModdle {
 
     public JsonEditorWindow(Project project, ToolWindow toolWindow) {
         super(project);
-        setLayout(new GridBagLayout());
+//        setLayout(new GridBagLayout());
+        setLayout(null);
 
         this.project = project;
         this.toolWindow = toolWindow;
@@ -40,14 +42,21 @@ public class JsonEditorWindow extends JsonEditorModdle {
         this.left = new Left(project, this);
         this.middle = new Middle(project, this);
         this.right = new Right(project, this);
+
+        add(left);
+        add(middle);
+        add(right);
+
         ModdleContext.addModdle(project, left, middle, right, this);
         ModdleContext.addListener(project);
         ModdleContext.toRight(project);
 
         addTitleActions();
+
+        setComponent();
     }
 
-    public void addTitleActions() {
+    private void addTitleActions() {
         Format format = new Format();
         Compress compress = new Compress();
         Reset reset = new Reset();
@@ -59,7 +68,7 @@ public class JsonEditorWindow extends JsonEditorModdle {
         Forward forward = new Forward();
         DefaultActionGroup rightAction = new DefaultActionGroup(expand, close, back, forward);
         rightAction.addSeparator();
-        DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView(right, middle));
+        DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView());
         DefaultActionGroup[] actions = new DefaultActionGroup[]{leftAction, rightAction, otherAction};
         actionMap.put(project, actions);
         setContext();
@@ -77,6 +86,26 @@ public class JsonEditorWindow extends JsonEditorModdle {
                 }
             }
         }
+    }
+
+    private void setComponent() {
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                JsonEditorWindow outer = JsonEditorWindow.this;
+                int x = outer.getWidth();
+                int y = outer.getHeight();
+                int middleWidth = 30;
+                int leftWidth = (int) Math.floor((x - middleWidth) * 0.6);
+                int rightWidth = (int) Math.ceil((x - middleWidth) * 0.4);
+                outer.left.setSize(leftWidth, y);
+                outer.middle.setSize(middleWidth, y);
+                outer.right.setSize(rightWidth, y);
+                outer.left.setLocation(0, 0);
+                outer.middle.setLocation(leftWidth, 0);
+                outer.right.setLocation(leftWidth + middleWidth, 0);
+            }
+        });
     }
 
 }

@@ -30,15 +30,16 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * @Description:
+ * @Description: 文档实例被对应的虚拟文件实例微弱的引用。因此，如果不再被引用，一篇未修改的文档实例可以被垃圾回收，
+ * 而如果文档内容之后又再次被访问，新的实例将被创建。将文档引用保存在你的插件的持久数据结构中将导致内存泄漏。
+ * https://blog.csdn.net/hawkdowen/article/details/41047229
  * @Author: zhengt
  * @CreateDate: 2020/8/15 21:58
  */
 public class TextPanel extends NonOpaquePanel {
-
-    private Document document;
 
     private Project project;
 
@@ -53,16 +54,12 @@ public class TextPanel extends NonOpaquePanel {
         this.psiFile = factory.createFileFromText("JSON." + fileType.getDefaultExtension(),
                 fileType, "", LocalTimeCounter.currentTime(), true, false);
         DaemonCodeAnalyzer.getInstance(project).setHighlightingEnabled(psiFile, true);
-        this.document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
-        this.editor = (EditorEx) EditorFactory.getInstance().createEditor(document, project);
+        // document只能在方法栈中使用，随着方法结束，对象会被回收。不能保存在成员变量、静态变量，否则内存泄露
+        Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
+        this.editor = (EditorEx) EditorFactory.getInstance().createEditor(Objects.requireNonNull(document), project);
         EditorHighlighterFactory highlighterFactory = EditorHighlighterFactory.getInstance();
-        VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(this.document);
-        EditorHighlighter highlighter;
-        if (virtualFile != null) {
-            highlighter = highlighterFactory.createEditorHighlighter(this.project, virtualFile);
-        } else {
-            highlighter = highlighterFactory.createEditorHighlighter(this.project, fileType);
-        }
+        VirtualFile virtualFile = FileDocumentManager.getInstance().getFile(document);
+        EditorHighlighter highlighter = highlighterFactory.createEditorHighlighter(this.project, Objects.requireNonNull(virtualFile));
         editor.setHighlighter(highlighter);
         editorSettings(editor);
         editor.setCaretEnabled(true);
@@ -88,12 +85,16 @@ public class TextPanel extends NonOpaquePanel {
         settings.setLineCursorWidth(1);
     }
 
+    public EditorEx getEditor() {
+        return this.editor;
+    }
+
     public String getText() {
-        return document.getText();
+        return editor.getDocument().getText();
     }
 
     public void setText(String text) {
-        executeCommand(() -> ApplicationManager.getApplication().runWriteAction(() -> this.document.setText(text)));
+        executeCommand(() -> ApplicationManager.getApplication().runWriteAction(() -> this.editor.getDocument().setText(text)));
     }
 
     private void executeCommand(Runnable command) {
@@ -103,7 +104,7 @@ public class TextPanel extends NonOpaquePanel {
                 null,
                 null,
                 UndoConfirmationPolicy.DEFAULT,
-                document
+                editor.getDocument()
         );
     }
 

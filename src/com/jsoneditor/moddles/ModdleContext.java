@@ -1,5 +1,6 @@
 package com.jsoneditor.moddles;
 
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
 import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.TreeUtils;
@@ -55,58 +56,74 @@ public class ModdleContext {
     }
 
     /* left */
+    public static Left getLeft(Project project) {
+        return getContext(project).left;
+    }
+
+    public static EditorEx getEditor(Project project) {
+        return getLeft(project).getEditor();
+    }
+
     public static void setText(Project project, String text) {
-        getContext(project).left.setText(text);
+        getLeft(project).setText(text);
     }
 
     public static String getText(Project project) {
-        return getContext(project).left.getText();
+        return getLeft(project).getText();
     }
 
     public static void resetScrollBarPosition(Project project) {
-        getContext(project).left.resetScrollBarPosition();
+        getLeft(project).resetScrollBarPosition();
     }
 
     public static void scrollToText(Project project, List<TreeNode> path) {
-        getContext(project).left.scrollToText(path);
+        getLeft(project).scrollToText(path);
     }
 
     /* middle */
+    public static Middle getMiddle(Project project) {
+        return getContext(project).middle;
+    }
+
     public static void toRight(Project project) {
-        getContext(project).middle.toRight();
+        getMiddle(project).toRight();
     }
 
     public static void toLeft(Project project) {
-        getContext(project).middle.toLeft();
+        getMiddle(project).toLeft();
     }
 
     public static void addListener(Project project) {
-        getContext(project).middle.addListener();
+        getMiddle(project).addListener();
     }
 
     /* right */
+    public static Right getRight(Project project) {
+        return getContext(project).right;
+    }
+
     public static TreeNode getRoot(Project project) {
-        return getContext(project).right.getRoot();
+        return getRight(project).getRoot();
     }
 
     public static void setRoot(Project project, TreeNode root) {
-        getContext(project).right.setRoot(root);
+        getRight(project).setRoot(root);
     }
 
     public static void expandTree(Project project) {
-        TreeUtils.expandTree(getContext(project).right.tree, new TreePath(getRoot(project)));
+        TreeUtils.expandTree(getRight(project).tree, new TreePath(getRoot(project)));
     }
 
     public static void collapseTree(Project project) {
-        TreeUtils.collapseTree(getContext(project).right.tree, new TreePath(getRoot(project)));
+        TreeUtils.collapseTree(getRight(project).tree, new TreePath(getRoot(project)));
     }
 
     public static void expandNode(Project project, TreePath path) {
-        getContext(project).right.tree.expandPath(path);
+        getRight(project).tree.expandPath(path);
     }
 
     public static void updateTree(Project project) {
-        getContext(project).right.tree.updateUI();
+        getRight(project).tree.updateUI();
     }
 
 }

@@ -15,7 +15,10 @@ import com.jsoneditor.CustomTreeCellRenderer;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.Undo;
 import com.jsoneditor.edits.*;
-import com.jsoneditor.node.*;
+import com.jsoneditor.node.ContainerNode;
+import com.jsoneditor.node.LeafNode;
+import com.jsoneditor.node.ObjectNode;
+import com.jsoneditor.node.TreeNode;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
@@ -118,14 +121,7 @@ public class Right extends JsonEditorModdle {
     private void paint() {
         GridBagLayout layout = new GridBagLayout();
         setLayout(layout);
-        GridBagLayout parentLayout = (GridBagLayout) parent.getLayout();
         GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 100;
-        c.weighty = 200;
-        c.fill = GridBagConstraints.BOTH;
-        parentLayout.setConstraints(this, c);
-        parent.add(this);
-        c = new GridBagConstraints();
         c.weightx = 100;
         c.weighty = 2;
         c.fill = GridBagConstraints.BOTH;
@@ -168,36 +164,38 @@ public class Right extends JsonEditorModdle {
             @Override
             public void mouseClicked(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                if (e.isMetaDown()) {
-                    if (select.isRoot()) {
-                        addSibling.setVisible(false);
-                        copy.setVisible(false);
-                        copyKey.setVisible(false);
-                        copyValue.setVisible(false);
-                        edit.setVisible(false);
-                        delete.setVisible(false);
-                    } else {
-                        addSibling.setVisible(true);
-                        copy.setVisible(true);
-                        copyKey.setVisible(true);
-                        copyValue.setVisible(true);
-                        edit.setVisible(true);
-                        delete.setVisible(true);
-                    }
-                    contextMenus.show(tree, e.getX(), e.getY());
-                } else {
-                    int clickCount = e.getClickCount();
-                    if (clickCount == 2) {
-                        // 双击叶子节点
-                        if (select.isLeaf()) {
-                            new AddOrEdit(project, select, 3, (node, selectNode) -> {
-                                ReplaceEdit action = new ReplaceEdit(tree, node, selectNode, false);
-                                action.doAction();
-                                Undo.addAction(project, action);
-                            });
+                if (select != null) {
+                    if (e.isMetaDown()) {
+                        if (select.isRoot()) {
+                            addSibling.setVisible(false);
+                            copy.setVisible(false);
+                            copyKey.setVisible(false);
+                            copyValue.setVisible(false);
+                            edit.setVisible(false);
+                            delete.setVisible(false);
+                        } else {
+                            addSibling.setVisible(true);
+                            copy.setVisible(true);
+                            copyKey.setVisible(true);
+                            copyValue.setVisible(true);
+                            edit.setVisible(true);
+                            delete.setVisible(true);
                         }
+                        contextMenus.show(tree, e.getX(), e.getY());
                     } else {
-                        ModdleContext.scrollToText(project, select.getFullPath());
+                        int clickCount = e.getClickCount();
+                        if (clickCount == 2) {
+                            // 双击叶子节点
+                            if (select.isLeaf()) {
+                                new AddOrEdit(project, select, 3, (node, selectNode) -> {
+                                    ReplaceEdit action = new ReplaceEdit(tree, node, selectNode, false);
+                                    action.doAction();
+                                    Undo.addAction(project, action);
+                                });
+                            }
+                        } else {
+                            ModdleContext.scrollToText(project, select.getFullPath());
+                        }
                     }
                 }
             }
@@ -213,7 +211,7 @@ public class Right extends JsonEditorModdle {
                                 TreeNode movingNode = (TreeNode) movingPath.getLastPathComponent();
                                 TreeNode cloneNode = movingNode.clone();
                                 AddEdit addAction;
-                                if (target instanceof ObjectNode || target instanceof ArrayNode) {
+                                if (target instanceof ContainerNode) {
                                     addAction = new AddEdit(tree, cloneNode, target, target.getChildCount());
                                 } else {
                                     TreeNode parent = target.getParent();
@@ -291,7 +289,7 @@ public class Right extends JsonEditorModdle {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 new AddOrEdit(project, select, 1, (node, selectNode) -> {
                     TreeEdit edit;
-                    if (selectNode instanceof StringNode || selectNode instanceof OtherNode) {
+                    if (selectNode instanceof LeafNode) {
                         TreeNode newSelect = TreeUtils.getNode(selectNode.key, new JSONObject(true));
                         newSelect.add(node);
                         edit = new ReplaceEdit(tree, newSelect, selectNode, false);
@@ -322,8 +320,8 @@ public class Right extends JsonEditorModdle {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 new AddOrEdit(project, select, 3, (node, selectNode) -> {
                     boolean keepChildren = false;
-                    if (node instanceof ObjectNode || node instanceof ArrayNode) {
-                        if (selectNode instanceof ObjectNode || selectNode instanceof ArrayNode) {
+                    if (node instanceof ContainerNode) {
+                        if (selectNode instanceof ContainerNode) {
                             node.attachChildrenFromAnotherNode(selectNode);
                             keepChildren = true;
                         }

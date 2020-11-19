@@ -2,8 +2,11 @@ package com.jsoneditor.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.AnActionButton;
+import com.jsoneditor.moddles.Left;
 import com.jsoneditor.moddles.Middle;
+import com.jsoneditor.moddles.ModdleContext;
 import com.jsoneditor.moddles.Right;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
@@ -15,15 +18,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SwitchView extends AnActionButton {
 
-    private Right right;
-
-    private Middle middle;
-
     private volatile boolean isShow = true;
 
-    public SwitchView(Right right, Middle middle) {
-        this.right = right;
-        this.middle = middle;
+    public SwitchView() {
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(Icons.SHOW);
         presentation.setText("view");
@@ -31,19 +28,19 @@ public class SwitchView extends AnActionButton {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
+        Middle middle = ModdleContext.getMiddle(project);
+        Left left = ModdleContext.getLeft(project);
+        Right right = ModdleContext.getRight(project);
         right.setVisible(!right.isShowing());
         middle.setVisible(!middle.isShowing());
-        switchIcon();
-    }
 
-    private void switchIcon() {
-        Presentation presentation = getTemplatePresentation();
         if (isShow) {
             isShow = false;
-            presentation.setSelectedIcon(Icons.HIDE);
+            left.setSize(left.parent.getWidth(), left.parent.getHeight());
         } else {
             isShow = true;
-            presentation.setSelectedIcon(Icons.SHOW);
+            left.setSize(left.parent.getWidth() - middle.getWidth() - right.getWidth(), left.parent.getHeight());
         }
     }
 

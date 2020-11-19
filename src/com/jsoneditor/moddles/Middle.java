@@ -14,6 +14,8 @@ import icons.Icons;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * @Description:
@@ -21,6 +23,8 @@ import java.awt.*;
  * @CreateDate: 2020/8/17 21:51
  */
 public class Middle extends JsonEditorModdle {
+
+    private int horizontalPointWhenmousePressed;
 
     private JButton syncToRight = new JButton() {{
         setIcon(Icons.TO_RIGHT);
@@ -34,26 +38,68 @@ public class Middle extends JsonEditorModdle {
     public Middle(Project project, JsonEditorModdle parent) {
         super(project, parent);
         paint();
+        dragEnable();
     }
 
     private void paint() {
         GridBagLayout layout = new GridBagLayout();
         setLayout(layout);
-        GridBagLayout parentLayout = (GridBagLayout) parent.getLayout();
         GridBagConstraints c = new GridBagConstraints();
-        c.weightx = 5;
-        c.fill = GridBagConstraints.BOTH;
-        parentLayout.setConstraints(this, c);
-        parent.add(this);
-        c = new GridBagConstraints();
-        c.ipadx = -35;
-        c.ipady = -1;
+        c.ipadx = -45;
+        c.ipady = -5;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = JBUI.insets(10, 0, 10, 0);
         layout.setConstraints(syncToRight, c);
         layout.setConstraints(syncToLeft, c);
         add(syncToRight);
         add(syncToLeft);
+    }
+
+    private void dragEnable() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                horizontalPointWhenmousePressed = e.getX();
+            }
+
+        });
+        addMouseMotionListener(new MouseAdapter() {
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (e.getX() > 5 && e.getX() < getWidth() - 5) {
+                    setCursor(new Cursor(Cursor.W_RESIZE_CURSOR));
+                } else {
+                    setCursor(Cursor.getDefaultCursor());
+                }
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                Left left = ModdleContext.getLeft(project);
+                Middle middle = ModdleContext.getMiddle(project);
+                Right right = ModdleContext.getRight(project);
+
+                int x = e.getX();
+                int offset = x - horizontalPointWhenmousePressed;
+                // left
+                Dimension leftSize = left.getSize();
+                int leftWidth = leftSize.width + offset;
+                if (leftWidth > 0 && leftWidth + middle.getWidth() < parent.getWidth()) {
+                    left.setSize(leftWidth, leftSize.height);
+                    // middle
+                    middle.setLocation(leftWidth, 0);
+                    // right
+                    Dimension rightSize = right.getSize();
+                    int rightWidth = rightSize.width - offset;
+                    right.setSize(rightWidth, rightSize.height);
+                    right.setLocation(leftWidth + middle.getWidth(), 0);
+
+                    parent.updateUI();
+                }
+            }
+
+        });
     }
 
     public void addListener() {
@@ -72,10 +118,22 @@ public class Middle extends JsonEditorModdle {
                 JsonEditorNotifier.error("JSON format error.");
             }
         });
+        syncToRight.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+        });
         syncToLeft.addActionListener((e) -> {
             TreeNode root = ModdleContext.getRoot(project);
             TreeUtils.refreshJson(root);
             ModdleContext.setText(project, JSON.toJSONString(root.getValue(), SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+        });
+        syncToLeft.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
         });
     }
 
