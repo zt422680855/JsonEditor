@@ -7,6 +7,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.event.CaretEvent;
+import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.ScrollingModelEx;
 import com.intellij.openapi.editor.highlighter.EditorHighlighter;
@@ -26,6 +28,7 @@ import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.TreeNode;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -66,6 +69,7 @@ public class TextPanel extends NonOpaquePanel {
         editor.getCaretModel().moveToOffset(document.getTextLength());
         this.add(editor.getComponent());
         setText(Constant.TEMP);
+//        caretListener();
     }
 
     private void editorSettings(EditorEx editor) {
@@ -83,6 +87,27 @@ public class TextPanel extends NonOpaquePanel {
         settings.setWheelFontChangeEnabled(false);
         settings.setAdditionalPageAtBottom(false);
         settings.setLineCursorWidth(1);
+    }
+
+    private void caretListener() {
+        CaretModel caretModel = editor.getCaretModel();
+        caretModel.addCaretListener(new CaretListener() {
+
+            @Override
+            public void caretAdded(@NotNull CaretEvent event) {
+                treeSelectByCaret(caretModel);
+            }
+
+            @Override
+            public void caretRemoved(@NotNull CaretEvent event) {
+                treeSelectByCaret(caretModel);
+            }
+        });
+    }
+
+    private void treeSelectByCaret(CaretModel caretModel) {
+        List<Caret> carets = caretModel.getAllCarets();
+        System.out.println(carets.size());
     }
 
     public EditorEx getEditor() {

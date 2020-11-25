@@ -28,6 +28,7 @@ public class JsonEditorFactory implements ToolWindowFactory {
                     jsonEditor.setContext();
                 }
             }
+
         });
     }
 }

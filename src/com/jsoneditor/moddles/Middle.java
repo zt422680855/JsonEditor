@@ -82,14 +82,14 @@ public class Middle extends JsonEditorModdle {
 
                 int x = e.getX();
                 int offset = x - horizontalPointWhenmousePressed;
-                // left
                 Dimension leftSize = left.getSize();
                 int leftWidth = leftSize.width + offset;
                 if (leftWidth > 0 && leftWidth + middle.getWidth() < parent.getWidth()) {
+                    // 调整left大小
                     left.setSize(leftWidth, leftSize.height);
-                    // middle
+                    // 调整middle位置
                     middle.setLocation(leftWidth, 0);
-                    // right
+                    // 调整right大小和位置
                     Dimension rightSize = right.getSize();
                     int rightWidth = rightSize.width - offset;
                     right.setSize(rightWidth, rightSize.height);
