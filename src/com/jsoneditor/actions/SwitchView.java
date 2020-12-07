@@ -1,9 +1,9 @@
 package com.jsoneditor.actions;
 
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.AnActionButton;
 import com.jsoneditor.moddles.Left;
 import com.jsoneditor.moddles.Middle;
 import com.jsoneditor.moddles.ModdleContext;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * @Author: zhengt
  * @CreateDate: 2020/8/24 22:26
  */
-public class SwitchView extends AnActionButton {
+public class SwitchView extends AnAction {
 
     private volatile boolean isShow = true;
 

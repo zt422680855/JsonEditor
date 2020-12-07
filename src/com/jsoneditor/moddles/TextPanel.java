@@ -1,6 +1,11 @@
 package com.jsoneditor.moddles;
 
+import com.intellij.codeInsight.actions.FileInEditorProcessor;
+import com.intellij.codeInsight.actions.LastRunReformatCodeOptionsProvider;
+import com.intellij.codeInsight.actions.ReformatCodeRunOptions;
+import com.intellij.codeInsight.actions.TextRangeType;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.json.JsonFileType;
 import com.intellij.json.psi.*;
 import com.intellij.openapi.application.ApplicationManager;
@@ -47,6 +52,8 @@ public class TextPanel extends NonOpaquePanel {
 
     private EditorEx editor;
 
+    private FileInEditorProcessor formatProcessor;
+
     public TextPanel(Project project) {
         this.project = project;
         JsonFileType fileType = JsonFileType.INSTANCE;
@@ -67,6 +74,12 @@ public class TextPanel extends NonOpaquePanel {
         this.add(editor.getComponent());
         setText(Constant.TEMP);
         caretListener();
+
+        // idea默认代码格式化
+        LastRunReformatCodeOptionsProvider provider = new LastRunReformatCodeOptionsProvider(PropertiesComponent.getInstance());
+        ReformatCodeRunOptions lastRunOptions = provider.getLastRunOptions(psiFile);
+        lastRunOptions.setProcessingScope(TextRangeType.WHOLE_FILE);
+        formatProcessor = new FileInEditorProcessor(psiFile, editor, lastRunOptions);
     }
 
     private void editorSettings(EditorEx editor) {
@@ -138,6 +151,10 @@ public class TextPanel extends NonOpaquePanel {
                 UndoConfirmationPolicy.DEFAULT,
                 editor.getDocument()
         );
+    }
+
+    public void format() {
+        formatProcessor.processCode();
     }
 
     public void resetScrollBarPosition() {

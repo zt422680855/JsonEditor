@@ -66,19 +66,23 @@ public class ModdleContext {
     }
 
     public static void setText(Project project, String text) {
-        getLeft(project).setText(text);
+        getLeft(project).textPanel.setText(text);
     }
 
     public static String getText(Project project) {
-        return getLeft(project).getText();
+        return getLeft(project).textPanel.getText();
     }
 
     public static void resetScrollBarPosition(Project project) {
-        getLeft(project).resetScrollBarPosition();
+        getLeft(project).textPanel.resetScrollBarPosition();
+    }
+
+    public static void formatCode(Project project) {
+        getLeft(project).textPanel.format();
     }
 
     public static void scrollToText(Project project, List<TreeNode> path) {
-        getLeft(project).scrollToText(path);
+        getLeft(project).textPanel.scrollToText(path);
     }
 
     /* middle */

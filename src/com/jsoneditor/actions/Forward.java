@@ -1,10 +1,10 @@
 package com.jsoneditor.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.AnActionButton;
 import com.jsoneditor.Undo;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * @Author: zhengt
  * @CreateDate: 2020/8/21 22:10
  */
-public class Forward extends AnActionButton {
+public class Forward extends AnAction {
 
     public Forward() {
         Presentation presentation = getTemplatePresentation();

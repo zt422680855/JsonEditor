@@ -1,19 +1,12 @@
 package com.jsoneditor;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ex.ToolWindowEx;
-import com.intellij.ui.AnActionButton;
-import com.jsoneditor.actions.*;
 import com.jsoneditor.moddles.*;
 
 import javax.swing.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @Description: 开发时iml文件module节点的type要等于PLUGIN_MODULE。
@@ -29,8 +22,6 @@ public class JsonEditorWindow extends JsonEditorModdle {
     private Right right;
 
     private ToolWindow toolWindow;
-
-    private static Map<Project, DefaultActionGroup[]> actionMap = new HashMap<>();
 
     public JsonEditorWindow(Project project, ToolWindow toolWindow) {
         super(project);
@@ -51,73 +42,35 @@ public class JsonEditorWindow extends JsonEditorModdle {
         ModdleContext.addListener(project);
         ModdleContext.toRight(project);
 
-        addTitleActions();
-
         setResizeListener();
-    }
-
-    private void addTitleActions() {
-        Format format = new Format();
-        Compress compress = new Compress();
-        Reset reset = new Reset();
-        DefaultActionGroup leftAction = new DefaultActionGroup(format, compress, reset);
-        leftAction.addSeparator();
-        Expand expand = new Expand();
-        Close close = new Close();
-        Back back = new Back();
-        Forward forward = new Forward();
-        DefaultActionGroup rightAction = new DefaultActionGroup(expand, close, back, forward);
-        rightAction.addSeparator();
-        DefaultActionGroup otherAction = new DefaultActionGroup(new SwitchView());
-        DefaultActionGroup[] actions = new DefaultActionGroup[]{leftAction, rightAction, otherAction};
-        actionMap.put(project, actions);
-        setContext();
-    }
-
-    public void setContext() {
-        DefaultActionGroup[] groups = actionMap.get(project);
-        ToolWindowEx ex = (ToolWindowEx) toolWindow;
-        ex.setTitleActions(groups);
-        for (DefaultActionGroup g : groups) {
-            AnAction[] children = g.getChildren(null);
-            for (AnAction child : children) {
-                if (child instanceof AnActionButton) {
-                    ((AnActionButton) child).setContextComponent(this);
-                }
-            }
-        }
     }
 
     private void setResizeListener() {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                setComponent();
+                int x = getWidth();
+                int y = getHeight();
+                int middleWidth = 30;
+                int leftWidth = (int) Math.floor((x - middleWidth) * 0.6);
+                int rightWidth = (int) Math.ceil((x - middleWidth) * 0.4);
+                if (right.isShowing()) {
+                    left.setSize(leftWidth, y);
+                } else {
+                    left.setSize(x, y);
+                }
+                left.setLocation(0, 0);
+                middle.setSize(middleWidth, y);
+                middle.setLocation(leftWidth, 0);
+                right.setSize(rightWidth, y);
+                right.setLocation(leftWidth + middleWidth, 0);
+                JComponent c = left.getEditor().getContentComponent();
+                if (c.hasFocus()) {
+                    right.requestFocus();
+                }
+                c.requestFocus();
             }
         });
-    }
-
-    private void setComponent() {
-        int x = getWidth();
-        int y = getHeight();
-        int middleWidth = 30;
-        int leftWidth = (int) Math.floor((x - middleWidth) * 0.6);
-        int rightWidth = (int) Math.ceil((x - middleWidth) * 0.4);
-        if (right.isShowing()) {
-            left.setSize(leftWidth, y);
-        } else {
-            left.setSize(x, y);
-        }
-        left.setLocation(0, 0);
-        middle.setSize(middleWidth, y);
-        middle.setLocation(leftWidth, 0);
-        right.setSize(rightWidth, y);
-        right.setLocation(leftWidth + middleWidth, 0);
-        JComponent c = left.getEditor().getContentComponent();
-        if (c.hasFocus()) {
-            right.requestFocus();
-        }
-        c.requestFocus();
     }
 
 }
