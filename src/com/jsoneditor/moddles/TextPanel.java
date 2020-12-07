@@ -30,10 +30,7 @@ import com.jsoneditor.node.TreeNode;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @Description: 文档实例被对应的虚拟文件实例微弱的引用。因此，如果不再被引用，一篇未修改的文档实例可以被垃圾回收，
@@ -57,7 +54,7 @@ public class TextPanel extends NonOpaquePanel {
         this.psiFile = factory.createFileFromText("JSON." + fileType.getDefaultExtension(),
                 fileType, "", LocalTimeCounter.currentTime(), true, false);
         DaemonCodeAnalyzer.getInstance(project).setHighlightingEnabled(psiFile, true);
-        // document只能在方法栈中使用，随着方法结束，对象会被回收。不能保存在成员变量、静态变量，否则内存泄露
+        // document只能在方法栈中使用，随着方法结束，对象可以被回收。不能保存在成员变量、静态变量，否则内存泄露
         Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
         this.editor = (EditorEx) EditorFactory.getInstance().createEditor(Objects.requireNonNull(document), project);
         EditorHighlighterFactory highlighterFactory = EditorHighlighterFactory.getInstance();
@@ -69,7 +66,7 @@ public class TextPanel extends NonOpaquePanel {
         editor.getCaretModel().moveToOffset(document.getTextLength());
         this.add(editor.getComponent());
         setText(Constant.TEMP);
-//        caretListener();
+        caretListener();
     }
 
     private void editorSettings(EditorEx editor) {
@@ -94,20 +91,30 @@ public class TextPanel extends NonOpaquePanel {
         caretModel.addCaretListener(new CaretListener() {
 
             @Override
-            public void caretAdded(@NotNull CaretEvent event) {
-                treeSelectByCaret(caretModel);
+            public void caretPositionChanged(@NotNull CaretEvent event) {
+                Caret caret = caretModel.getCurrentCaret();
+                PsiElement ele = psiFile.findElementAt(caret.getOffset());
+                if (ele != null) {
+                    // 当前光标所在位置元素
+                    PsiElement element = ele.getParent();
+                    if (element instanceof JsonElement) {
+                        JsonElement jsonElement = (JsonElement) element;
+                        LinkedList<JsonElement> jsonElements = new LinkedList<>();
+                        for (; ; ) {
+                            jsonElements.push(jsonElement);
+                            PsiElement parent = jsonElement.getParent();
+                            if (parent instanceof JsonFile) {
+                                break;
+                            } else {
+                                jsonElement = (JsonElement) parent;
+                            }
+                        }
+                        ModdleContext.scrollToTreeNode(project, jsonElements);
+                    }
+                }
             }
 
-            @Override
-            public void caretRemoved(@NotNull CaretEvent event) {
-                treeSelectByCaret(caretModel);
-            }
         });
-    }
-
-    private void treeSelectByCaret(CaretModel caretModel) {
-        List<Caret> carets = caretModel.getAllCarets();
-        System.out.println(carets.size());
     }
 
     public EditorEx getEditor() {
@@ -139,8 +146,8 @@ public class TextPanel extends NonOpaquePanel {
     }
 
     public void scrollToText(List<TreeNode> path) {
-        PsiElement[] wholeJson = psiFile.getChildren();
-        Arrays.stream(wholeJson).filter(ele ->
+        PsiElement[] content = psiFile.getChildren();
+        Arrays.stream(content).filter(ele ->
                 StringUtils.isNotBlank(ele.getText()) && ele instanceof JsonContainer
         ).findFirst().ifPresent(first -> {
             JsonValue jsonValue = (JsonValue) first;

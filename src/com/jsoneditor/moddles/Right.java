@@ -1,9 +1,14 @@
 package com.jsoneditor.moddles;
 
 import com.alibaba.fastjson.JSONObject;
+import com.intellij.json.psi.JsonContainer;
+import com.intellij.json.psi.JsonElement;
+import com.intellij.json.psi.JsonFile;
+import com.intellij.json.psi.JsonProperty;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
+import com.intellij.psi.PsiElement;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -378,6 +383,42 @@ public class Right extends JsonEditorModdle {
     public void setRoot(TreeNode root) {
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         model.setRoot(root);
+    }
+
+    public void scrollToTreeNode(java.util.List<JsonElement> elements) {
+        TreeNode mapperNode = (TreeNode) tree.getModel().getRoot();
+        PsiElement parent;
+        for (JsonElement jsonEle : elements) {
+            parent = jsonEle.getParent();
+            if (parent instanceof JsonFile || jsonEle instanceof JsonProperty) {
+                continue;
+            }
+            if (parent instanceof JsonProperty) {
+                JsonContainer grandpa = (JsonContainer) parent.getParent();
+                PsiElement[] children = grandpa.getChildren();
+                for (int i = 0; i < children.length; i++) {
+                    PsiElement child = children[i];
+                    if (parent.equals(child) && !mapperNode.isLeaf() && i < mapperNode.getChildCount()) {
+                        mapperNode = (TreeNode) mapperNode.getChildAt(i);
+                        break;
+                    }
+                }
+            } else {
+                PsiElement[] children = parent.getChildren();
+                for (int i = 0; i < children.length; i++) {
+                    PsiElement child = children[i];
+                    if (jsonEle.equals(child) && !mapperNode.isLeaf() && i < mapperNode.getChildCount()) {
+                        mapperNode = (TreeNode) mapperNode.getChildAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+        TreePath scrollPath = new TreePath(mapperNode.getPath());
+        tree.setSelectionPath(scrollPath);
+        tree.scrollPathToVisible(scrollPath);
+        JBScrollPane scrollPane = (JBScrollPane) (tree.getParent().getParent());
+        scrollPane.getHorizontalScrollBar().setValue(0);
     }
 
 }

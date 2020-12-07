@@ -1,5 +1,6 @@
 package com.jsoneditor.moddles;
 
+import com.intellij.json.psi.JsonElement;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
 import com.jsoneditor.JsonEditorWindow;
@@ -124,6 +125,10 @@ public class ModdleContext {
 
     public static void updateTree(Project project) {
         getRight(project).tree.updateUI();
+    }
+
+    public static void scrollToTreeNode(Project project, List<JsonElement> elements) {
+        getRight(project).scrollToTreeNode(elements);
     }
 
 }

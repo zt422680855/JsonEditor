@@ -9,7 +9,7 @@ import com.intellij.ui.AnActionButton;
 import com.jsoneditor.actions.*;
 import com.jsoneditor.moddles.*;
 
-import java.awt.*;
+import javax.swing.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.HashMap;
@@ -103,13 +103,21 @@ public class JsonEditorWindow extends JsonEditorModdle {
         int middleWidth = 30;
         int leftWidth = (int) Math.floor((x - middleWidth) * 0.6);
         int rightWidth = (int) Math.ceil((x - middleWidth) * 0.4);
-        left.setSize(leftWidth, y);
-        middle.setSize(middleWidth, y);
-        right.setSize(rightWidth, y);
+        if (right.isShowing()) {
+            left.setSize(leftWidth, y);
+        } else {
+            left.setSize(x, y);
+        }
         left.setLocation(0, 0);
+        middle.setSize(middleWidth, y);
         middle.setLocation(leftWidth, 0);
+        right.setSize(rightWidth, y);
         right.setLocation(leftWidth + middleWidth, 0);
-        left.getEditor().getContentComponent().requestFocus();
+        JComponent c = left.getEditor().getContentComponent();
+        if (c.hasFocus()) {
+            right.requestFocus();
+        }
+        c.requestFocus();
     }
 
 }
