@@ -11,9 +11,12 @@ import com.intellij.json.psi.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.ScrollingModelEx;
 import com.intellij.openapi.editor.highlighter.EditorHighlighter;
@@ -21,6 +24,7 @@ import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -32,14 +36,14 @@ import com.jsoneditor.Constant;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.TreeNode;
-import org.apache.commons.lang3.StringUtils;
+import com.jsoneditor.persist.JsonEditorPersistentState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 /**
  * @Description: 文档实例被对应的虚拟文件实例微弱的引用。因此，如果不再被引用，一篇未修改的文档实例可以被垃圾回收，
- * 而如果文档内容之后又再次被访问，新的实例将被创建。将文档引用保存在你的插件的持久数据结构中将导致内存泄漏。
+ * 而如果修改文档内容之后又再次被访问，新的实例将被创建。将文档引用保存在你的插件的持久数据结构中将导致内存泄漏。
  * https://blog.csdn.net/hawkdowen/article/details/41047229
  * @Author: zhengt
  * @CreateDate: 2020/8/15 21:58
@@ -53,6 +57,8 @@ public class TextPanel extends NonOpaquePanel {
     private EditorEx editor;
 
     private FileInEditorProcessor formatProcessor;
+
+    private JsonEditorPersistentState state;
 
     public TextPanel(Project project) {
         this.project = project;
@@ -72,7 +78,17 @@ public class TextPanel extends NonOpaquePanel {
         editor.setCaretEnabled(true);
         editor.getCaretModel().moveToOffset(document.getTextLength());
         this.add(editor.getComponent());
-        setText(Constant.TEMP);
+
+        state = ServiceManager.getService(project, JsonEditorPersistentState.class);
+        setText(state.getText(project.getName()));
+        document.addDocumentListener(new DocumentListener() {
+            @Override
+            public void documentChanged(@NotNull DocumentEvent event) {
+                state.setText(project.getName(), document.getText());
+            }
+        });
+
+        // 光标事件
         caretListener();
 
         // idea默认代码格式化
@@ -165,7 +181,7 @@ public class TextPanel extends NonOpaquePanel {
     public void scrollToText(List<TreeNode> path) {
         PsiElement[] content = psiFile.getChildren();
         Arrays.stream(content).filter(ele ->
-                StringUtils.isNotBlank(ele.getText()) && ele instanceof JsonContainer
+                !StringUtil.isEmpty(ele.getText()) && ele instanceof JsonContainer
         ).findFirst().ifPresent(first -> {
             JsonValue jsonValue = (JsonValue) first;
             if (path.size() == 1) {

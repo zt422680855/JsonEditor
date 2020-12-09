@@ -12,7 +12,7 @@ import com.intellij.openapi.editor.ScrollingModel;
 /**
  * @Description:
  * @Author: zhengt
- * @CreateDate: 2020/9/12 16:56
+ * @CreateDate: 2020/9/12 22:56
  */
 public class JsonEditorNotifier {
 

@@ -25,18 +25,18 @@ public class JsonEditorFactory implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        SimpleToolWindowPanel panel = getContent(project, toolWindow);
+        SimpleToolWindowPanel panel = getDisplayPanel(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(panel, project.getName(), false);
         ContentManager contentManager = toolWindow.getContentManager();
         contentManager.addContent(content);
     }
 
-    private SimpleToolWindowPanel getContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+    private SimpleToolWindowPanel getDisplayPanel(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         SimpleToolWindowPanel content = new SimpleToolWindowPanel(true);
         content.setLayout(new BorderLayout());
         JsonEditorWindow jsonEditor = new JsonEditorWindow(project, toolWindow);
-        content.add(jsonEditor, "Center");
+        content.add(jsonEditor, BorderLayout.CENTER);
         setToolBar(content, jsonEditor);
         return content;
     }

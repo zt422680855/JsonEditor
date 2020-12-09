@@ -13,8 +13,6 @@ import com.jsoneditor.notification.JsonEditorNotifier;
 import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
-
 /**
  * @Description:
  * @Author: zhengt
@@ -22,21 +20,14 @@ import java.awt.*;
  */
 public class Format extends AnAction {
 
-    // 0 fastjson format, 1 ctrl + alt + L
+    // 0 fastjson format, 1 idea默认格式化
     private Integer state;
-
-    private Robot r;
 
     public Format() {
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(Icons.FORMAT);
         presentation.setText("format");
         this.state = 0;
-        try {
-            r = new Robot();
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

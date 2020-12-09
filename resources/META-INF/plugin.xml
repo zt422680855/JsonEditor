@@ -33,6 +33,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="JsonEditor" secondary="false" icon="/icons/main-icon.svg"
                     anchor="right" factoryClass="com.jsoneditor.JsonEditorFactory"/>
+        <projectService serviceImplementation="com.jsoneditor.persist.JsonEditorPersistentState"/>
     </extensions>
 
     <actions>
