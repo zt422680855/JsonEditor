@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @State(name = "jsonEditor", storages = {@Storage("$PROJECT_FILE$")})
 public class JsonEditorPersistentState implements PersistentStateComponent<JsonEditorPersistentState> {
 
-    /* 需要持久化的属性必须是public */
+    /** 需要持久化的属性必须是public */
     public Map<String, String> stateMap;
 
     public JsonEditorPersistentState() {

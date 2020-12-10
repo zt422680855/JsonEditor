@@ -104,9 +104,7 @@ public class Right extends JsonEditorModdle {
     public Tree tree;
     private TreePath movingPath;
     private JBLabel movingLabel = new JBLabel();
-    private final JWindow window = new JWindow() {{
-        setPreferredSize(new Dimension(300, 30));
-    }};
+    private final JWindow window = new JWindow();
 
     private JBPopupMenu contextMenus = new JBPopupMenu();
     private JBMenuItem addSub = new JBMenuItem("add child", Icons.ADD);
@@ -235,8 +233,6 @@ public class Right extends JsonEditorModdle {
                         }
                     }
                     movingPath = null;
-
-                    window.remove(movingLabel);
                     window.setVisible(false);
                 }
             }
@@ -251,21 +247,19 @@ public class Right extends JsonEditorModdle {
                         movingPath = pathWhenPressed;
                     }
                 } else {
-                    TreeNode node = (TreeNode) movingPath.getLastPathComponent();
-                    movingLabel.setText(node.getText());
-                    movingLabel.setIcon(node.icon());
-                    int x = e.getX() - movingLabel.getWidth() / 3;
-                    int y = e.getY() - movingLabel.getHeight() / 2;
-
-                    window.add(movingLabel);
-                    window.pack();
-
-                    Point pt = new Point(x, y);
+                    if (movingLabel.getParent() == null) {
+                        TreeNode node = (TreeNode) movingPath.getLastPathComponent();
+                        movingLabel.setText(node.getText());
+                        movingLabel.setIcon(node.icon());
+                        window.add(movingLabel);
+                        window.pack();
+                    }
+                    Point pt = new Point(0, e.getY() - movingLabel.getHeight() / 2);
                     Component c = (Component) e.getSource();
                     SwingUtilities.convertPointToScreen(pt, c);
                     window.setLocation(pt);
                     window.setVisible(true);
-
+                    window.setSize(getWidth() - 2, 30);
                     TreePath targetPath = tree.getPathForLocation(e.getX(), e.getY());
                     if (targetPath != null) {
                         TreeNode targetNode = (TreeNode) targetPath.getLastPathComponent();

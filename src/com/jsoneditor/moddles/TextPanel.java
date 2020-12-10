@@ -32,7 +32,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.util.LocalTimeCounter;
-import com.jsoneditor.Constant;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.TreeNode;
@@ -67,7 +66,6 @@ public class TextPanel extends NonOpaquePanel {
         this.psiFile = factory.createFileFromText("JSON." + fileType.getDefaultExtension(),
                 fileType, "", LocalTimeCounter.currentTime(), true, false);
         DaemonCodeAnalyzer.getInstance(project).setHighlightingEnabled(psiFile, true);
-        // document只能在方法栈中使用，随着方法结束，对象可以被回收。不能保存在成员变量、静态变量，否则内存泄露
         Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
         this.editor = (EditorEx) EditorFactory.getInstance().createEditor(Objects.requireNonNull(document), project);
         EditorHighlighterFactory highlighterFactory = EditorHighlighterFactory.getInstance();
