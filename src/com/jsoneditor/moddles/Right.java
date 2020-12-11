@@ -247,10 +247,10 @@ public class Right extends JsonEditorModdle {
                         movingPath = pathWhenPressed;
                     }
                 } else {
+                    TreeNode node = (TreeNode) movingPath.getLastPathComponent();
+                    movingLabel.setText(node.getText());
+                    movingLabel.setIcon(node.icon());
                     if (movingLabel.getParent() == null) {
-                        TreeNode node = (TreeNode) movingPath.getLastPathComponent();
-                        movingLabel.setText(node.getText());
-                        movingLabel.setIcon(node.icon());
                         window.add(movingLabel);
                         window.pack();
                     }
