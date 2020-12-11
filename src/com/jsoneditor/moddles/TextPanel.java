@@ -119,24 +119,26 @@ public class TextPanel extends NonOpaquePanel {
 
             @Override
             public void caretPositionChanged(@NotNull CaretEvent event) {
-                Caret caret = caretModel.getCurrentCaret();
-                PsiElement ele = psiFile.findElementAt(caret.getOffset());
-                if (ele != null) {
-                    // 当前光标所在位置元素
-                    PsiElement element = ele.getParent();
-                    if (element instanceof JsonElement) {
-                        JsonElement jsonElement = (JsonElement) element;
-                        LinkedList<JsonElement> jsonElements = new LinkedList<>();
-                        for (; ; ) {
-                            jsonElements.push(jsonElement);
-                            PsiElement parent = jsonElement.getParent();
-                            if (parent instanceof JsonFile) {
-                                break;
-                            } else {
-                                jsonElement = (JsonElement) parent;
+                if (editor.getContentComponent().hasFocus()) {
+                    Caret caret = caretModel.getCurrentCaret();
+                    PsiElement ele = psiFile.findElementAt(caret.getOffset());
+                    if (ele != null) {
+                        // 当前光标所在位置元素
+                        PsiElement element = ele.getParent();
+                        if (element instanceof JsonElement) {
+                            JsonElement jsonElement = (JsonElement) element;
+                            LinkedList<JsonElement> jsonElements = new LinkedList<>();
+                            for (; ; ) {
+                                jsonElements.push(jsonElement);
+                                PsiElement parent = jsonElement.getParent();
+                                if (parent instanceof JsonFile) {
+                                    break;
+                                } else {
+                                    jsonElement = (JsonElement) parent;
+                                }
                             }
+                            ModdleContext.scrollToTreeNode(project, jsonElements);
                         }
-                        ModdleContext.scrollToTreeNode(project, jsonElements);
                     }
                 }
             }
