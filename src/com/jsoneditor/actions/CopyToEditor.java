@@ -63,12 +63,9 @@ public class CopyToEditor extends AnAction {
                         JSONObject object = generateObj(selectClass, project);
                         Content[] contents = toolWindow.getContentManager().getContents();
                         Arrays.stream(contents).filter(c -> project.getName().equals(c.getDisplayName())).findFirst().ifPresent(content -> {
-                            JComponent component = content.getComponent();
-                            if (component instanceof JsonEditorWindow) {
-                                ModdleContext.setText(project, JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-                                ModdleContext.toRight(project);
-                                toolWindow.show(null);
-                            }
+                            ModdleContext.setText(project, JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+                            ModdleContext.toRight(project);
+                            toolWindow.show(null);
                         });
                     } else {
                         JsonEditorNotifier.warning("'" + selectText + "' is not a class or it is not user's class.");
