@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @Description:
  * @Author: zhengt
- * @CreateDate: 2020/12/8 21:55
+ * @CreateDate: 2020/12/8 21:56
  */
 @State(name = "jsonEditor", storages = {@Storage("$PROJECT_FILE$")})
 public class JsonEditorPersistentState implements PersistentStateComponent<JsonEditorPersistentState> {
