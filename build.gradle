@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij.platform' version '2.2.1'
+}
+
+group = 'com.zt'
+version = '2.9.2'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
+}
+
+dependencies {
+    implementation 'com.alibaba:fastjson:1.2.58'
+    intellijPlatform {
+        intellijIdeaCommunity('2024.3')
+        bundledPlugins('com.intellij.java')
+    }
+}
+
+intellijPlatform {
+    instrumentCode = false
+}
+
+patchPluginXml {
+    sinceBuild = '243'
+    untilBuild = ''
+}
+
+tasks.named('buildSearchableOptions') {
+    enabled = false
+}
