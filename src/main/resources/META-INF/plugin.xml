@@ -31,12 +31,14 @@
 <!--    <depends optional="true" config-file="">com.intellij.json</depends>-->
 
 <!--    <idea-version since-build="144"/>-->
-<!--    <idea-version since-build="243.*"/>-->
+    <idea-version since-build="202.8194.7" until-build="261.22158.277" />
+<!--    <idea-version since-build="202.8194.7"/>-->
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="JsonEditor" secondary="false" icon="/icons/main-icon.svg"
                     anchor="right" factoryClass="com.jsoneditor.JsonEditorFactory"/>
         <projectService serviceImplementation="com.jsoneditor.persist.JsonEditorPersistentState"/>
+        <notificationGroup id="JsonEditorNotificationGroup" displayType="BALLOON" key="JsonEditor"/>
     </extensions>
 
     <actions>

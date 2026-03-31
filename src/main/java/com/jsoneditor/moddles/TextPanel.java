@@ -11,7 +11,6 @@ import com.intellij.json.psi.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
@@ -35,7 +34,6 @@ import com.intellij.util.LocalTimeCounter;
 import com.jsoneditor.node.ArrayNode;
 import com.jsoneditor.node.ObjectNode;
 import com.jsoneditor.node.TreeNode;
-import com.jsoneditor.persist.JsonEditorPersistentState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -51,16 +49,17 @@ public class TextPanel extends NonOpaquePanel {
 
     private Project project;
 
+    private ModdleContext ctx;
+
     private PsiFile psiFile;
 
     private EditorEx editor;
 
     private FileInEditorProcessor formatProcessor;
 
-    private JsonEditorPersistentState state;
-
-    public TextPanel(Project project) {
+    public TextPanel(Project project, ModdleContext ctx) {
         this.project = project;
+        this.ctx = ctx;
         JsonFileType fileType = JsonFileType.INSTANCE;
         PsiFileFactory factory = PsiFileFactory.getInstance(project);
         this.psiFile = factory.createFileFromText("JSON." + fileType.getDefaultExtension(),
@@ -77,13 +76,10 @@ public class TextPanel extends NonOpaquePanel {
         editor.getCaretModel().moveToOffset(document.getTextLength());
         this.add(editor.getComponent());
 
-        state = ServiceManager.getService(project, JsonEditorPersistentState.class);
-        // ModdleContext.setText(project, state.getText(project.getName()));
-        setText(state.getText(project.getName()));
         document.addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(@NotNull DocumentEvent event) {
-                state.setText(project.getName(), document.getText());
+                ctx.storeText(document.getText());
             }
         });
 
@@ -138,7 +134,7 @@ public class TextPanel extends NonOpaquePanel {
                                     jsonElement = (JsonElement) parent;
                                 }
                             }
-                            ModdleContext.scrollToTreeNode(jsonElements);
+                            ctx.scrollToTreeNode(jsonElements);
                         }
                     }
                 }

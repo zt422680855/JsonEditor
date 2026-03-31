@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.jsoneditor.JsonEditorWindow;
 import com.jsoneditor.TreeUtils;
 import com.jsoneditor.node.TreeNode;
+import com.jsoneditor.persist.JsonEditorPersistentState;
 
 import javax.swing.tree.TreePath;
 import java.util.List;
@@ -17,12 +18,11 @@ import java.util.List;
  */
 public class ModdleContext {
 
-    private static final ModdleContext INSTANCE = new ModdleContext();
-    ;
-
     private Project project;
 
-    private JsonEditorWindow parent;
+    private JsonEditorPersistentState state;
+
+    private JsonEditorWindow window;
 
     private Left left;
 
@@ -30,108 +30,122 @@ public class ModdleContext {
 
     private Right right;
 
-    private String selectTab;
+    private String storeKey;
 
-    public static ModdleContext getInstance() {
-        return INSTANCE;
+    public void initModdles(Project project, JsonEditorWindow window) {
+        this.project = project;
+        this.window = window;
+        this.state = project.getService(JsonEditorPersistentState.class);
+        this.left = new Left(project, window);
+        this.middle = new Middle(project, window);
+        this.right = new Right(project, window);
+        window.add(left);
+        window.add(middle);
+        window.add(right);
+        this.storeKey = project.getName() + "_" + this.window.getTitle();
+        setText(loadText());
     }
 
-    public static void addModdles(Project project, JsonEditorModdle... moddles) {
-        ModdleContext ctx = getInstance();
-        ctx.project = project;
-        for (JsonEditorModdle moddle : moddles) {
-            if (moddle instanceof JsonEditorWindow) {
-                ctx.parent = (JsonEditorWindow) moddle;
-            } else if (moddle instanceof Left) {
-                ctx.left = (Left) moddle;
-            } else if (moddle instanceof Middle) {
-                ctx.middle = (Middle) moddle;
-            } else if (moddle instanceof Right) {
-                ctx.right = (Right) moddle;
-            }
-        }
+    public JsonEditorWindow getWindow() {
+        return this.window;
     }
 
-    public static JsonEditorWindow getParent() {
-        return getInstance().parent;
+    public JsonEditorPersistentState getState() {
+        return this.state;
     }
 
-    /* left */
-    public static Left getLeft() {
-        return getInstance().left;
+    public Left getLeft() {
+        return this.left;
     }
 
-    public static EditorEx getEditor() {
+    public EditorEx getEditor() {
         return getLeft().getEditor();
     }
 
-    public static void setText(String text) {
+    public void setText(String text) {
         getLeft().textPanel.setText(text);
     }
 
-    public static String getText() {
+    public String getText() {
         return getLeft().textPanel.getText();
     }
 
-    public static void resetScrollBarPosition() {
+    public void storeText(String text) {
+        JsonEditorWindow p = getWindow();
+        JsonEditorPersistentState s = getState();
+        if (p != null && s != null) {
+            s.setText(this.storeKey, text);
+        }
+    }
+
+    public String loadText() {
+        JsonEditorWindow p = getWindow();
+        JsonEditorPersistentState s = getState();
+        if (p != null && s != null) {
+            return s.getText(this.storeKey);
+        }
+        return "";
+    }
+
+    public void resetScrollBarPosition() {
         getLeft().textPanel.resetScrollBarPosition();
     }
 
-    public static void formatCode() {
+    public void formatCode() {
         getLeft().textPanel.format();
     }
 
-    public static void scrollToText(List<TreeNode> path) {
+    public void scrollToText(List<TreeNode> path) {
         getLeft().textPanel.scrollToText(path);
     }
 
     /* middle */
-    public static Middle getMiddle() {
-        return getInstance().middle;
+    public Middle getMiddle() {
+        return this.middle;
     }
 
-    public static void toRight() {
+    public void toRight() {
         getMiddle().toRight();
     }
 
-    public static void toLeft() {
+    public void toLeft() {
         getMiddle().toLeft();
     }
 
-    public static void addListener() {
+    public void addListener() {
         getMiddle().addListener();
     }
 
     /* right */
-    public static Right getRight() {
-        return getInstance().right;
+    public Right getRight() {
+        return this.right;
     }
 
-    public static TreeNode getRoot() {
+    public TreeNode getRoot() {
         return getRight().getRoot();
     }
 
-    public static void setRoot(TreeNode root) {
+    public void setRoot(TreeNode root) {
         getRight().setRoot(root);
     }
 
-    public static void expandTree() {
+    public void expandTree() {
         TreeUtils.expandTree(getRight().tree, new TreePath(getRoot()));
     }
 
-    public static void collapseTree() {
+    public void collapseTree() {
         TreeUtils.collapseTree(getRight().tree, new TreePath(getRoot()));
     }
 
-    public static void expandNode(TreePath path) {
+    public void expandNode(TreePath path) {
         getRight().tree.expandPath(path);
     }
 
-    public static void updateTree() {
+    public void updateTree() {
         getRight().tree.updateUI();
     }
 
-    public static void scrollToTreeNode(List<JsonElement> elements) {
+    public void scrollToTreeNode(List<JsonElement> elements) {
         getRight().scrollToTreeNode(elements);
     }
 

@@ -26,7 +26,7 @@ public class Left extends JsonEditorModdle {
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
-        textPanel = new TextPanel(project);
+        textPanel = new TextPanel(project, ctx);
         layout.setConstraints(textPanel, c);
         add(textPanel);
     }

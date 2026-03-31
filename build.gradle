@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.zt'
-version = '2.9.2'
+version = '2.9.3'
 
 java {
     toolchain {
@@ -32,8 +32,11 @@ intellijPlatform {
 }
 
 patchPluginXml {
-    sinceBuild = '243'
-    untilBuild = ''
+//    sinceBuild = '202.8194.7'
+//    untilBuild = '231.*'
+    sinceBuild = '232.9559.62'
+    untilBuild = '261.22158.277'
+
 }
 
 tasks.named('buildSearchableOptions') {

@@ -4,11 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.jsoneditor.Constant;
-import com.jsoneditor.moddles.ModdleContext;
+import com.jsoneditor.JsonEditorWindow;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,9 +15,10 @@ import org.jetbrains.annotations.NotNull;
  * @Author: zhengt
  * @CreateDate: 2020/8/21 22:12
  */
-public class Reset extends AnAction {
+public class Reset extends BaseAction {
 
-    public Reset() {
+    public Reset(JsonEditorWindow jsonEditor) {
+        super(jsonEditor);
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(AllIcons.Actions.Rollback);
         presentation.setText("reset");
@@ -27,6 +27,6 @@ public class Reset extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Object json = JSON.parse(Constant.TEMP, Feature.OrderedField);
-        ModdleContext.setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+        getCtx().setText(JSON.toJSONString(json, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
     }
 }

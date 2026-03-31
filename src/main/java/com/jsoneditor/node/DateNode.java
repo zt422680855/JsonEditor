@@ -1,5 +1,6 @@
 package com.jsoneditor.node;
 
+import com.intellij.icons.AllIcons;
 import com.jsoneditor.Constant.DateFormat;
 import com.jsoneditor.Utils;
 import icons.Icons;
@@ -62,6 +63,7 @@ public final class DateNode extends LeafNode {
 
     @Override
     public Icon displayIcon() {
+        // return AllIcons.General.History;
         return Icons.DATE;
     }
 

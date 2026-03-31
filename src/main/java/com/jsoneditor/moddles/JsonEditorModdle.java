@@ -14,15 +14,22 @@ public class JsonEditorModdle extends JBPanel {
 
     public JsonEditorModdle parent;
 
+    protected ModdleContext ctx;
+
     public JsonEditorModdle(Project project, JsonEditorModdle parent) {
         this.project = project;
         if (parent != null) {
             this.parent = parent;
+            this.ctx = parent.ctx;
         }
     }
 
     public JsonEditorModdle(Project project) {
         this(project, null);
+    }
+
+    public ModdleContext getCtx() {
+        return this.ctx;
     }
 
 }

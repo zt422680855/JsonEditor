@@ -19,12 +19,9 @@ import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.content.Content;
 import com.jsoneditor.JsonEditorWindow;
-import com.jsoneditor.moddles.ModdleContext;
 import com.jsoneditor.notification.JsonEditorNotifier;
-import icons.Icons;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,26 +47,29 @@ public class CopyToEditor extends AnAction {
             if (project != null) {
                 ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
                 ToolWindow toolWindow = toolWindowManager.getToolWindow("JsonEditor");
-                PsiElement selectElement = psiFile.findElementAt(editor.getCaretModel().getOffset());
-                PsiClass containingClass = PsiTreeUtil.getContextOfType(selectElement, PsiClass.class);
-                if (selectElement != null && containingClass != null) {
-                    String selectText = selectElement.getText();
-                    PsiClass selectClass;
-                    if (selectText.equals(containingClass.getName())) {
-                        selectClass = containingClass;
-                    } else {
-                        selectClass = getPsiClassByShortClassName(selectText, containingClass, project);
-                    }
-                    if (selectClass != null) {
-                        JSONObject object = generateObj(selectClass, project);
-                        Content[] contents = toolWindow.getContentManager().getContents();
-                        Arrays.stream(contents).filter(c -> project.getName().equals(c.getDisplayName())).findFirst().ifPresent(content -> {
-                            ModdleContext.setText(JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
-                            ModdleContext.toRight();
-                            toolWindow.show(null);
-                        });
-                    } else {
-                        JsonEditorNotifier.warning("'" + selectText + "' is not a class or it is not user's class.");
+                if (toolWindow != null) {
+                    PsiElement selectElement = psiFile.findElementAt(editor.getCaretModel().getOffset());
+                    PsiClass containingClass = PsiTreeUtil.getContextOfType(selectElement, PsiClass.class);
+                    if (selectElement != null && containingClass != null) {
+                        String selectText = selectElement.getText();
+                        PsiClass selectClass;
+                        if (selectText.equals(containingClass.getName())) {
+                            selectClass = containingClass;
+                        } else {
+                            selectClass = getPsiClassByShortClassName(selectText, containingClass, project);
+                        }
+                        if (selectClass != null) {
+                            JSONObject object = generateObj(selectClass, project);
+                            Content content = toolWindow.getContentManager().getSelectedContent();
+                            if (content != null) {
+                                JsonEditorWindow window = (JsonEditorWindow) content.getComponent();
+                                window.getCtx().setText(JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+                                window.getCtx().toRight();
+                                toolWindow.show(null);
+                            }
+                        } else {
+                            JsonEditorNotifier.warning("'" + selectText + "' is not a class or it is not user's class.");
+                        }
                     }
                 }
             }
@@ -141,7 +141,17 @@ public class CopyToEditor extends AnAction {
                     obj.put(name, arr);
                 } else if (type instanceof PsiPrimitiveType) {
                     Object value;
-                    if (PsiType.INT.equals(type) || PsiType.LONG.equals(type) ||
+                    if (PsiTypes.intType().equals(type) || PsiTypes.longType().equals(type) ||
+                            PsiTypes.shortType().equals(type) || PsiTypes.byteType().equals(type)) {
+                        value = 0;
+                    } else if (type.equals(PsiTypes.booleanType())) {
+                        value = true;
+                    } else if (PsiTypes.doubleType().equals(type) || PsiTypes.floatType().equals(type)) {
+                        value = 0.0;
+                    } else {
+                        value = typeName;
+                    }
+                    /*if (PsiType.INT.equals(type) || PsiType.LONG.equals(type) ||
                             PsiType.SHORT.equals(type) || PsiType.BYTE.equals(type)) {
                         value = 0;
                     } else if (type.equals(PsiType.BOOLEAN)) {
@@ -150,7 +160,7 @@ public class CopyToEditor extends AnAction {
                         value = 0.0;
                     } else {
                         value = typeName;
-                    }
+                    }*/
                     obj.put(name, value);
                 }
             }

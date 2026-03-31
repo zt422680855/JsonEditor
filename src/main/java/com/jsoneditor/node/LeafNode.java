@@ -1,5 +1,6 @@
 package com.jsoneditor.node;
 
+import com.intellij.icons.AllIcons;
 import icons.Icons;
 
 import javax.swing.*;
@@ -27,7 +28,7 @@ public abstract class LeafNode extends TreeNode {
 
     @Override
     public Icon displayIcon() {
-        return Icons.AUTO;
+        return AllIcons.FileTypes.Any_type;
     }
 
 }

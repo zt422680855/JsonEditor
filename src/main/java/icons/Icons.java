@@ -26,7 +26,7 @@ public interface Icons {
     Icon AUTO = IconLoader.getIcon("/icons/auto.png", Icons.class);
     Icon DATE = IconLoader.getIcon("/icons/date.png", Icons.class);
 
-    Icon FORMAT = IconLoader.getIcon("/icons/format.png", Icons.class);
+    Icon FORMAT = IconLoader.getIcon("/icons/format.svg", Icons.class);
     Icon COMPRESS = IconLoader.getIcon("/icons/compress.png", Icons.class);
 
     Icon SELECT = IconLoader.getIcon("/icons/select.png", Icons.class);

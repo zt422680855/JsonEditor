@@ -31,7 +31,7 @@ import java.util.function.BiConsumer;
  */
 public class AddOrEdit extends JDialog {
 
-    private Project project;
+    private Right right;
 
     private JBLabel typeLabel = new JBLabel("type");
 
@@ -81,8 +81,8 @@ public class AddOrEdit extends JDialog {
 
     private BiConsumer<TreeNode, TreeNode> callback;
 
-    public AddOrEdit(Project project, TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
-        this.project = project;
+    public AddOrEdit(Right right, TreeNode node, Integer opt, BiConsumer<TreeNode, TreeNode> callback) {
+        this.right = right;
         this.selectNode = node;
         this.callback = callback;
         // 1、2、3分别代表新增子节点、新增兄弟节点、编辑节点
@@ -125,7 +125,6 @@ public class AddOrEdit extends JDialog {
                         datePicker.setDateFormat(new SimpleDateFormat(dateNode.format));
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
                 dateFormat.setSelectedItem(dateNode.format);
             } else {
@@ -139,13 +138,17 @@ public class AddOrEdit extends JDialog {
         }
         key.setText(opt != 3 ? "key" : node.key);
         value.setText(opt != 3 ? "value" : node.valueString());
-        openDialog();
+        if (node instanceof DateNode) {
+            openDialog(300, 250);
+        } else {
+            openDialog();
+        }
     }
 
-    private void openDialog() {
+    private void  openDialog(int width, int height) {
         setTitle(title);
-        setSize(300, 200);
-        setLocationRelativeTo(ModdleContext.getParent());
+        setSize(width, height);
+        setLocationRelativeTo(this.right.getParent());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         setModal(true);
@@ -226,6 +229,10 @@ public class AddOrEdit extends JDialog {
         p.add(cancel);
         addListener();
         setVisible(true);
+    }
+
+    private void openDialog() {
+        openDialog(300, 200);
     }
 
     private void addListener() {

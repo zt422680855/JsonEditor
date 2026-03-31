@@ -76,9 +76,9 @@ public class Middle extends JsonEditorModdle {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                Left left = ModdleContext.getLeft();
-                Middle middle = ModdleContext.getMiddle();
-                Right right = ModdleContext.getRight();
+                Left left = ctx.getLeft();
+                Middle middle = ctx.getMiddle();
+                Right right = ctx.getRight();
 
                 int x = e.getX();
                 int offset = x - horizontalPointWhenmousePressed;
@@ -106,13 +106,13 @@ public class Middle extends JsonEditorModdle {
         syncToRight.addActionListener((e) -> {
             try {
                 TreeNode root;
-                Object parse = JSON.parse(ModdleContext.getText(), Feature.OrderedField);
+                Object parse = JSON.parse(ctx.getText(), Feature.OrderedField);
                 root = TreeUtils.getNode("ROOT", parse);
-                ModdleContext.setRoot(root);
+                ctx.setRoot(root);
                 TreeUtils.refreshTree(root);
                 root.updateNode();
-                ModdleContext.expandNode(new TreePath(root.getPath()));
-                ModdleContext.updateTree();
+                ctx.expandNode(new TreePath(root.getPath()));
+                ctx.updateTree();
                 Undo.clear();
             } catch (Exception ex) {
                 JsonEditorNotifier.error("JSON format error.");
@@ -125,9 +125,9 @@ public class Middle extends JsonEditorModdle {
             }
         });
         syncToLeft.addActionListener((e) -> {
-            TreeNode root = ModdleContext.getRoot();
+            TreeNode root = ctx.getRoot();
             TreeUtils.refreshJson(root);
-            ModdleContext.setText(JSON.toJSONString(root.getValue(), SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+            ctx.setText(JSON.toJSONString(root.getValue(), SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
         });
         syncToLeft.addMouseMotionListener(new MouseAdapter() {
             @Override

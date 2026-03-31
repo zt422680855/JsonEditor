@@ -15,40 +15,37 @@ import java.awt.event.ComponentEvent;
  */
 public class JsonEditorWindow extends JsonEditorModdle {
 
-    private Left left;
+    private String title;
 
-    private Middle middle;
+    private final ToolWindow toolWindow;
 
-    private Right right;
-
-    private ToolWindow toolWindow;
-
-    public JsonEditorWindow(Project project, ToolWindow toolWindow) {
+    public JsonEditorWindow(Project project, ToolWindow toolWindow, String title) {
         super(project);
+        this.title = title;
         setLayout(null);
 
         this.project = project;
         this.toolWindow = toolWindow;
 
-        this.left = new Left(project, this);
-        this.middle = new Middle(project, this);
-        this.right = new Right(project, this);
-
-        add(left);
-        add(middle);
-        add(right);
-
-        ModdleContext.addModdles(project, left, middle, right, this);
-        ModdleContext.addListener();
-        ModdleContext.toRight();
+        super.ctx = new ModdleContext();
+        this.ctx.initModdles(project, this);
+        this.ctx.addListener();
+        this.ctx.toRight();
 
         setResizeListener();
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     private void setResizeListener() {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
+                Left left = ctx.getLeft();
+                Middle middle = ctx.getMiddle();
+                Right right = ctx.getRight();
                 int x = getWidth();
                 int y = getHeight();
                 int middleWidth = 30;

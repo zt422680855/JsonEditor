@@ -168,14 +168,14 @@ public class Right extends JsonEditorModdle {
                 if (clickCount == 2) {
                     // 双击叶子节点
                     if (select.isLeaf()) {
-                        new AddOrEdit(project, select, 3, (node, selectNode) -> {
+                        new AddOrEdit(this, select, 3, (node, selectNode) -> {
                             ReplaceEdit action = new ReplaceEdit(tree, node, selectNode, false);
                             action.doAction();
                             Undo.addAction(action);
                         });
                     }
                 } else {
-                    ModdleContext.scrollToText(select.getFullPath());
+                    ctx.scrollToText(select.getFullPath());
                 }
             }
         }
@@ -282,6 +282,7 @@ public class Right extends JsonEditorModdle {
     }
 
     private void initContextMenu() {
+        Right right = this;
         contextMenus.add(addSub);
         contextMenus.add(addSibling);
         contextMenus.add(edit);
@@ -294,7 +295,7 @@ public class Right extends JsonEditorModdle {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(project, select, 1, (node, selectNode) -> {
+                new AddOrEdit(right, select, 1, (node, selectNode) -> {
                     TreeEdit edit;
                     if (selectNode instanceof LeafNode) {
                         TreeNode newSelect = TreeUtils.getNode(selectNode.key, new JSONObject(true));
@@ -313,7 +314,7 @@ public class Right extends JsonEditorModdle {
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
                 TreeNode parent = select.getParent();
-                new AddOrEdit(project, select, 2, (node, selectNode) -> {
+                new AddOrEdit(right, select, 2, (node, selectNode) -> {
                     int index = parent.getIndex(selectNode) + 1;
                     AddEdit edit = new AddEdit(tree, node, parent, index);
                     edit.doAction();
@@ -325,7 +326,7 @@ public class Right extends JsonEditorModdle {
             @Override
             public void mousePressed(MouseEvent e) {
                 TreeNode select = (TreeNode) tree.getLastSelectedPathComponent();
-                new AddOrEdit(project, select, 3, (node, selectNode) -> {
+                new AddOrEdit(right, select, 3, (node, selectNode) -> {
                     boolean keepChildren = false;
                     if (node instanceof ContainerNode) {
                         if (selectNode instanceof ContainerNode) {

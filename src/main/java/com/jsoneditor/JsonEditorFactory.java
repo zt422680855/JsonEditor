@@ -25,17 +25,25 @@ public class JsonEditorFactory implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        SimpleToolWindowPanel panel = getDisplayPanel(project, toolWindow);
+        String title1 = "tab 1", title2 = "tab 2", title3 = "tab 3", title4 = "tab 4", title5 = "tab 5";
         ContentFactory contentFactory = ContentFactory.getInstance();
-        Content content = contentFactory.createContent(panel, project.getName(), false);
+        Content tab1 = contentFactory.createContent(getDisplayPanel(project, toolWindow, title1), title1, false);
+        Content tab2 = contentFactory.createContent(getDisplayPanel(project, toolWindow, title2), title2, false);
+        Content tab3 = contentFactory.createContent(getDisplayPanel(project, toolWindow, title3), title3, false);
+        Content tab4 = contentFactory.createContent(getDisplayPanel(project, toolWindow, title4), title4, false);
+        Content tab5 = contentFactory.createContent(getDisplayPanel(project, toolWindow, title5), title5, false);
         ContentManager contentManager = toolWindow.getContentManager();
-        contentManager.addContent(content);
+        contentManager.addContent(tab1);
+        contentManager.addContent(tab2);
+        contentManager.addContent(tab3);
+        contentManager.addContent(tab4);
+        contentManager.addContent(tab5);
     }
 
-    private SimpleToolWindowPanel getDisplayPanel(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+    private SimpleToolWindowPanel getDisplayPanel(@NotNull Project project, @NotNull ToolWindow toolWindow, String title) {
         SimpleToolWindowPanel content = new SimpleToolWindowPanel(true);
         content.setLayout(new BorderLayout());
-        JsonEditorWindow jsonEditor = new JsonEditorWindow(project, toolWindow);
+        JsonEditorWindow jsonEditor = new JsonEditorWindow(project, toolWindow, title);
         content.add(jsonEditor, BorderLayout.CENTER);
         setToolBar(content, jsonEditor);
         return content;
@@ -43,17 +51,16 @@ public class JsonEditorFactory implements ToolWindowFactory {
 
     private void setToolBar(SimpleToolWindowPanel content, JsonEditorWindow jsonEditor) {
         DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new Format());
-        group.add(new Compress());
-        group.add(new Reset());
+        group.add(new Format(jsonEditor));
+        group.add(new Compress(jsonEditor));
+        group.add(new Reset(jsonEditor));
         group.addSeparator();
-        group.add(new Expand());
-        group.add(new Close());
-        group.add(new Back());
-        group.add(new Forward());
-        group.add(new SwitchView());
+        group.add(new Expand(jsonEditor));
+        group.add(new Close(jsonEditor));
+        group.add(new Back(jsonEditor));
+        group.add(new Forward(jsonEditor));
+        group.add(new SwitchView(jsonEditor));
         group.addSeparator();
-        group.add(new History());
         ActionToolbar toolBar = ActionManager.getInstance().createActionToolbar("jsonEditorToolbar", group, true);
         toolBar.setTargetComponent(jsonEditor);
         content.setToolbar(JBUI.Panels.simplePanel(toolBar.getComponent()));

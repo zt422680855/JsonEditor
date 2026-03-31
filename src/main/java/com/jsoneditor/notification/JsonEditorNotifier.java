@@ -1,10 +1,7 @@
 package com.jsoneditor.notification;
 
 import com.intellij.codeInsight.hint.HintManager;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
-import com.intellij.notification.NotificationGroup;
-import com.intellij.notification.NotificationType;
+import com.intellij.notification.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.ScrollingModel;
@@ -15,12 +12,6 @@ import com.intellij.openapi.editor.ScrollingModel;
  * @CreateDate: 2020/9/12 22:56
  */
 public class JsonEditorNotifier {
-
-    private static final NotificationGroup NOTIFICATION_GROUP;
-
-    static {
-        NOTIFICATION_GROUP = new NotificationGroup("JsonEditorNotificationGroup", NotificationDisplayType.BALLOON, false);
-    }
 
     public static void info(String content) {
         notify(content, NotificationType.INFORMATION);
@@ -35,8 +26,13 @@ public class JsonEditorNotifier {
     }
 
     private static void notify(String content, NotificationType notificationType) {
-        Notification notification = NOTIFICATION_GROUP.createNotification("JsonEditor Tip", content, notificationType, null);
-        notification.notify(null);
+        // Notification notification = NOTIFICATION_GROUP.createNotification("JsonEditor Tip", content, notificationType, null);
+        // notification.notify(null);
+
+        NotificationGroupManager.getInstance()
+                .getNotificationGroup("JsonEditorNotificationGroup")
+                .createNotification("JsonEditor Tip", content, notificationType)
+                .notify(null);
     }
 
     public static void hintInfo(Editor editor, String message) {
@@ -48,7 +44,7 @@ public class JsonEditorNotifier {
     }
 
     public static void hintError(Editor editor, String message) {
-        if (message != null && !"".equals(message.trim())) {
+        if (message != null && !message.trim().isEmpty()) {
             ScrollingModel scrollingModel = editor.getScrollingModel();
             scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE);
             HintManager.getInstance().showErrorHint(editor, message);
