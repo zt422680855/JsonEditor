@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.zt'
-version = '2.9.4'
+version = '2.9.5'
 
 java {
     toolchain {
@@ -13,6 +13,8 @@ java {
 }
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/central' }
+    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
     intellijPlatform {
         defaultRepositories()
@@ -29,6 +31,42 @@ dependencies {
 
 intellijPlatform {
     instrumentCode = false
+
+    publishing {
+        token = providers.environmentVariable('PUBLISH_TOKEN')
+                .orElse(providers.gradleProperty('publishToken'))
+                .getOrElse('')
+        channels = ['default']
+    }
+
+    pluginConfiguration {
+        id = 'com.zt.json-editor'
+        name = 'JSON Editor'
+        version = project.version
+        description = '''Fix compatibility issues with IDEA 2023.x-2026.x and supports multiple editors.'''
+        changeNotes = provider {
+            """
+            <h3>2.9.5</h3>
+            <ul>
+                <li>Fix compatibility issues with IDEA 2023.x-2026.x</li>
+                <li>Optimize JSON language registration</li>
+            </ul>
+            """
+        }
+        ideaVersion {
+            sinceBuild = '231.8109.175'
+            untilBuild = '253.*'
+        }
+    }
+
+    pluginVerification {
+        ides {
+            ide("IC", "2024.3")
+            ide("IC", "2025.1")
+            ide("IC", "2025.2")
+        }
+    }
+
 }
 
 patchPluginXml {
@@ -41,4 +79,14 @@ patchPluginXml {
 
 tasks.named('buildSearchableOptions') {
     enabled = false
+}
+
+tasks.register('validatePluginConfiguration') {
+    doLast {
+        println "Plugin ID: ${intellijPlatform.pluginConfiguration.id.get()}"
+        println "Plugin Name: ${intellijPlatform.pluginConfiguration.name.get()}"
+        println "Version: ${project.version}"
+        println "Since Build: ${intellijPlatform.pluginConfiguration.ideaVersion.sinceBuild.get()}"
+        println "Until Build: ${intellijPlatform.pluginConfiguration.ideaVersion.untilBuild.get()}"
+    }
 }
