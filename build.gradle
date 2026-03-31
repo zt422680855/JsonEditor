@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.zt'
-version = '2.9.3'
+version = '2.9.4'
 
 java {
     toolchain {
@@ -34,7 +34,7 @@ intellijPlatform {
 patchPluginXml {
 //    sinceBuild = '202.8194.7'
 //    untilBuild = '231.*'
-    sinceBuild = '232.9559.62'
+    sinceBuild = '231.8109.175'
     untilBuild = '261.22158.277'
 
 }

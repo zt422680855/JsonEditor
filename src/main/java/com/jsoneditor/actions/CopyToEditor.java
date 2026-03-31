@@ -62,10 +62,19 @@ public class CopyToEditor extends AnAction {
                             JSONObject object = generateObj(selectClass, project);
                             Content content = toolWindow.getContentManager().getSelectedContent();
                             if (content != null) {
-                                JsonEditorWindow window = (JsonEditorWindow) content.getComponent();
+                                JsonEditorWindow window = (JsonEditorWindow) content.getComponent().getComponent(0);
                                 window.getCtx().setText(JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
                                 window.getCtx().toRight();
                                 toolWindow.show(null);
+                            } else {
+                                Content[] contents = toolWindow.getContentManager().getContents();
+                                if (contents.length > 0) {
+                                    content = contents[0];
+                                    JsonEditorWindow window = (JsonEditorWindow) content.getComponent().getComponent(0);
+                                    window.getCtx().setText(JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue));
+                                    window.getCtx().toRight();
+                                    toolWindow.show(null);
+                                }
                             }
                         } else {
                             JsonEditorNotifier.warning("'" + selectText + "' is not a class or it is not user's class.");
